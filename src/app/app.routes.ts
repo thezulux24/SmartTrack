@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { privateGuard, publicGuard } from './shared/guards/auth.guard';
+import { clientGuard, internalGuard } from './shared/guards/role.guard';
 
 export const routes: Routes = [
     {
@@ -9,12 +10,12 @@ export const routes: Routes = [
     },
     {
         path: 'client',
-        canActivate: [privateGuard],
+        canActivate: [privateGuard, clientGuard],
         loadChildren: () => import('./features/client/client-shell/client-routing').then(m => m.default)
     },
     {
         path: 'internal',
-        canActivate: [privateGuard],
+        canActivate: [privateGuard, internalGuard],
         loadChildren: () => import('./features/internal/internal-shell/internal-routing').then(m => m.default)
     },
     {
