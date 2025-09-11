@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-      "deploy": "ng deploy --base-href=https://thezulux24.github.io/SmartTrack/"
+    "deploy": "ng deploy --base-href=https://thezulux24.github.io/SmartTrack/"
 
     
   },

@@ -8,25 +8,99 @@
     <p class="text-sm text-gray-600 dark:text-gray-300">Implantes médico - Quirúrgicos</p>
   </div>
 
-  <!-- Caja con botones -->
-  <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+  <!-- Loading state -->
+  <div *ngIf="loading" class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+    <div class="p-6 space-y-4 md:space-y-6 sm:p-8 text-center">
+      <div class="animate-pulse">
+        <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+        <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+      </div>
+      <p class="text-sm text-gray-500">Cargando información del usuario...</p>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!loading && error" class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+    <div class="p-6 space-y-4 md:space-y-6 sm:p-8 text-center">
+      <div class="text-red-600 dark:text-red-400">
+        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+        <p class="text-sm">{{ error }}</p>
+      </div>
+      <button type="button" (click)="logout()"
+              class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none 
+                     focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
+                     dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+        Volver al login
+      </button>
+    </div>
+  </div>
+
+  <!-- Success state - Usuario cargado -->
+  <div *ngIf="!loading && !error && userProfile" class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
     <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
 
-      <!-- Botón Continuar -->
-      <button type="button"
-              class="w-full text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
-                     focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
-                     dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500 mb-3">
-        Continuar
-      </button>
+      <!-- Información del usuario -->
+      <div class="text-center border-b pb-4 mb-4">
+        <div class="w-16 h-16 bg-gradient-to-r from-lime-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+          <span class="text-white text-xl font-bold">{{ displayName.charAt(0).toUpperCase() }}</span>
+        </div>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ displayName }}</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-300">{{ userProfile.email }}</p>
+        
+        <!-- Role badge -->
+        <div class="mt-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [ngClass]="{
+                  'bg-blue-100 text-blue-800': userProfile.role === 'comercial',
+                  'bg-green-100 text-green-800': userProfile.role === 'soporte_tecnico',
+                  'bg-yellow-100 text-yellow-800': userProfile.role === 'logistica',
+                  'bg-purple-100 text-purple-800': userProfile.role === 'admin',
+                  'bg-gray-100 text-gray-800': userProfile.role === 'client'
+                }">
+            {{ roleDisplayName }}
+          </span>
+        </div>
 
-      <!-- Botón Cerrar sesión -->
-      <button type="button" (click)="logout()"
-              class="w-full text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none 
-                     focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
-                     dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-        Cerrar sesión
-      </button>
+        <!-- Organización -->
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ organizationName }}</p>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="space-y-2 text-sm">
+        <div *ngIf="userProfile.area" class="flex justify-between">
+          <span class="text-gray-600 dark:text-gray-300">Área:</span>
+          <span class="text-gray-900 dark:text-white capitalize">{{ userProfile.area }}</span>
+        </div>
+        <div *ngIf="userProfile.phone" class="flex justify-between">
+          <span class="text-gray-600 dark:text-gray-300">Teléfono:</span>
+          <span class="text-gray-900 dark:text-white">{{ userProfile.phone }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-600 dark:text-gray-300">Estado:</span>
+          <span class="text-green-600 dark:text-green-400">{{ userProfile.is_active ? 'Activo' : 'Inactivo' }}</span>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="space-y-3 pt-4">
+        <!-- Botón Continuar -->
+        <button type="button" (click)="acceder()"
+                class="w-full text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
+                       focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
+                       dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500">
+          Acceder al Sistema
+        </button>
+
+        <!-- Botón Cerrar sesión -->
+        <button type="button" (click)="logout()"
+                class="w-full text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none 
+                       focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
+                       dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+          Cerrar sesión
+        </button>
+      </div>
 
     </div>
   </div>

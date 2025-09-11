@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WelcomeShellComponent } from './welcome-shell.component';
+import { ClientHomeComponent } from './client-home.component';
 
-describe('WelcomeShellComponent', () => {
-  let component: WelcomeShellComponent;
-  let fixture: ComponentFixture<WelcomeShellComponent>;
+describe('ClientHomeComponent', () => {
+  let component: ClientHomeComponent;
+  let fixture: ComponentFixture<ClientHomeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WelcomeShellComponent]
+      imports: [ClientHomeComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(WelcomeShellComponent);
+    fixture = TestBed.createComponent(ClientHomeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
