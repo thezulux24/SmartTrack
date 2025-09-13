@@ -1,1 +1,0 @@
-import"./chunk-FK42CRUA.js";var o=[{path:"sign-up",loadComponent:()=>import("./chunk-VHCXGMI5.js")},{path:"log-in",loadComponent:()=>import("./chunk-ETYPDQ4R.js")},{path:"**",redirectTo:"log-in"}];export{o as default};
