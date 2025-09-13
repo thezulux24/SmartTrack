@@ -6,6 +6,11 @@ export default [
     loadComponent: () => import('../internal-home/internal-home.component')
   },
 
+      {
+        path: 'inventario',
+        loadChildren: () => import('../inventario/inventario-routing'),
+    },
+
     {
         path: '**', redirectTo: ''
     }

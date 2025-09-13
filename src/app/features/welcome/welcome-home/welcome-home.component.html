@@ -1,7 +1,9 @@
 <section class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center px-6 py-8 mx-auto">
   <!-- Logo y título -->
   <div class="flex flex-col items-center mb-6">
-    <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Bienvenido a</h1>
+    <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+      {{ showProfileForm ? 'Completar Perfil' : 'Bienvenido a' }}
+    </h1>
     <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
          alt="Implameq Logo" 
          class="w-48 mb-2">
@@ -37,8 +39,113 @@
     </div>
   </div>
 
-  <!-- Success state - Usuario cargado -->
-  <div *ngIf="!loading && !error && userProfile" class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+  <!-- Formulario de completar perfil -->
+  <div *ngIf="!loading && !error && showProfileForm" class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white text-center">
+        Completa tu perfil para continuar
+      </h2>
+      
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="space-y-4">
+        
+        <!-- Nombre completo -->
+        <div>
+          <label for="full_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Nombre completo *
+          </label>
+          <input 
+            type="text" 
+            id="full_name" 
+            formControlName="full_name"
+            placeholder="Ingresa tu nombre completo"
+            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                   focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+                   dark:focus:ring-lime-400 dark:focus:border-lime-400"
+            [class.border-red-500]="profileForm.get('full_name')?.invalid && profileForm.get('full_name')?.touched">
+          <div *ngIf="profileForm.get('full_name')?.invalid && profileForm.get('full_name')?.touched" 
+               class="text-red-500 text-xs mt-1">
+            El nombre es requerido (mínimo 2 caracteres)
+          </div>
+        </div>
+
+        <!-- Rol -->
+        <div>
+          <label for="role" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Área de trabajo *
+          </label>
+          <select 
+            id="role" 
+            formControlName="role"
+            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                   focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+                   dark:focus:ring-lime-400 dark:focus:border-lime-400"
+            [class.border-red-500]="profileForm.get('role')?.invalid && profileForm.get('role')?.touched">
+            <option value="">Selecciona tu área</option>
+            <option *ngFor="let option of roleOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+          <div *ngIf="profileForm.get('role')?.invalid && profileForm.get('role')?.touched" 
+               class="text-red-500 text-xs mt-1">
+            Debes seleccionar un área de trabajo
+          </div>
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Teléfono (opcional)
+          </label>
+          <input 
+            type="tel" 
+            id="phone" 
+            formControlName="phone"
+            placeholder="+57 300 123 4567"
+            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                   focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+                   dark:focus:ring-lime-400 dark:focus:border-lime-400"
+            [class.border-red-500]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched">
+          <div *ngIf="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched" 
+               class="text-red-500 text-xs mt-1">
+            Formato de teléfono inválido
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="space-y-3 pt-2">
+          <button type="submit" 
+                  [disabled]="savingProfile"
+                  class="w-full text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
+                         focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
+                         dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500
+                         disabled:opacity-50 disabled:cursor-not-allowed">
+            <span *ngIf="!savingProfile">Crear Perfil</span>
+            <span *ngIf="savingProfile" class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Creando perfil...
+            </span>
+          </button>
+
+          <button type="button" (click)="logout()"
+                  class="w-full text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none 
+                         focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
+                         dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+            Cerrar sesión
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Usuario con perfil completo -->
+  <div *ngIf="!loading && !error && !showProfileForm && userProfile" class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
     <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
 
       <!-- Información del usuario -->
@@ -56,15 +163,14 @@
                   'bg-blue-100 text-blue-800': userProfile.role === 'comercial',
                   'bg-green-100 text-green-800': userProfile.role === 'soporte_tecnico',
                   'bg-yellow-100 text-yellow-800': userProfile.role === 'logistica',
-                  'bg-purple-100 text-purple-800': userProfile.role === 'admin',
-                  'bg-gray-100 text-gray-800': userProfile.role === 'client'
+                  'bg-purple-100 text-purple-800': userProfile.role === 'admin'
                 }">
             {{ roleDisplayName }}
           </span>
         </div>
 
         <!-- Organización -->
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ organizationName }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Implameq S.A.S.</p>
       </div>
 
       <!-- Información adicional -->

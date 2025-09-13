@@ -21,4 +21,6 @@ export default class InternalHomeComponent implements OnInit {
     await this._authService.logOut();
     this._router.navigate(['/auth/log-in']);
   }
+
+
 }
