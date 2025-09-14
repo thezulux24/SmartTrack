@@ -22,5 +22,12 @@ export default class InternalHomeComponent implements OnInit {
     this._router.navigate(['/auth/log-in']);
   }
 
+  async navigateToAgenda() {
+    this._router.navigate(['/agenda']);
+  }
+
+  async navigateToInventario() {
+    this._router.navigate(['/inventario']);
+  }
 
 }
