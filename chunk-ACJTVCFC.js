@@ -1,1 +1,0 @@
-import"./chunk-FK42CRUA.js";var o=[{path:"",loadComponent:()=>import("./chunk-G33LKH52.js")},{path:"inventario",loadChildren:()=>import("./chunk-XZQRBDO6.js")},{path:"**",redirectTo:""}];export{o as default};

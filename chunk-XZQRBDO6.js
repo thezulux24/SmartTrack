@@ -1,1 +1,0 @@
-import"./chunk-FK42CRUA.js";var o=[{path:"",loadComponent:()=>import("./chunk-ZJXGBHXN.js")},{path:"movimientos",loadComponent:()=>import("./chunk-OTSJZSP3.js")},{path:"**",redirectTo:""}];export{o as default};
