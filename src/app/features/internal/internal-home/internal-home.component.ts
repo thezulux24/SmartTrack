@@ -1,11 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router'; 
+
 import { Router } from '@angular/router';
 import { AuthService } from '../../../auth/data-access/auth.service';
 
 @Component({
   selector: 'app-internal-home',
-  imports: [CommonModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './internal-home.component.html',
   styleUrl: './internal-home.component.css'
 })

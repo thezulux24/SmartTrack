@@ -1,1 +1,298 @@
-<p>agenda-list works!</p>
+<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+  <!-- Header mejorado para móvil -->
+  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
+    <div class="px-4 py-4">
+      <!-- Top bar con logo y navegación -->
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center space-x-3">
+          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+               alt="Implameq" class="h-8 brightness-0 invert">
+          <span class="text-lg font-semibold">Agenda Cirugías</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button [routerLink]="['/internal/agenda/calendario']" 
+                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
+            📅 Calendario
+          </button>
+          <button [routerLink]="['/internal']" 
+                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
+            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Volver
+          </button>
+        </div>
+      </div>
+      
+      <!-- Título principal -->
+      <div class="text-center">
+        <h1 class="text-2xl font-bold mb-1">Gestión de Cirugías</h1>
+        <p class="text-green-100 text-sm">Programa y gestiona las cirugías programadas</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  <div *ngIf="loading()" class="px-4 py-6">
+    <div class="max-w-lg mx-auto">
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
+        <div class="animate-pulse space-y-4">
+          <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+          <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+          <div class="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
+        </div>
+        <p class="text-sm text-gray-500 mt-4">Cargando cirugías...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!loading() && error()" class="px-4 py-6">
+    <div class="max-w-lg mx-auto">
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
+        <div class="text-red-600 dark:text-red-400">
+          <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+            </path>
+          </svg>
+          <p class="text-sm">{{ error() }}</p>
+        </div>
+        <button type="button" (click)="loadData()"
+                class="mt-4 w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none 
+                       focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+          Reintentar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main *ngIf="!loading() && !error()" class="px-4 py-6">
+    <!-- KPIs rápidos optimizados para móvil -->
+    <div class="max-w-lg mx-auto grid grid-cols-2 gap-3 mb-6">
+      
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-lime-400 to-lime-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xl font-bold text-gray-900 dark:text-white">{{ cirugiasProgramadas() }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300">Programadas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xl font-bold text-gray-900 dark:text-white">{{ cirugiasCurso() }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300">En Curso</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xl font-bold text-gray-900 dark:text-white">{{ cirugiasFcompletadas() }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300">Completadas</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-xl font-bold text-gray-900 dark:text-white">{{ cirugiaUrgencia() }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-300">Urgencias</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Botón nueva cirugía destacado -->
+    <div class="max-w-lg mx-auto mb-6">
+      <button [routerLink]="['/internal/agenda/nueva']"
+              class="w-full bg-gradient-to-r from-lime-400 to-green-500 hover:from-lime-500 hover:to-green-600 
+                     text-white px-6 py-4 rounded-xl font-medium shadow-lg transition-all duration-200 
+                     flex items-center justify-center space-x-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span class="text-lg">Nueva Cirugía</span>
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="max-w-lg mx-auto mb-6">
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filtros</h3>
+        <div class="space-y-4">
+          <!-- Búsqueda -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
+            <input type="text" 
+                   [value]="searchTerm()"
+                   (input)="onSearchChange($event)"
+                   placeholder="Paciente, hospital, médico..."
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 
+                          focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+
+          <!-- Estado -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estado</label>
+            <select [value]="selectedEstado()"
+                    (change)="onEstadoChange($event)"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 
+                           focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="">Todos los estados</option>
+              <option value="programada">Programada</option>
+              <option value="en_curso">En Curso</option>
+              <option value="completada">Completada</option>
+              <option value="cancelada">Cancelada</option>
+              <option value="urgencia">Urgencia</option>
+            </select>
+          </div>
+
+          <!-- Fecha -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fecha</label>
+            <input type="date" 
+                   [value]="selectedFecha()"
+                   (change)="onFechaChange($event)"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 
+                          focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de cirugías optimizada para móvil -->
+    <div class="max-w-lg mx-auto space-y-4">
+      <div *ngFor="let cirugia of filteredCirugias()" 
+           class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 
+                  hover:shadow-lg transition-all duration-200 border border-gray-100">
+        
+        <!-- Header de la cirugía -->
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex justify-between items-start gap-3">
+            <div class="flex-1">
+              <div class="flex items-center space-x-2 mb-2">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ cirugia.numero_cirugia }}</h3>
+                <span [class]="getEstadoBadgeClass(cirugia.estado)" 
+                      class="px-2 py-1 rounded-full text-xs font-medium">
+                  {{ getEstadoLabel(cirugia.estado) }}
+                </span>
+              </div>
+              <p class="text-gray-600 dark:text-gray-300 font-medium">{{ cirugia.paciente_nombre }}</p>
+              <div class="flex items-center space-x-1 mt-2">
+                <span [class]="getPrioridadBadgeClass(cirugia.prioridad)" 
+                      class="px-2 py-1 rounded-full text-xs font-medium">
+                  {{ getPrioridadLabel(cirugia.prioridad) }}
+                </span>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatFecha(cirugia.fecha_programada) }}</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white" *ngIf="cirugia.hora_inicio">
+                {{ cirugia.hora_inicio }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido de la cirugía -->
+        <div class="p-4 space-y-3">
+          <!-- Información principal -->
+          <div class="space-y-2">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Hospital</p>
+              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ cirugia.hospital }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Médico Cirujano</p>
+              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ cirugia.medico_cirujano }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Tipo de Cirugía</p>
+              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ cirugia.tipo_cirugia }}</p>
+            </div>
+            <div *ngIf="cirugia.tecnico_asignado">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Técnico Asignado</p>
+              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ cirugia.tecnico_asignado.full_name }}</p>
+            </div>
+          </div>
+
+          <!-- Notas si existen -->
+          <div *ngIf="cirugia.notas" class="border-t border-gray-200 dark:border-gray-700 pt-3">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Notas</p>
+            <p class="text-gray-700 dark:text-gray-300 text-sm">{{ cirugia.notas }}</p>
+          </div>
+
+          <!-- Acciones optimizadas para móvil -->
+          <div class="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <button [routerLink]="['/internal/agenda/detalle', cirugia.id]"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 
+                           rounded-lg text-sm font-medium transition duration-200">
+              Ver Detalle Completo
+            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button [routerLink]="['/internal/agenda/editar', cirugia.id]"
+                      class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 
+                             rounded-lg text-sm font-medium transition duration-200">
+                Editar
+              </button>
+              <button (click)="cambiarEstado(cirugia)"
+                      [disabled]="cirugia.estado === 'completada' || cirugia.estado === 'cancelada'"
+                      class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 
+                             disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm 
+                             font-medium transition duration-200">
+                Cambiar Estado
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin resultados -->
+    <div *ngIf="filteredCirugias().length === 0" class="max-w-lg mx-auto">
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-8 text-center">
+        <div class="text-gray-400 dark:text-gray-500">
+          <div class="text-4xl mb-4">🗓️</div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No se encontraron cirugías</h3>
+          <p class="text-gray-500 dark:text-gray-400 mb-4">Intenta ajustar los filtros de búsqueda</p>
+          <button [routerLink]="['/internal/agenda/nueva']"
+                  class="bg-gradient-to-r from-lime-400 to-green-500 hover:from-lime-500 hover:to-green-600 
+                         text-white px-6 py-2.5 rounded-lg font-medium shadow-lg transition-all duration-200">
+            Programar Primera Cirugía
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom spacing para móvil -->
+    <div class="h-6"></div>
+  </main>
+</section>

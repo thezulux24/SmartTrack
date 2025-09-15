@@ -205,6 +205,15 @@ export class SupabaseService {
     return data;
   }
 
+
+    async getCurrentUserId(): Promise<string | null> {
+    const { data } = await this.client.auth.getUser();
+    return data.user?.id ?? null;
+  }
+
+
+  
+
   async getMovimientos(): Promise<MovimientoInventario[]> {
     const { data, error } = await this.supabaseClient
       .from('movimientos_inventario')
@@ -219,4 +228,7 @@ export class SupabaseService {
     if (error) throw error;
     return data || [];
   }
+
+
+  
 }

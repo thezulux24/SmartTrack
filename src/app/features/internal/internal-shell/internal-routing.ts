@@ -11,6 +11,11 @@ export default [
         loadChildren: () => import('../inventario/inventario-routing'),
     },
 
+      {
+    path: 'agenda',
+    loadChildren: () => import('../agenda/agenda-routing').then(m => m.AGENDA_ROUTES)
+  },
+
     {
         path: '**', redirectTo: ''
     }
