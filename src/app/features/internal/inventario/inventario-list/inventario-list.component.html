@@ -157,9 +157,10 @@
           <!-- Stock por ubicación -->
           <div *ngIf="producto.inventario?.length > 0" class="border-t pt-3">
             <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">Stock por ubicación:</div>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-1 gap-2">
               <div *ngFor="let inv of producto.inventario" class="flex justify-between text-sm">
-                <span class="text-gray-600 dark:text-gray-400">{{ inv.ubicacion | titlecase }}</span>
+                <!-- ✅ Usar función de formateo -->
+                <span class="text-gray-600 dark:text-gray-400">{{ formatUbicacion(inv.ubicacion) }}</span>
                 <span [class]="inv.cantidad > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'">
                   {{ inv.cantidad }}
                 </span>
@@ -251,9 +252,39 @@
                            focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
                            dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
                            dark:focus:ring-lime-400 dark:focus:border-lime-400">
-              <option *ngFor="let ub of ubicaciones" [value]="ub">
-                {{ ub | titlecase }}
-              </option>
+              
+              <!-- ✅ Opciones organizadas -->
+              <optgroup label="🏢 Sedes Principales">
+                <option value="sede_principal_norte">Sede Principal Norte</option>
+                <option value="sede_principal_sur">Sede Principal Sur</option>
+              </optgroup>
+
+              <optgroup label="🏬 Sedes Secundarias">
+                <option value="sede_secundaria_este">Sede Secundaria Este</option>
+                <option value="sede_secundaria_oeste">Sede Secundaria Oeste</option>
+              </optgroup>
+
+              <optgroup label="📦 Bodegas">
+                <option value="bodega_central">Bodega Central</option>
+                <option value="bodega_norte">Bodega Norte</option>
+                <option value="bodega_sur">Bodega Sur</option>
+              </optgroup>
+
+              <optgroup label="🏥 Quirófanos">
+                <option value="quirofano_sede_norte_1">Quirófano Norte 1</option>
+                <option value="quirofano_sede_norte_2">Quirófano Norte 2</option>
+                <option value="quirofano_sede_sur_1">Quirófano Sur 1</option>
+                <option value="quirofano_sede_sur_2">Quirófano Sur 2</option>
+              </optgroup>
+
+              <optgroup label="🚨 Emergencias">
+                <option value="emergencia_norte">Emergencia Norte</option>
+                <option value="emergencia_sur">Emergencia Sur</option>
+              </optgroup>
+
+              <optgroup label="⚡ Áreas Especiales">
+                <option value="esterilizacion_central">Esterilización Central</option>
+              </optgroup>
             </select>
           </div>
 

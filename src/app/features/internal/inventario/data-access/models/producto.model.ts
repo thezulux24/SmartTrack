@@ -9,7 +9,7 @@ export interface Producto {
   stock_total: number;
   unidad_medida: string;
   proveedor?: string;
-  ubicacion_principal?: string;
+  ubicacion_principal?: string; // ✅ Ahora será sede_principal_norte, etc.
   es_activo: boolean;
   notas?: string;
   created_at: string;
@@ -22,7 +22,7 @@ export interface Producto {
 export interface InventarioDetalle {
   id: string;
   producto_id: string;
-  ubicacion: 'bodega' | 'quirofano_1' | 'quirofano_2' | 'quirofano_3' | 'emergencia' | 'esterilizacion';
+  ubicacion: string; // ✅ Ubicaciones por sede
   cantidad: number;
   lote?: string;
   fecha_vencimiento?: string;

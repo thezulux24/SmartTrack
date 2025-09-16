@@ -44,10 +44,22 @@ export default class InventarioListComponent implements OnInit {
     'fijacion_externa'
   ];
 
+  // ✅ Actualizar ubicaciones por defecto
   ubicaciones = [
-    'sede_principal',
-    'sede_norte',
-    'almacen_central'
+    'sede_principal_norte',
+    'sede_principal_sur', 
+    'sede_secundaria_este',
+    'sede_secundaria_oeste',
+    'bodega_central',
+    'bodega_norte',
+    'bodega_sur',
+    'quirofano_sede_norte_1',
+    'quirofano_sede_norte_2',
+    'quirofano_sede_sur_1',
+    'quirofano_sede_sur_2',
+    'emergencia_norte',
+    'emergencia_sur',
+    'esterilizacion_central'
   ];
 
   async ngOnInit(): Promise<void> {
@@ -241,5 +253,27 @@ export default class InventarioListComponent implements OnInit {
     if (producto.stock_total === 0) return '❌';
     if (producto.stock_bajo) return '⚠️';
     return '✅';
+  }
+
+  // ✅ Función para formatear nombres de ubicación
+  formatUbicacion(ubicacion: string): string {
+    const ubicacionesMap: { [key: string]: string } = {
+      'sede_principal_norte': 'Sede Principal Norte',
+      'sede_principal_sur': 'Sede Principal Sur',
+      'sede_secundaria_este': 'Sede Secundaria Este',
+      'sede_secundaria_oeste': 'Sede Secundaria Oeste',
+      'bodega_central': 'Bodega Central',
+      'bodega_norte': 'Bodega Norte',
+      'bodega_sur': 'Bodega Sur',
+      'quirofano_sede_norte_1': 'Quirófano Norte 1',
+      'quirofano_sede_norte_2': 'Quirófano Norte 2',
+      'quirofano_sede_sur_1': 'Quirófano Sur 1',
+      'quirofano_sede_sur_2': 'Quirófano Sur 2',
+      'emergencia_norte': 'Emergencia Norte',
+      'emergencia_sur': 'Emergencia Sur',
+      'esterilizacion_central': 'Esterilización Central'
+    };
+    
+    return ubicacionesMap[ubicacion] || ubicacion;
   }
 }

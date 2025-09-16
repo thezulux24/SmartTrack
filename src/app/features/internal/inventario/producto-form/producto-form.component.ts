@@ -36,14 +36,12 @@ export class ProductoFormComponent implements OnInit {
     stock_minimo: [1, [Validators.required, Validators.min(0)]],
     unidad_medida: ['unidad', Validators.required],
     proveedor: [''],
-    ubicacion_principal: ['bodega'],
+    ubicacion_principal: ['bodega_central'], // ✅ Cambiar default
     notas: ['']
   });
 
-  // Opciones
-  categorias = this.productosService.getCategorias();
-  ubicaciones = this.productosService.getUbicaciones();
-  unidadesMedida = this.productosService.getUnidadesMedida();
+  // ✅ Opciones organizadas
+  ubicacionesOrganizadas = this.productosService.getUbicacionesOrganizadas();
 
   // Opciones con labels
   categoriasOptions = [

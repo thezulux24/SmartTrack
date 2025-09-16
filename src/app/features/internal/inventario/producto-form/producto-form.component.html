@@ -286,9 +286,48 @@
                                focus:ring-lime-500 focus:border-lime-500 block w-full p-3
                                dark:bg-gray-700 dark:border-gray-600 dark:text-white 
                                dark:focus:ring-lime-500 dark:focus:border-lime-500">
-                  @for (ubicacion of ubicacionesOptions; track ubicacion.value) {
-                    <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
-                  }
+                  
+                  <!-- ✅ Sedes Principales -->
+                  <optgroup label="🏢 Sedes Principales">
+                    @for (ubicacion of ubicacionesOrganizadas.sedes_principales; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <!-- ✅ Sedes Secundarias -->
+                  <optgroup label="🏬 Sedes Secundarias">
+                    @for (ubicacion of ubicacionesOrganizadas.sedes_secundarias; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <!-- ✅ Bodegas -->
+                  <optgroup label="📦 Bodegas">
+                    @for (ubicacion of ubicacionesOrganizadas.bodegas; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <!-- ✅ Quirófanos -->
+                  <optgroup label="🏥 Quirófanos">
+                    @for (ubicacion of ubicacionesOrganizadas.quirofanos; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <!-- ✅ Emergencias -->
+                  <optgroup label="🚨 Emergencias">
+                    @for (ubicacion of ubicacionesOrganizadas.emergencias; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <!-- ✅ Especiales -->
+                  <optgroup label="⚡ Áreas Especiales">
+                    @for (ubicacion of ubicacionesOrganizadas.especiales; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
                 </select>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Ubicación donde se almacenará principalmente este producto.
