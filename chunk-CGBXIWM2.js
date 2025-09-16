@@ -1,1 +1,0 @@
-import{Ca as a,Ua as t,Va as o,bb as r}from"./chunk-L6U4RGVI.js";import"./chunk-FK42CRUA.js";var d=class n{static \u0275fac=function(e){return new(e||n)};static \u0275cmp=a({type:n,selectors:[["app-agenda-calendar"]],decls:2,vars:0,template:function(e,c){e&1&&(t(0,"p"),r(1,"agenda-calendar works!"),o())},encapsulation:2})};export{d as AgendaCalendarComponent};
