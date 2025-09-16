@@ -1,0 +1,44 @@
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Animación del spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Mejoras para campos inválidos */
+.border-red-500:focus {
+  --tw-ring-color: rgb(239 68 68);
+  border-color: rgb(239 68 68);
+}
+
+/* Transiciones suaves */
+input, select, textarea {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Hover effects para botones */
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease-in-out;
+}
+
+button:disabled {
+  transform: none;
+}
