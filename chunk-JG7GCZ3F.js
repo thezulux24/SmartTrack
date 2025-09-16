@@ -1,1 +1,0 @@
-import"./chunk-FK42CRUA.js";var o=[{path:"",loadComponent:()=>import("./chunk-LMVDZL2L.js")},{path:"inventario",loadChildren:()=>import("./chunk-AG2JAJBK.js")},{path:"agenda",loadChildren:()=>import("./chunk-XZFGRRSY.js").then(t=>t.AGENDA_ROUTES)},{path:"**",redirectTo:""}];export{o as default};
