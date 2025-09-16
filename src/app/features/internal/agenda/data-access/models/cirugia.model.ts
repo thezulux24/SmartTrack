@@ -1,4 +1,5 @@
 import { Producto, Profile } from "./index";
+import { TecnicoAsignado } from "./agenda-tecnico.model";
 import { Hospital } from "./hospital.model";
 import { TipoCirugia } from "./tipo-cirugia.model";
 
@@ -8,11 +9,16 @@ export interface Cirugia {
   paciente_nombre: string;
   paciente_documento?: string;
   paciente_telefono?: string;
-  hospital: string;
-  hospital_id?: string;
+  
+  // FK - Referencias reales
+  hospital_id: string;
+  tipo_cirugia_id: string;
+  
+  // Campos de texto (legacy/temporal)
+  hospital?: string;
+  tipo_cirugia?: string;
+  
   medico_cirujano: string;
-  tipo_cirugia: string;
-  tipo_cirugia_id?: string;
   fecha_programada: string;
   hora_inicio?: string;
   duracion_estimada?: number;
@@ -24,22 +30,20 @@ export interface Cirugia {
   created_at: string;
   updated_at: string;
   
-  // Relaciones
+  // Relaciones expandidas
+  tecnico_asignado?: TecnicoAsignado;
   hospital_data?: Hospital;
   tipo_cirugia_data?: TipoCirugia;
-  tecnico_asignado?: Profile;
-  productos?: CirugiaProducto[];
 }
 
 export interface CirugiaCreate {
+  numero_cirugia: string;
   paciente_nombre: string;
   paciente_documento?: string;
   paciente_telefono?: string;
-  hospital: string;
-  hospital_id?: string;
+  hospital_id: string;
+  tipo_cirugia_id: string;
   medico_cirujano: string;
-  tipo_cirugia: string;
-  tipo_cirugia_id?: string;
   fecha_programada: string;
   hora_inicio?: string;
   duracion_estimada?: number;

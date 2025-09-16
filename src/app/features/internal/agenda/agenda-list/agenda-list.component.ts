@@ -1,13 +1,13 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // ✅ AGREGAR ESTA LÍNEA
+import { RouterModule } from '@angular/router';
 import { CirugiasService } from '../data-access/cirugias.service';
 import { Cirugia } from '../data-access/models';
 
 @Component({
   selector: 'app-agenda-list',
   standalone: true,
-  imports: [CommonModule, RouterModule], // ✅ AGREGAR RouterModule AQUÍ
+  imports: [CommonModule, RouterModule],
   templateUrl: './agenda-list.component.html',
   styleUrl: './agenda-list.component.css'
 })
@@ -32,9 +32,12 @@ export class AgendaListComponent implements OnInit {
       const term = this.searchTerm().toLowerCase();
       result = result.filter(cirugia => 
         cirugia.paciente_nombre.toLowerCase().includes(term) ||
-        cirugia.hospital.toLowerCase().includes(term) ||
+        // ✅ Usar las relaciones FK en lugar de campos legacy
+        (cirugia.hospital_data?.nombre || cirugia.hospital || '').toLowerCase().includes(term) ||
+        (cirugia.tipo_cirugia_data?.nombre || cirugia.tipo_cirugia || '').toLowerCase().includes(term) ||
         cirugia.medico_cirujano.toLowerCase().includes(term) ||
-        cirugia.numero_cirugia.toLowerCase().includes(term)
+        cirugia.numero_cirugia.toLowerCase().includes(term) ||
+        (cirugia.tecnico_asignado?.full_name || '').toLowerCase().includes(term)
       );
     }
     
@@ -94,6 +97,37 @@ export class AgendaListComponent implements OnInit {
     this.selectedFecha.set(target.value);
   }
 
+  // ✅ Métodos helpers para obtener datos con fallback
+  getHospitalNombre(cirugia: Cirugia): string {
+    return cirugia.hospital_data?.nombre || cirugia.hospital || 'Hospital no especificado';
+  }
+
+  getHospitalCiudad(cirugia: Cirugia): string {
+    return cirugia.hospital_data?.ciudad || 'Ciudad no especificada';
+  }
+
+  getTipoCirugiaNombre(cirugia: Cirugia): string {
+    return cirugia.tipo_cirugia_data?.nombre || cirugia.tipo_cirugia || 'Tipo no especificado';
+  }
+
+  getTecnicoNombre(cirugia: Cirugia): string {
+    return cirugia.tecnico_asignado?.full_name || 'Sin asignar';
+  }
+
+  getDuracionEstimada(cirugia: Cirugia): string {
+    if (cirugia.duracion_estimada) {
+      const horas = Math.floor(cirugia.duracion_estimada / 60);
+      const minutos = cirugia.duracion_estimada % 60;
+      if (horas > 0) {
+        return `${horas}h ${minutos}m`;
+      }
+      return `${minutos}m`;
+    }
+    return cirugia.tipo_cirugia_data?.duracion_promedio 
+      ? `~${cirugia.tipo_cirugia_data.duracion_promedio}m`
+      : 'No estimada';
+  }
+
   // Métodos para formateo y estilos
   formatFecha(fecha: string): string {
     const date = new Date(fecha);
@@ -103,6 +137,19 @@ export class AgendaListComponent implements OnInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  formatFechaCorta(fecha: string): string {
+    const date = new Date(fecha);
+    return date.toLocaleDateString('es-ES', {
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  formatHora(hora?: string): string {
+    if (!hora) return 'No programada';
+    return hora.substring(0, 5); // HH:MM
   }
 
   getEstadoBadgeClass(estado: string): string {
@@ -117,7 +164,7 @@ export class AgendaListComponent implements OnInit {
       case 'cancelada':
         return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300`;
       case 'urgencia':
-        return `${baseClass} bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300`;
+        return `${baseClass} bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 animate-pulse`;
       default:
         return `${baseClass} bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300`;
     }
@@ -140,7 +187,7 @@ export class AgendaListComponent implements OnInit {
       case 'alta':
         return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300`;
       case 'urgencia':
-        return `${baseClass} bg-red-200 text-red-900 dark:bg-red-800 dark:text-red-200`;
+        return `${baseClass} bg-red-200 text-red-900 dark:bg-red-800 dark:text-red-200 animate-pulse`;
       case 'normal':
         return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300`;
       case 'baja':
@@ -160,12 +207,22 @@ export class AgendaListComponent implements OnInit {
     }
   }
 
-  cambiarEstado(cirugia: Cirugia) {
-    // TODO: Implementar modal o componente para cambiar estado
-    console.log('Cambiar estado de:', cirugia.numero_cirugia);
-    
-    // Por ahora, ejemplo simple:
-    let nuevoEstado = '';
+  // ✅ Método mejorado para cambiar estado
+    cambiarEstado(cirugia: Cirugia, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Si ya está completada o cancelada, no permitir cambios
+    if (cirugia.estado === 'completada' || cirugia.estado === 'cancelada') {
+      return;
+    }
+
+    console.log('🔄 Cambiando estado de cirugía:', cirugia.numero_cirugia);
+
+    // Por ahora, solo rotamos entre los estados principales
+    let nuevoEstado: Cirugia['estado'];
     switch (cirugia.estado) {
       case 'programada':
         nuevoEstado = 'en_curso';
@@ -173,36 +230,106 @@ export class AgendaListComponent implements OnInit {
       case 'en_curso':
         nuevoEstado = 'completada';
         break;
+      case 'urgencia':
+        nuevoEstado = 'en_curso';
+        break;
       default:
-        return;
+        nuevoEstado = 'programada';
+        break;
     }
-    
-    this.cirugiasService.updateEstado(cirugia.id, nuevoEstado, 'Estado actualizado desde la lista').subscribe({
-      next: () => {
-        this.loadData(); // Recargar datos
+
+    // Actualizar el estado en la base de datos
+    this.loading.set(true);
+    this.cirugiasService.updateCirugia(cirugia.id, { estado: nuevoEstado }).subscribe({
+      next: (cirugiaActualizada) => {
+        console.log('✅ Estado actualizado:', cirugiaActualizada);
+        // Recargar la lista para reflejar los cambios
+        this.loadData();
       },
       error: (err) => {
-        console.error('Error updating estado:', err);
-        // TODO: Mostrar toast de error
+        console.error('❌ Error updating estado:', err);
+        this.error.set('Error al actualizar el estado: ' + (err?.message || err));
+        this.loading.set(false);
       }
     });
   }
 
+  // ✅ Método para determinar si se puede cambiar estado
+  canChangeEstado(estado: string): boolean {
+    return estado === 'programada' || estado === 'en_curso';
+  }
+
+  // ✅ Método para obtener el siguiente estado
+  getNextEstado(estado: string): string {
+    switch (estado) {
+      case 'programada': return 'Iniciar';
+      case 'en_curso': return 'Completar';
+      default: return '';
+    }
+  }
+
+  // ✅ Método para determinar si una cirugía es urgente
+  isUrgente(cirugia: Cirugia): boolean {
+    return cirugia.estado === 'urgencia' || cirugia.prioridad === 'urgencia';
+  }
+
+  // ✅ Método para determinar si una cirugía está próxima (hoy o mañana)
+  isProxima(cirugia: Cirugia): boolean {
+    const hoy = new Date();
+    const fechaCirugia = new Date(cirugia.fecha_programada);
+    const diffTime = fechaCirugia.getTime() - hoy.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 1 && diffDays >= 0;
+  }
 
   // Computed para KPIs
-cirugiasProgramadas = computed(() => 
-  this.cirugias().filter(c => c.estado === 'programada').length
-);
+  cirugiasProgramadas = computed(() => 
+    this.cirugias().filter(c => c.estado === 'programada').length
+  );
 
-cirugiasCurso = computed(() => 
-  this.cirugias().filter(c => c.estado === 'en_curso').length
-);
+  cirugiasCurso = computed(() => 
+    this.cirugias().filter(c => c.estado === 'en_curso').length
+  );
 
-cirugiasFcompletadas = computed(() => 
-  this.cirugias().filter(c => c.estado === 'completada').length
-);
+  cirugiasFcompletadas = computed(() => 
+    this.cirugias().filter(c => c.estado === 'completada').length
+  );
 
-cirugiaUrgencia = computed(() => 
-  this.cirugias().filter(c => c.estado === 'urgencia' || c.prioridad === 'urgencia').length
-);
+  cirugiaUrgencia = computed(() => 
+    this.cirugias().filter(c => c.estado === 'urgencia' || c.prioridad === 'urgencia').length
+  );
+
+  // ✅ Nuevos KPIs
+  cirugiasCanceladas = computed(() => 
+    this.cirugias().filter(c => c.estado === 'cancelada').length
+  );
+
+  cirugiasSinTecnico = computed(() => 
+    this.cirugias().filter(c => !c.tecnico_asignado_id && c.estado === 'programada').length
+  );
+
+  cirugiaProximas = computed(() => 
+    this.cirugias().filter(c => this.isProxima(c) && c.estado === 'programada').length
+  );
+
+  // ✅ Métodos de utilidad para el template
+  clearFilters() {
+    this.searchTerm.set('');
+    this.selectedEstado.set('');
+    this.selectedFecha.set('');
+  }
+
+  refreshData() {
+    this.loadData();
+  }
+
+  // ✅ Estados disponibles para el filtro
+  estadosDisponibles = [
+    { value: '', label: 'Todos los estados' },
+    { value: 'programada', label: 'Programada' },
+    { value: 'en_curso', label: 'En Curso' },
+    { value: 'completada', label: 'Completada' },
+    { value: 'cancelada', label: 'Cancelada' },
+    { value: 'urgencia', label: 'Urgencia' }
+  ];
 }

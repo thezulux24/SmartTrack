@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, from, map, catchError, throwError } from 'rxjs';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
-import { TipoCirugia, TipoCirugiaCreate, Producto } from './models';
+import { TipoCirugia, TipoCirugiaCreate } from './models';
 
 @Injectable({
   providedIn: 'root'
@@ -10,164 +10,158 @@ export class TiposCirugiaService {
   constructor(private supabase: SupabaseService) {}
 
   getTiposCirugia(): Observable<TipoCirugia[]> {
-    return new Observable(observer => {
+    return from(
       this.supabase.client
         .from('tipos_cirugia')
         .select('*')
         .eq('es_activo', true)
         .order('nombre', { ascending: true })
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data || []);
-            observer.complete();
-          }
-        });
-    });
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          console.error('Error fetching tipos cirugia:', response.error);
+          throw new Error(response.error.message || 'Error al cargar tipos de cirugía');
+        }
+        return response.data || [];
+      }),
+      catchError(error => {
+        console.error('Service error loading tipos cirugia:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   getTipoCirugiaById(id: string): Observable<TipoCirugia> {
-    return new Observable(observer => {
+    return from(
       this.supabase.client
         .from('tipos_cirugia')
         .select('*')
         .eq('id', id)
         .single()
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data);
-            observer.complete();
-          }
-        });
-    });
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          throw new Error(response.error.message || 'Error al cargar tipo de cirugía');
+        }
+        return response.data;
+      }),
+      catchError(error => {
+        console.error('Service error loading tipo cirugia:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  createTipoCirugia(tipoCirugia: TipoCirugiaCreate): Observable<TipoCirugia> {
-    return new Observable(observer => {
+  createTipoCirugia(tipo: TipoCirugiaCreate): Observable<TipoCirugia> {
+    return from(
       this.supabase.client
         .from('tipos_cirugia')
-        .insert(tipoCirugia)
+        .insert([tipo])
         .select()
         .single()
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data);
-            observer.complete();
-          }
-        });
-    });
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          console.error('Error creating tipo cirugia:', response.error);
+          throw new Error(response.error.message || 'Error al crear tipo de cirugía');
+        }
+        return response.data;
+      }),
+      catchError(error => {
+        console.error('Service error creating tipo cirugia:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   updateTipoCirugia(id: string, updates: Partial<TipoCirugia>): Observable<TipoCirugia> {
-    return new Observable(observer => {
+    return from(
       this.supabase.client
         .from('tipos_cirugia')
         .update(updates)
         .eq('id', id)
         .select()
         .single()
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data);
-            observer.complete();
-          }
-        });
-    });
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          console.error('Error updating tipo cirugia:', response.error);
+          throw new Error(response.error.message || 'Error al actualizar tipo de cirugía');
+        }
+        return response.data;
+      }),
+      catchError(error => {
+        console.error('Service error updating tipo cirugia:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   deleteTipoCirugia(id: string): Observable<void> {
-    return new Observable(observer => {
-      // Soft delete - marcar como inactivo
+    return from(
       this.supabase.client
         .from('tipos_cirugia')
         .update({ es_activo: false })
         .eq('id', id)
-        .then(({ error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next();
-            observer.complete();
-          }
-        });
-    });
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          console.error('Error deleting tipo cirugia:', response.error);
+          throw new Error(response.error.message || 'Error al eliminar tipo de cirugía');
+        }
+      }),
+      catchError(error => {
+        console.error('Service error deleting tipo cirugia:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  getProductosComunes(tipoId: string): Observable<Producto[]> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('tipos_cirugia')
-        .select('productos_comunes')
-        .eq('id', tipoId)
-        .single()
-        .then(async ({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else if (data?.productos_comunes && Array.isArray(data.productos_comunes)) {
-            // Obtener los productos por sus IDs
-            const { data: productos, error: prodError } = await this.supabase.client
-              .from('productos')
-              .select('*')
-              .in('id', data.productos_comunes);
-            
-            if (prodError) {
-              observer.error(prodError);
-            } else {
-              observer.next(productos || []);
-              observer.complete();
-            }
-          } else {
-            observer.next([]);
-            observer.complete();
-          }
-        });
-    });
-  }
-
-  getTiposCirugiaPorEspecialidad(especialidad: string): Observable<TipoCirugia[]> {
-    return new Observable(observer => {
+  getTiposByEspecialidad(especialidad: string): Observable<TipoCirugia[]> {
+    return from(
       this.supabase.client
         .from('tipos_cirugia')
         .select('*')
         .eq('especialidad', especialidad)
         .eq('es_activo', true)
         .order('nombre', { ascending: true })
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data || []);
-            observer.complete();
-          }
-        });
-    });
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          console.error('Error fetching tipos by especialidad:', response.error);
+          throw new Error(response.error.message || 'Error al cargar tipos por especialidad');
+        }
+        return response.data || [];
+      }),
+      catchError(error => {
+        console.error('Service error loading tipos by especialidad:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   getEspecialidades(): Observable<string[]> {
-    return new Observable(observer => {
+    return from(
       this.supabase.client
         .from('tipos_cirugia')
         .select('especialidad')
         .eq('es_activo', true)
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            // Extraer especialidades únicas
-            const especialidades = [...new Set(
-              data?.map(t => t.especialidad).filter(e => e) || []
-            )].sort();
-            observer.next(especialidades);
-            observer.complete();
-          }
-        });
-    });
+    ).pipe(
+      map(response => {
+        if (response.error) {
+          console.error('Error fetching especialidades:', response.error);
+          throw new Error(response.error.message || 'Error al cargar especialidades');
+        }
+        // Extraer especialidades únicas
+        const especialidades = [...new Set(
+          response.data?.map(t => t.especialidad).filter(e => e) || []
+        )].sort();
+        return especialidades;
+      }),
+      catchError(error => {
+        console.error('Service error loading especialidades:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

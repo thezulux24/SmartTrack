@@ -18,5 +18,6 @@ export interface HospitalCreate {
   contacto_principal?: string;
   email?: string;
   ciudad?: string;
+  es_activo?: boolean;
   notas?: string;
 }

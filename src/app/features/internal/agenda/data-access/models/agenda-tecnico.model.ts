@@ -1,5 +1,14 @@
 import { Profile } from "./index";
 
+
+
+export interface TecnicoAsignado {
+  id: string;
+  full_name: string;
+  email: string;
+  area?: string;
+}
+
 export interface AgendaTecnico {
   id: string;
   tecnico_id: string;
@@ -22,3 +31,4 @@ export interface AgendaTecnicoCreate {
   disponible?: boolean;
   motivo_no_disponible?: string;
 }
+

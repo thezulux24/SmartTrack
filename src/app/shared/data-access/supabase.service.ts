@@ -213,6 +213,7 @@ export class SupabaseService {
 
 
   
+  
 
   async getMovimientos(): Promise<MovimientoInventario[]> {
     const { data, error } = await this.supabaseClient
