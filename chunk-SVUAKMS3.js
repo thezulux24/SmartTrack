@@ -1,0 +1,1 @@
+import"./chunk-FK42CRUA.js";var o=[{path:"",loadComponent:()=>import("./chunk-NGEJS336.js")},{path:"movimientos",loadComponent:()=>import("./chunk-FASSX5BK.js")},{path:"**",redirectTo:""}];export{o as default};

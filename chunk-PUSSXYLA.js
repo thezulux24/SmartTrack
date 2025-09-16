@@ -1,1 +1,0 @@
-import{Ca as o,Ra as i,Sa as n,_a as r}from"./chunk-QW3IPT2E.js";import"./chunk-FK42CRUA.js";var a=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=o({type:t,selectors:[["app-cirugia-form"]],decls:2,vars:0,template:function(e,p){e&1&&(i(0,"p"),r(1,"cirugia-form works!"),n())},encapsulation:2})};export{a as CirugiaFormComponent};

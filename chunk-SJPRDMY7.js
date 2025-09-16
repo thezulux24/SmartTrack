@@ -1,0 +1,1 @@
+import{Ca as i,Ua as a,Va as n,bb as o}from"./chunk-L6U4RGVI.js";import"./chunk-FK42CRUA.js";var r=class t{static \u0275fac=function(e){return new(e||t)};static \u0275cmp=i({type:t,selectors:[["app-cirugia-detail"]],decls:2,vars:0,template:function(e,p){e&1&&(a(0,"p"),o(1,"cirugia-detail works!"),n())},encapsulation:2})};export{r as CirugiaDetailComponent};
