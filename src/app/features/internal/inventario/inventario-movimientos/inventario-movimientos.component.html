@@ -1,1 +1,459 @@
-<p>inventario-movimientos works!</p>
+<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+  <!-- Header con estilo similar al welcome -->
+  <div class="px-6 py-8 mx-auto max-w-7xl">
+    <!-- Logo y título -->
+    <div class="flex flex-col items-center mb-6">
+      <div class="flex items-center gap-4 mb-4">
+        <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+             alt="Implameq Logo" 
+             class="h-12">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Movimientos de Inventario</h1>
+          <p class="text-sm text-gray-600 dark:text-gray-300">Historial de entradas, salidas y transferencias</p>
+        </div>
+      </div>
+      
+      <!-- Botón volver y acciones -->
+      <div class="flex gap-2 w-full max-w-md">
+        <button (click)="volverAtras()" 
+                class="flex-1 text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none 
+                       focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
+                       dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+          ← Volver
+        </button>
+        <button (click)="recargarDatos()" 
+                class="flex-1 text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
+                       focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
+                       dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500">
+          🔄 Recargar
+        </button>
+        <button (click)="exportarMovimientos()" 
+                class="flex-1 text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
+                       focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
+                       dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500">
+          📊 Exportar
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    @if (loading()) {
+      <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700 mx-auto">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8 text-center">
+          <div class="animate-pulse">
+            <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+          </div>
+          <p class="text-sm text-gray-500">Cargando movimientos...</p>
+        </div>
+      </div>
+    } @else {
+
+      <!-- Mensaje de error -->
+      @if (error()) {
+        <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700 mx-auto">
+          <div class="p-6 space-y-4 md:space-y-6 sm:p-8 text-center">
+            <div class="text-red-600 dark:text-red-400">
+              <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                </path>
+              </svg>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Error</p>
+              <p class="text-sm">{{ error() }}</p>
+            </div>
+            <button (click)="recargarDatos()" 
+                    class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none 
+                           focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
+                           dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Estadísticas rápidas -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-4">
+          <div class="flex items-center">
+            <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ stats().totalMovimientos }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-4">
+          <div class="flex items-center">
+            <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+              <span class="text-2xl">➕</span>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Entradas Hoy</p>
+              <p class="text-lg font-semibold text-green-600 dark:text-green-400">{{ stats().entradasHoy }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-4">
+          <div class="flex items-center">
+            <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+              <span class="text-2xl">➖</span>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Salidas Hoy</p>
+              <p class="text-lg font-semibold text-red-600 dark:text-red-400">{{ stats().salidasHoy }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 p-4">
+          <div class="flex items-center">
+            <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+              <svg class="w-6 h-6 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Productos</p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ stats().productosAfectados }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 mx-auto mb-6">
+        <div class="p-6 space-y-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Filtros de Búsqueda</h3>
+            <button (click)="limpiarFiltros()" 
+                    class="text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+              Limpiar
+            </button>
+          </div>
+
+          <form [formGroup]="filtrosForm" class="space-y-4">
+            <!-- Rango de fechas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Fecha desde</label>
+                <input type="date" 
+                       formControlName="fecha_desde"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                              focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                              dark:bg-gray-700 dark:border-gray-600 dark:text-white 
+                              dark:focus:ring-lime-400 dark:focus:border-lime-400">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Fecha hasta</label>
+                <input type="date" 
+                       formControlName="fecha_hasta"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                              focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                              dark:bg-gray-700 dark:border-gray-600 dark:text-white 
+                              dark:focus:ring-lime-400 dark:focus:border-lime-400">
+              </div>
+            </div>
+
+            <!-- Búsqueda y tipo -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Buscar</label>
+                <input type="text" 
+                       formControlName="search"
+                       placeholder="Producto, usuario, motivo..."
+                       class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                              focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+                              dark:focus:ring-lime-400 dark:focus:border-lime-400">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Tipo de movimiento</label>
+                <select formControlName="tipo"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                               focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                               dark:bg-gray-700 dark:border-gray-600 dark:text-white 
+                               dark:focus:ring-lime-400 dark:focus:border-lime-400">
+                  <option value="">Todos los tipos</option>
+                  @for (tipo of tiposMovimiento; track tipo.value) {
+                    <option [value]="tipo.value">{{ tipo.icon }} {{ tipo.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Producto y ubicación -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Producto específico</label>
+                <select formControlName="producto_id"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                               focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                               dark:bg-gray-700 dark:border-gray-600 dark:text-white 
+                               dark:focus:ring-lime-400 dark:focus:border-lime-400">
+                  <option value="">Todos los productos</option>
+                  @for (producto of productos(); track producto.id) {
+                    <option [value]="producto.id">{{ producto.codigo }} - {{ producto.nombre }}</option>
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2">Ubicación</label>
+                <select formControlName="ubicacion"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+                               focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+                               dark:bg-gray-700 dark:border-gray-600 dark:text-white 
+                               dark:focus:ring-lime-400 dark:focus:border-lime-400">
+                  <option value="">Todas las ubicaciones</option>
+                  
+                  <optgroup label="🏢 Sedes Principales">
+                    @for (ubicacion of ubicacionesOrganizadas.sedes_principales; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <optgroup label="🏬 Sedes Secundarias">
+                    @for (ubicacion of ubicacionesOrganizadas.sedes_secundarias; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <optgroup label="📦 Bodegas">
+                    @for (ubicacion of ubicacionesOrganizadas.bodegas; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <optgroup label="🏥 Quirófanos">
+                    @for (ubicacion of ubicacionesOrganizadas.quirofanos; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <optgroup label="🚨 Emergencias">
+                    @for (ubicacion of ubicacionesOrganizadas.emergencias; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+
+                  <optgroup label="⚡ Especiales">
+                    @for (ubicacion of ubicacionesOrganizadas.especiales; track ubicacion.value) {
+                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                    }
+                  </optgroup>
+                </select>
+              </div>
+            </div>
+
+            <!-- Resultado del filtro -->
+            <div class="text-center pt-2 border-t">
+              <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                📋 {{ filteredMovimientos().length }} movimientos encontrados
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Resumen por tipo -->
+      @if (filteredMovimientos().length > 0) {
+        <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 mx-auto mb-6">
+          <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Resumen por Tipo</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              @for (tipoData of getMovimientosPorTipo(); track tipoData.tipo) {
+                <div class="text-center">
+                  <div class="text-2xl mb-1">{{ tipoData.info.icon }}</div>
+                  <div class="text-lg font-semibold" [class]="tipoData.info.color">{{ tipoData.cantidad }}</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">{{ tipoData.info.label }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Lista de movimientos -->
+      @if (filteredMovimientos().length > 0) {
+        <div class="space-y-4">
+          @for (movimiento of filteredMovimientos(); track movimiento.id) {
+            <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700">
+              
+              <!-- Header del movimiento -->
+              <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-start">
+                  <div class="flex items-center space-x-3">
+                    <div class="text-2xl">{{ getTipoInfo(movimiento.tipo).icon }}</div>
+                    <div>
+                      <div class="font-semibold text-gray-900 dark:text-white">
+                        {{ getTipoInfo(movimiento.tipo).label }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-300">
+                        {{ formatFecha(movimiento.created_at) }}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-lg font-bold" [class]="getTipoInfo(movimiento.tipo).color">
+                      {{ movimiento.tipo === 'salida' ? '-' : '+' }}{{ movimiento.cantidad }}
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">
+                      unidades
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contenido del movimiento -->
+              <div class="p-4 space-y-4">
+                <!-- Información del producto -->
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <button (click)="verDetalleProducto(movimiento.producto_id)" 
+                            class="text-left hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                      <div class="font-medium text-gray-900 dark:text-white">
+                        {{ movimiento.producto?.nombre || 'Producto no encontrado' }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-300">
+                        {{ movimiento.producto?.codigo }}
+                      </div>
+                    </button>
+                  </div>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                    {{ movimiento.producto?.categoria | titlecase }}
+                  </span>
+                </div>
+
+                <!-- Ubicaciones -->
+                @if (movimiento.ubicacion_origen || movimiento.ubicacion_destino) {
+                  <div class="border-t pt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      @if (movimiento.ubicacion_origen) {
+                        <div>
+                          <div class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Origen</div>
+                          <div class="text-sm text-gray-900 dark:text-white">
+                            {{ formatUbicacion(movimiento.ubicacion_origen) }}
+                          </div>
+                        </div>
+                      }
+                      @if (movimiento.ubicacion_destino) {
+                        <div>
+                          <div class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Destino</div>
+                          <div class="text-sm text-gray-900 dark:text-white">
+                            {{ formatUbicacion(movimiento.ubicacion_destino) }}
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Motivo y observaciones -->
+                @if (movimiento.motivo || movimiento.observaciones) {
+                  <div class="border-t pt-4">
+                    @if (movimiento.motivo) {
+                      <div class="mb-2">
+                        <div class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Motivo</div>
+                        <div class="text-sm text-gray-900 dark:text-white">{{ movimiento.motivo }}</div>
+                      </div>
+                    }
+                    @if (movimiento.observaciones) {
+                      <div>
+                        <div class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Observaciones</div>
+                        <div class="text-sm text-gray-900 dark:text-white">{{ movimiento.observaciones }}</div>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Información adicional -->
+                <div class="border-t pt-4 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                  <div>
+                    Realizado por: {{ movimiento.usuario?.full_name || 'Usuario no encontrado' }}
+                  </div>
+                  @if (movimiento.referencia) {
+                    <div>
+                      Ref: {{ movimiento.referencia }}
+                    </div>
+                  }
+                </div>
+
+                <!-- Información de lote y vencimiento -->
+                @if (movimiento.lote || movimiento.fecha_vencimiento) {
+                  <div class="border-t pt-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                      @if (movimiento.lote) {
+                        <div>
+                          <span class="font-medium text-gray-500 dark:text-gray-400">Lote:</span>
+                          <span class="text-gray-900 dark:text-white ml-1">{{ movimiento.lote }}</span>
+                        </div>
+                      }
+                      @if (movimiento.fecha_vencimiento) {
+                        <div>
+                          <span class="font-medium text-gray-500 dark:text-gray-400">Vencimiento:</span>
+                          <span class="text-gray-900 dark:text-white ml-1">{{ formatFechaCorta(movimiento.fecha_vencimiento) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Sin resultados -->
+        <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 mx-auto">
+          <div class="p-6 space-y-4 md:space-y-6 sm:p-8 text-center">
+            <div class="text-gray-400 dark:text-gray-500">
+              <div class="text-4xl mb-4">📋</div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No se encontraron movimientos</h3>
+              <p class="text-gray-500 dark:text-gray-400">Intenta ajustar los filtros de búsqueda</p>
+            </div>
+            <button (click)="recargarDatos()"
+                    class="w-full text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
+                           focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
+                           dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500">
+              Recargar movimientos
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Productos más movidos -->
+      @if (getProductosMasMovidos().length > 0) {
+        <div class="w-full bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700 mx-auto mt-6">
+          <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Productos con más Movimientos</h3>
+            <div class="space-y-3">
+              @for (producto of getProductosMasMovidos(); track producto.codigo) {
+                <div class="flex justify-between items-center">
+                  <div class="flex-1">
+                    <div class="font-medium text-gray-900 dark:text-white">{{ producto.producto }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-300">{{ producto.codigo }}</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-bold text-blue-600 dark:text-blue-400">{{ producto.cantidad }}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">movimientos</div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Bottom spacing para móvil -->
+      <div class="h-6"></div>
+    }
+  </div>
+</section>

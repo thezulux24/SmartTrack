@@ -243,6 +243,8 @@ export default class InventarioListComponent implements OnInit {
     }
   }
 
+
+
   getStockColor(producto: any): string {
     if (producto.stock_total === 0) return 'text-red-600';
     if (producto.stock_bajo) return 'text-yellow-600';

@@ -1,11 +1,278 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { combineLatest } from 'rxjs';
+import { startWith, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+import { ProductosService } from '../data-access/productos.service';
+import { MovimientoInventario, FiltrosMovimientos } from '../data-access/models/movimiento.model';
+import { Producto } from '../data-access/models/producto.model';
 
 @Component({
   selector: 'app-inventario-movimientos',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './inventario-movimientos.component.html',
   styleUrl: './inventario-movimientos.component.css'
 })
-export class InventarioMovimientosComponent {
+export class InventarioMovimientosComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private productosService = inject(ProductosService);
 
+  // Signals
+  loading = signal(false);
+  error = signal<string | null>(null);
+  movimientos = signal<MovimientoInventario[]>([]);
+  productos = signal<Producto[]>([]);
+  filteredMovimientos = signal<MovimientoInventario[]>([]);
+  resumen = signal<any>(null);
+
+  // Formulario de filtros
+  filtrosForm: FormGroup = this.fb.group({
+    fecha_desde: [''],
+    fecha_hasta: [''],
+    tipo: [''],
+    producto_id: [''],
+    ubicacion: [''],
+    search: ['']
+  });
+
+  // Opciones
+  tiposMovimiento = this.productosService.getTiposMovimiento();
+  ubicacionesOrganizadas = this.productosService.getUbicacionesOrganizadas();
+
+  // Estadísticas
+  stats = signal({
+    totalMovimientos: 0,
+    entradasHoy: 0,
+    salidasHoy: 0,
+    productosAfectados: 0
+  });
+
+  ngOnInit() {
+    console.log('🚀 InventarioMovimientosComponent iniciando...');
+    this.initializeFilters();
+    this.loadData();
+    this.setupFilterSubscription();
+  }
+
+  private initializeFilters() {
+    // Configurar fechas por defecto (últimos 30 días)
+    const hoy = new Date();
+    const hace30Dias = new Date();
+    hace30Dias.setDate(hoy.getDate() - 30);
+
+    this.filtrosForm.patchValue({
+      fecha_desde: hace30Dias.toISOString().split('T')[0],
+      fecha_hasta: hoy.toISOString().split('T')[0]
+    });
+  }
+
+  private setupFilterSubscription() {
+    // Suscribirse a cambios en los filtros
+    this.filtrosForm.valueChanges.pipe(
+      startWith(this.filtrosForm.value),
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.applyFilters();
+    });
+  }
+
+  private loadData() {
+    this.loading.set(true);
+    this.error.set(null);
+
+    // Cargar movimientos y productos en paralelo
+    combineLatest([
+      this.productosService.getMovimientos(),
+      this.productosService.getProductos()
+    ]).subscribe({
+      next: ([movimientos, productos]) => {
+        console.log('✅ Datos cargados:', { movimientos: movimientos.length, productos: productos.length });
+        this.movimientos.set(movimientos);
+        this.productos.set(productos);
+        this.applyFilters();
+        this.calculateStats();
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('❌ Error loading data:', err);
+        this.error.set('Error al cargar los datos: ' + (err?.message || err));
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private applyFilters() {
+    const filtros = this.filtrosForm.value;
+    let movimientosFiltrados = [...this.movimientos()];
+
+    // Aplicar filtros
+    if (filtros.fecha_desde) {
+      movimientosFiltrados = movimientosFiltrados.filter(m => 
+        new Date(m.created_at) >= new Date(filtros.fecha_desde)
+      );
+    }
+
+    if (filtros.fecha_hasta) {
+      const fechaHasta = new Date(filtros.fecha_hasta);
+      fechaHasta.setHours(23, 59, 59, 999); // Incluir todo el día
+      movimientosFiltrados = movimientosFiltrados.filter(m => 
+        new Date(m.created_at) <= fechaHasta
+      );
+    }
+
+    if (filtros.tipo) {
+      movimientosFiltrados = movimientosFiltrados.filter(m => m.tipo === filtros.tipo);
+    }
+
+    if (filtros.producto_id) {
+      movimientosFiltrados = movimientosFiltrados.filter(m => m.producto_id === filtros.producto_id);
+    }
+
+    if (filtros.ubicacion) {
+      movimientosFiltrados = movimientosFiltrados.filter(m => 
+        m.ubicacion_origen === filtros.ubicacion || m.ubicacion_destino === filtros.ubicacion
+      );
+    }
+
+    if (filtros.search) {
+      const searchTerm = filtros.search.toLowerCase();
+      movimientosFiltrados = movimientosFiltrados.filter(m =>
+        m.producto?.nombre?.toLowerCase().includes(searchTerm) ||
+        m.producto?.codigo?.toLowerCase().includes(searchTerm) ||
+        m.usuario?.full_name?.toLowerCase().includes(searchTerm) ||
+        m.motivo?.toLowerCase().includes(searchTerm) ||
+        m.observaciones?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    this.filteredMovimientos.set(movimientosFiltrados);
+  }
+
+  private calculateStats() {
+    const movimientos = this.movimientos();
+    const hoy = new Date().toISOString().split('T')[0];
+    
+    const movimientosHoy = movimientos.filter(m => 
+      new Date(m.created_at).toISOString().split('T')[0] === hoy
+    );
+
+    const entradasHoy = movimientosHoy.filter(m => m.tipo === 'entrada').length;
+    const salidasHoy = movimientosHoy.filter(m => m.tipo === 'salida').length;
+    const productosAfectados = new Set(movimientos.map(m => m.producto_id)).size;
+
+    this.stats.set({
+      totalMovimientos: movimientos.length,
+      entradasHoy,
+      salidasHoy,
+      productosAfectados
+    });
+  }
+
+  // Métodos de utilidad
+  getTipoInfo(tipo: string) {
+    return this.tiposMovimiento.find(t => t.value === tipo) || 
+           { value: tipo, label: tipo, icon: '❓', color: 'text-gray-600' };
+  }
+
+  formatFecha(fecha: string): string {
+    return new Date(fecha).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  formatFechaCorta(fecha: string): string {
+    return new Date(fecha).toLocaleDateString('es-ES');
+  }
+
+  formatUbicacion(ubicacion: string | undefined): string {
+    if (!ubicacion) return 'No especificada';
+    
+    const ubicacionesMap: { [key: string]: string } = {
+      'sede_principal_norte': 'Sede Principal Norte',
+      'sede_principal_sur': 'Sede Principal Sur',
+      'sede_secundaria_este': 'Sede Secundaria Este',
+      'sede_secundaria_oeste': 'Sede Secundaria Oeste',
+      'bodega_central': 'Bodega Central',
+      'bodega_norte': 'Bodega Norte',
+      'bodega_sur': 'Bodega Sur',
+      'quirofano_sede_norte_1': 'Quirófano Norte 1',
+      'quirofano_sede_norte_2': 'Quirófano Norte 2',
+      'quirofano_sede_sur_1': 'Quirófano Sur 1',
+      'quirofano_sede_sur_2': 'Quirófano Sur 2',
+      'emergencia_norte': 'Emergencia Norte',
+      'emergencia_sur': 'Emergencia Sur',
+      'esterilizacion_central': 'Esterilización Central'
+    };
+    
+    return ubicacionesMap[ubicacion] || ubicacion;
+  }
+
+  // Acciones
+  limpiarFiltros() {
+    this.filtrosForm.reset();
+    this.initializeFilters();
+  }
+
+  recargarDatos() {
+    this.loadData();
+  }
+
+  exportarMovimientos() {
+    // TODO: Implementar exportación a Excel/CSV
+    console.log('📊 Exportando movimientos...');
+    alert('Funcionalidad de exportación próximamente');
+  }
+
+  volverAtras() {
+    this.router.navigate(['/internal/inventario']);
+  }
+
+  verDetalleProducto(productoId: string) {
+    // TODO: Navegar al detalle del producto
+    console.log('🔍 Ver detalle producto:', productoId);
+  }
+
+  // Métodos para estadísticas rápidas
+  getMovimientosPorTipo() {
+    const movimientos = this.filteredMovimientos();
+    const tipos = this.tiposMovimiento.map(t => t.value);
+    
+    return tipos.map(tipo => ({
+      tipo,
+      cantidad: movimientos.filter(m => m.tipo === tipo).length,
+      info: this.getTipoInfo(tipo)
+    }));
+  }
+
+  getProductosMasMovidos() {
+    const movimientos = this.filteredMovimientos();
+    const productosCount: { [key: string]: number } = {};
+    
+    movimientos.forEach(m => {
+      if (m.producto_id) {
+        productosCount[m.producto_id] = (productosCount[m.producto_id] || 0) + 1;
+      }
+    });
+
+    return Object.entries(productosCount)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([productoId, cantidad]) => {
+        const producto = this.productos().find(p => p.id === productoId);
+        return {
+          producto: producto?.nombre || 'Producto no encontrado',
+          codigo: producto?.codigo || '',
+          cantidad
+        };
+      });
+  }
 }
