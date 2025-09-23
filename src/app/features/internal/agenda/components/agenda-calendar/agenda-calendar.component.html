@@ -1,1 +1,330 @@
-<p>agenda-calendar works!</p>
+<section class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
+    <div class="px-4 py-4">
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center space-x-3">
+          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+               alt="Implameq" class="h-8 brightness-0 invert">
+          <span class="text-lg font-semibold">Calendario Cirugías</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button [routerLink]="['/internal/agenda']" 
+                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 backdrop-blur-sm">
+            📋 Lista
+          </button>
+          <button [routerLink]="['/internal']" 
+                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 backdrop-blur-sm">
+            Volver
+          </button>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <h1 class="text-2xl font-bold mb-1">Calendario de Cirugías</h1>
+        <p class="text-green-100 text-sm">Visualiza y gestiona la programación quirúrgica</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="px-4 py-6">
+    <!-- Controles del calendario -->
+    <div class="max-w-6xl mx-auto mb-6">
+      <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 p-6">
+        
+        <!-- Navigation y vista -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+          <!-- Navegación de fecha -->
+          <div class="flex items-center space-x-4">
+            <button (click)="previousPeriod()" 
+                    class="bg-gray-100 hover:bg-green-100 border border-gray-300 hover:border-green-300 text-gray-700 hover:text-green-700 px-4 py-2 rounded-lg transition duration-200 shadow-sm">
+              ←
+            </button>
+            
+            <h2 class="text-xl font-bold text-gray-800 min-w-0 text-center px-4">
+              {{ getCurrentPeriodTitle() }}
+            </h2>
+            
+            <button (click)="nextPeriod()" 
+                    class="bg-gray-100 hover:bg-green-100 border border-gray-300 hover:border-green-300 text-gray-700 hover:text-green-700 px-4 py-2 rounded-lg transition duration-200 shadow-sm">
+              →
+            </button>
+          </div>
+
+          <!-- Selector de vista -->
+          <div class="flex items-center space-x-2 bg-gray-100 p-1 rounded-lg">
+            <button (click)="setView('day')"
+                    [class]="currentView() === 'day' ? 'bg-green-600 text-white shadow-md' : 'bg-transparent text-gray-600 hover:bg-white hover:text-gray-800'"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition duration-200">
+              Día
+            </button>
+            <button (click)="setView('week')"
+                    [class]="currentView() === 'week' ? 'bg-green-600 text-white shadow-md' : 'bg-transparent text-gray-600 hover:bg-white hover:text-gray-800'"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition duration-200">
+              Semana
+            </button>
+            <button (click)="setView('month')"
+                    [class]="currentView() === 'month' ? 'bg-green-600 text-white shadow-md' : 'bg-transparent text-gray-600 hover:bg-white hover:text-gray-800'"
+                    class="px-4 py-2 rounded-md text-sm font-medium transition duration-200">
+              Mes
+            </button>
+          </div>
+        </div>
+
+        <!-- Botón nueva cirugía -->
+        <div class="flex justify-center">
+          <button [routerLink]="['/internal/agenda/nueva']"
+                  class="bg-gradient-to-r from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 
+                         text-white px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 
+                         flex items-center space-x-3 border border-green-400">
+            <span class="text-lg">+</span>
+            <span>Nueva Cirugía</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista del calendario -->
+    <div class="max-w-6xl mx-auto">
+      
+      <!-- Vista Mensual -->
+      <div *ngIf="currentView() === 'month'" class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        
+        <!-- Headers de días de la semana -->
+        <div class="grid grid-cols-7 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-200">
+          <div *ngFor="let day of weekDays" 
+               class="px-3 py-4 text-center text-sm font-bold text-green-800 border-r border-green-100 last:border-r-0">
+            {{ day }}
+          </div>
+        </div>
+        
+        <!-- Grid del calendario -->
+        <div class="grid grid-cols-7 bg-gray-50">
+          <div *ngFor="let day of calendarDays()" 
+               class="min-h-[120px] border-r border-b border-gray-200 p-3 hover:bg-green-50 transition duration-200"
+               [class.bg-gray-100]="!day.isCurrentMonth"
+               [class.bg-blue-50]="day.isToday && day.isCurrentMonth"
+               [class.border-2]="day.isToday && day.isCurrentMonth"
+               [class.border-blue-400]="day.isToday && day.isCurrentMonth">
+            
+            <!-- Número del día -->
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm font-semibold px-2 py-1 rounded-md"
+                    [class.text-gray-400]="!day.isCurrentMonth"
+                    [class.bg-blue-500]="day.isToday && day.isCurrentMonth"
+                    [class.text-white]="day.isToday && day.isCurrentMonth"
+                    [class.text-gray-700]="day.isCurrentMonth && !day.isToday">
+                {{ day.date.getDate() }}
+              </span>
+              
+              <!-- Indicador de eventos -->
+              <div *ngIf="day.events.length > 0" 
+                   class="w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+            </div>
+            
+            <!-- Lista de eventos -->
+            <div class="space-y-1">
+              <div *ngFor="let event of day.events.slice(0, 2)" 
+                   (click)="selectEvent(event)"
+                   class="text-xs p-2 rounded-md cursor-pointer transition duration-200 shadow-sm border"
+                   [class.bg-red-100]="event.tipoUrgencia === 'urgente'"
+                   [class.text-red-800]="event.tipoUrgencia === 'urgente'"
+                   [class.border-red-200]="event.tipoUrgencia === 'urgente'"
+                   [class.hover:bg-red-200]="event.tipoUrgencia === 'urgente'"
+                   [class.bg-blue-100]="event.tipoUrgencia === 'programada'"
+                   [class.text-blue-800]="event.tipoUrgencia === 'programada'"
+                   [class.border-blue-200]="event.tipoUrgencia === 'programada'"
+                   [class.hover:bg-blue-200]="event.tipoUrgencia === 'programada'">
+                <div class="font-semibold">{{ event.horaInicio }}</div>
+                <div class="truncate">{{ event.titulo }}</div>
+              </div>
+              
+              <div *ngIf="day.events.length > 2" 
+                   class="text-xs text-gray-600 font-medium bg-gray-200 px-2 py-1 rounded-md text-center">
+                +{{ day.events.length - 2 }} más
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista Semanal -->
+      <div *ngIf="currentView() === 'week'" class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 overflow-x-auto">
+        
+        <!-- Header con días de la semana -->
+        <div class="grid grid-cols-8 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-200 min-w-[800px]">
+          <div class="px-4 py-4 bg-green-100"></div>
+          <div *ngFor="let day of getWeekDays(); let i = index" 
+               class="px-3 py-4 text-center border-r border-green-100 last:border-r-0">
+            <div class="text-sm font-semibold text-green-800">
+              {{ weekDays[i] }}
+            </div>
+            <div class="text-lg font-bold px-2 py-1 rounded-md"
+                 [class.bg-blue-500]="isToday(day)"
+                 [class.text-white]="isToday(day)"
+                 [class.text-gray-700]="!isToday(day)">
+              {{ day.getDate() }}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Grid de tiempo -->
+        <div class="grid grid-cols-8 divide-x divide-gray-200 min-w-[800px] bg-gray-50">
+          <!-- Columna de horas -->
+          <div class="bg-green-50">
+            <div *ngFor="let hour of hours" 
+                 class="h-16 px-3 py-2 text-sm font-semibold text-green-800 border-b border-gray-200 flex items-center">
+              {{ formatHour(hour) }}
+            </div>
+          </div>
+          
+          <!-- Columnas de días -->
+          <div *ngFor="let day of getWeekDays(); let dayIndex = index" 
+               class="min-w-0 relative bg-white">
+            <div *ngFor="let hour of hours" 
+                 class="h-16 border-b border-gray-200 p-1 relative hover:bg-green-50 transition duration-200">
+              
+              <!-- Eventos para esta hora -->
+              <div *ngFor="let event of getEventsForDayHour(dayIndex, hour)" 
+                   (click)="selectEvent(event)"
+                   class="absolute inset-1 rounded-md p-2 cursor-pointer text-xs font-medium overflow-hidden shadow-md border-l-4 transition duration-200"
+                   [class.bg-red-500]="event.tipoUrgencia === 'urgente'"
+                   [class.text-white]="event.tipoUrgencia === 'urgente'"
+                   [class.border-red-600]="event.tipoUrgencia === 'urgente'"
+                   [class.hover:bg-red-600]="event.tipoUrgencia === 'urgente'"
+                   [class.bg-blue-500]="event.tipoUrgencia === 'programada'"
+                   [class.text-white]="event.tipoUrgencia === 'programada'"
+                   [class.border-blue-600]="event.tipoUrgencia === 'programada'"
+                   [class.hover:bg-blue-600]="event.tipoUrgencia === 'programada'">
+                <div class="truncate font-bold">{{ event.titulo }}</div>
+                <div class="truncate opacity-90">Dr. {{ event.cirujano }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista Diaria -->
+      <div *ngIf="currentView() === 'day'" class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        
+        <!-- Header del día -->
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-bold text-green-800">
+            {{ getCurrentDayDate() }}
+          </h3>
+        </div>
+        
+        <!-- Timeline del día -->
+        <div class="divide-y divide-gray-200 bg-gray-50">
+          <div *ngFor="let hour of hours" 
+               class="flex hover:bg-green-50 transition duration-200">
+            
+            <!-- Hora -->
+            <div class="w-24 flex-shrink-0 p-4 bg-green-50 text-sm font-bold text-green-800 border-r border-gray-200">
+              {{ formatHour(hour) }}
+            </div>
+            
+            <!-- Contenido -->
+            <div class="flex-1 p-4 min-h-[100px] relative bg-white">
+              <div *ngFor="let event of getEventsForHour(hour)" 
+                   (click)="selectEvent(event)"
+                   class="mb-4 p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-lg border-l-4 shadow-md"
+                   [class.bg-red-50]="event.tipoUrgencia === 'urgente'"
+                   [class.border-red-500]="event.tipoUrgencia === 'urgente'"
+                   [class.hover:bg-red-100]="event.tipoUrgencia === 'urgente'"
+                   [class.bg-blue-50]="event.tipoUrgencia === 'programada'"
+                   [class.border-blue-500]="event.tipoUrgencia === 'programada'"
+                   [class.hover:bg-blue-100]="event.tipoUrgencia === 'programada'">
+                
+                <!-- Header del evento -->
+                <div class="flex justify-between items-start mb-3">
+                  <div class="flex items-center space-x-3">
+                    <span class="font-bold text-gray-800 bg-white px-3 py-1 rounded-md shadow-sm">
+                      {{ event.horaInicio }}
+                      <span *ngIf="event.horaFin"> - {{ event.horaFin }}</span>
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500 text-white shadow-sm">
+                      {{ getStatusLabel(event.estado) }}
+                    </span>
+                  </div>
+                  
+                  <div *ngIf="event.tipoUrgencia === 'urgente'" 
+                       class="text-red-500 animate-pulse text-xl">
+                    🚨
+                  </div>
+                </div>
+                
+                <!-- Información del evento -->
+                <div class="space-y-2">
+                  <h4 class="font-bold text-gray-900 text-lg">{{ event.titulo }}</h4>
+                  <p class="text-gray-700 font-medium"><strong>Paciente:</strong> {{ event.paciente }}</p>
+                  <p class="text-gray-700 font-medium"><strong>Dr. {{ event.cirujano }}</strong></p>
+                  <p class="text-gray-600 text-sm flex items-center">
+                    <span class="mr-1">📍</span>
+                    {{ event.institucion }}
+                  </p>
+                  
+                  <!-- Material requerido -->
+                  <div *ngIf="event.materialRequerido.length > 0" class="mt-3">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">Material requerido:</p>
+                    <div class="flex flex-wrap gap-2">
+                      <span *ngFor="let material of event.materialRequerido" 
+                            class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium border border-green-200">
+                        {{ material }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Espacio vacío si no hay eventos -->
+              <div *ngIf="getEventsForHour(hour).length === 0" 
+                   class="text-gray-500 text-sm italic flex items-center justify-center h-full bg-gray-50 rounded-md border-2 border-dashed border-gray-300">
+                Sin cirugías programadas
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel de alertas -->
+    <div *ngIf="alerts().length > 0" class="max-w-6xl mx-auto mt-6">
+      <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 p-6">
+        <h4 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+          <span class="mr-3 text-yellow-500 text-xl">⚠️</span>
+          Alertas y Notificaciones
+        </h4>
+        
+        <div class="space-y-3">
+          <div *ngFor="let alert of alerts()" 
+               class="flex items-start space-x-4 p-4 rounded-lg border-l-4 shadow-sm"
+               [class.bg-red-50]="alert.tipo === 'urgente'"
+               [class.border-red-500]="alert.tipo === 'urgente'"
+               [class.bg-blue-50]="alert.tipo === 'info'"
+               [class.border-blue-500]="alert.tipo === 'info'"
+               [class.bg-yellow-50]="alert.tipo === 'advertencia'"
+               [class.border-yellow-500]="alert.tipo === 'advertencia'">
+            
+            <div class="flex-shrink-0">
+              <span *ngIf="alert.tipo === 'urgente'" class="text-red-600 text-2xl">⚠️</span>
+              <span *ngIf="alert.tipo === 'info'" class="text-blue-600 text-2xl">ℹ️</span>
+              <span *ngIf="alert.tipo === 'advertencia'" class="text-yellow-600 text-2xl">⚡</span>
+            </div>
+            
+            <div class="flex-1 min-w-0">
+              <h5 class="font-bold text-gray-900">{{ alert.titulo }}</h5>
+              <p class="text-gray-700 text-sm mt-1">{{ alert.mensaje }}</p>
+            </div>
+            
+            <div class="flex-shrink-0 text-xs text-gray-500 bg-white px-2 py-1 rounded-md">
+              {{ alert.tiempo }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</section>

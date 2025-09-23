@@ -17,6 +17,11 @@ export default [
   },
 
     {
+    path: 'clientes',
+    loadChildren: () => import('../clientes/clientes-routing').then(m => m.clientesRoutes),
+  },
+
+    {
         path: '**', redirectTo: ''
     }
 

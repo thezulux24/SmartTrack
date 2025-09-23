@@ -59,11 +59,35 @@ CREATE TABLE public.cirugias (
   updated_at timestamp with time zone DEFAULT now(),
   hospital_id uuid NOT NULL,
   tipo_cirugia_id uuid NOT NULL,
+  cliente_id uuid,
   CONSTRAINT cirugias_pkey PRIMARY KEY (id),
   CONSTRAINT cirugias_tecnico_asignado_id_fkey FOREIGN KEY (tecnico_asignado_id) REFERENCES public.profiles(id),
   CONSTRAINT cirugias_usuario_creador_id_fkey FOREIGN KEY (usuario_creador_id) REFERENCES public.profiles(id),
   CONSTRAINT cirugias_hospital_id_fkey FOREIGN KEY (hospital_id) REFERENCES public.hospitales(id),
-  CONSTRAINT cirugias_tipo_cirugia_id_fkey FOREIGN KEY (tipo_cirugia_id) REFERENCES public.tipos_cirugia(id)
+  CONSTRAINT cirugias_tipo_cirugia_id_fkey FOREIGN KEY (tipo_cirugia_id) REFERENCES public.tipos_cirugia(id),
+  CONSTRAINT cirugias_cliente_id_fkey FOREIGN KEY (cliente_id) REFERENCES public.clientes(id)
+);
+CREATE TABLE public.clientes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  nombre character varying NOT NULL,
+  apellido character varying NOT NULL,
+  documento_tipo character varying NOT NULL DEFAULT 'cedula'::character varying,
+  documento_numero character varying NOT NULL UNIQUE,
+  fecha_nacimiento date,
+  telefono character varying,
+  email character varying,
+  direccion text,
+  ciudad character varying,
+  pais character varying DEFAULT 'Ecuador'::character varying,
+  observaciones text,
+  estado character varying DEFAULT 'activo'::character varying,
+  created_by uuid,
+  updated_by uuid,
+  CONSTRAINT clientes_pkey PRIMARY KEY (id),
+  CONSTRAINT clientes_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id),
+  CONSTRAINT clientes_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES auth.users(id)
 );
 CREATE TABLE public.hospitales (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

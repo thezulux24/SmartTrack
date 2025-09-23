@@ -25,5 +25,7 @@ export const AGENDA_ROUTES: Routes = [
   {
     path: 'detalle/:id',
     loadComponent: () => import('./cirugia-detail/cirugia-detail.component').then(c => c.CirugiaDetailComponent)
-  }
+  },
+
+  
 ];
