@@ -1,27 +1,14 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
-interface CirugiaEvent {
-  id: string;
-  titulo: string;
-  fecha: Date;
-  horaInicio: string;
-  horaFin?: string;
-  cirujano: string;
-  paciente: string;
-  tipoUrgencia: 'programada' | 'urgente';
-  estado: 'programada' | 'en_curso' | 'completada' | 'cancelada' | 'urgencia';
-  institucion: string;
-  tecnicoAsignado?: string;
-  materialRequerido: string[];
-}
+import { CirugiasService } from '../../data-access/cirugias.service';
+import { Cirugia } from '../../data-access/models';
 
 interface CalendarDay {
   date: Date;
   isCurrentMonth: boolean;
   isToday: boolean;
-  events: CirugiaEvent[];
+  events: Cirugia[];
 }
 
 interface Alert {
@@ -38,99 +25,87 @@ interface Alert {
   templateUrl: './agenda-calendar.component.html'
 })
 export class AgendaCalendarComponent implements OnInit {
+  private cirugiasService = inject(CirugiasService);
+
+  // Signals para el estado
   currentView = signal<'month' | 'week' | 'day'>('month');
   currentDate = signal(new Date());
-  selectedEvent = signal<CirugiaEvent | null>(null);
+  selectedEvent = signal<Cirugia | null>(null);
+  loading = signal(false);
+  error = signal<string | null>(null);
   
-  // Datos de ejemplo
-  cirugias = signal<CirugiaEvent[]>([
-    {
-      id: '1',
-      titulo: 'Osteosíntesis Fémur Izquierdo',
-      fecha: new Date(2025, 8, 25), // 25 septiembre 2025
-      horaInicio: '08:00',
-      horaFin: '10:00',
-      cirujano: 'García López',
-      paciente: 'Juan Carlos Pérez',
-      tipoUrgencia: 'programada',
-      estado: 'programada',
-      institucion: 'Hospital San José',
-      tecnicoAsignado: 'Carlos López Técnico',
-      materialRequerido: ['Placa DCP 4.5mm', 'Tornillos Corticales', 'Guías de Perforación']
-    },
-    {
-      id: '2',
-      titulo: 'Fractura Tibia - EMERGENCIA',
-      fecha: new Date(2025, 8, 23), // 23 septiembre 2025 (hoy)
-      horaInicio: '14:30',
-      horaFin: '16:30',
-      cirujano: 'Martínez Silva',
-      paciente: 'Ana María González',
-      tipoUrgencia: 'urgente',
-      estado: 'urgencia',
-      institucion: 'Clínica Los Andes',
-      materialRequerido: ['Sistema Ilizarov', 'Fijador Externo', 'Material de Osteosíntesis']
-    },
-    {
-      id: '3',
-      titulo: 'Artroscopia de Rodilla',
-      fecha: new Date(2025, 8, 24), // 24 septiembre 2025
-      horaInicio: '10:00',
-      horaFin: '11:30',
-      cirujano: 'Rodriguez Muñoz',
-      paciente: 'Pedro Antonio Ruiz',
-      tipoUrgencia: 'programada',
-      estado: 'programada',
-      institucion: 'Centro Médico Nacional',
-      tecnicoAsignado: 'María Fernanda Tech',
-      materialRequerido: ['Set Artroscopia', 'Cámara HD', 'Instrumental Específico']
-    },
-    {
-      id: '4',
-      titulo: 'Fijación Columna Vertebral',
-      fecha: new Date(2025, 8, 26), // 26 septiembre 2025
-      horaInicio: '07:00',
-      horaFin: '12:00',
-      cirujano: 'Hernández Castro',
-      paciente: 'Luis Eduardo Morales',
-      tipoUrgencia: 'programada',
-      estado: 'programada',
-      institucion: 'Hospital Universitario',
-      materialRequerido: ['Sistema de Fijación Spinal', 'Tornillos Pediculares', 'Barras de Titanio']
-    }
-  ]);
+  // Datos reales
+  cirugias = signal<Cirugia[]>([]);
 
-  alerts = signal<Alert[]>([
-    {
-      tipo: 'urgente',
-      titulo: 'Material Faltante',
-      mensaje: 'Set de columna no disponible para cirugía de las 07:00 del 26/09',
-      tiempo: '5 min'
-    },
-    {
-      tipo: 'info',
-      titulo: 'Técnico Confirmado',
-      mensaje: 'Carlos López confirmado para osteosíntesis de mañana',
-      tiempo: '15 min'
-    },
-    {
-      tipo: 'advertencia',
-      titulo: 'Cambio de Horario',
-      mensaje: 'Artroscopia movida de 09:00 a 10:00 - Confirmar con equipo',
-      tiempo: '30 min'
-    }
-  ]);
+  // Alertas generadas basadas en las cirugías reales
+  alerts = computed<Alert[]>(() => {
+    const alerts: Alert[] = [];
+    const hoy = new Date();
+    const manana = new Date(hoy);
+    manana.setDate(hoy.getDate() + 1);
+
+    this.cirugias().forEach(cirugia => {
+      // Alertas de urgencia
+      if (cirugia.estado === 'urgencia' || cirugia.prioridad === 'urgencia') {
+        alerts.push({
+          tipo: 'urgente',
+          titulo: 'Cirugía de Urgencia',
+          mensaje: `${cirugia.paciente_nombre} - ${this.getTipoCirugiaNombre(cirugia)}`,
+          tiempo: this.getTimeAgo(cirugia.created_at || '')
+        });
+      }
+
+      // Alertas de cirugías sin técnico asignado para mañana
+      if (!cirugia.tecnico_asignado_id && this.isTomorrow(cirugia.fecha_programada)) {
+        alerts.push({
+          tipo: 'advertencia',
+          titulo: 'Sin Técnico Asignado',
+          mensaje: `Cirugía de ${cirugia.paciente_nombre} no tiene técnico asignado`,
+          tiempo: 'Mañana'
+        });
+      }
+
+      // Cirugías próximas (hoy)
+      if (this.isToday(new Date(cirugia.fecha_programada)) && cirugia.estado === 'programada') {
+        alerts.push({
+          tipo: 'info',
+          titulo: 'Cirugía Programada Hoy',
+          mensaje: `${cirugia.paciente_nombre} - ${this.formatHora(cirugia.hora_inicio)}`,
+          tiempo: 'Hoy'
+        });
+      }
+    });
+
+    return alerts.slice(0, 5); // Máximo 5 alertas
+  });
 
   weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   hours = Array.from({length: 14}, (_, i) => i + 6); // 6 AM a 8 PM
+
+  // Nuevo signal para controlar el modal
+  showModal = signal(false);
+  selectedEventDetails = signal<Cirugia | null>(null);
 
   ngOnInit() {
     this.loadCirugias();
   }
 
   loadCirugias() {
-    // Cargar cirugías desde el servicio
-    console.log('Cargando cirugías...');
+    this.loading.set(true);
+    this.error.set(null);
+    
+    this.cirugiasService.getCirugias().subscribe({
+      next: (cirugias) => {
+        console.log('✅ Cirugías cargadas para calendario:', cirugias);
+        this.cirugias.set(cirugias);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('❌ Error loading cirugias for calendar:', err);
+        this.error.set('Error al cargar las cirugías');
+        this.loading.set(false);
+      }
+    });
   }
 
   calendarDays = computed((): CalendarDay[] => {
@@ -162,28 +137,35 @@ export class AgendaCalendarComponent implements OnInit {
     return days;
   });
 
-  getEventsForDate(date: Date): CirugiaEvent[] {
-    return this.cirugias().filter(cirugia => 
-      cirugia.fecha.toDateString() === date.toDateString()
-    );
+  getEventsForDate(date: Date): Cirugia[] {
+    return this.cirugias().filter(cirugia => {
+      const cirugiaDate = new Date(cirugia.fecha_programada);
+      return cirugiaDate.toDateString() === date.toDateString();
+    });
   }
 
-  getEventsForHour(hour: number): CirugiaEvent[] {
+  getEventsForHour(hour: number): Cirugia[] {
     const currentDate = this.currentDate();
     return this.cirugias().filter(cirugia => {
-      if (cirugia.fecha.toDateString() !== currentDate.toDateString()) return false;
-      const eventHour = parseInt(cirugia.horaInicio.split(':')[0]);
+      const cirugiaDate = new Date(cirugia.fecha_programada);
+      if (cirugiaDate.toDateString() !== currentDate.toDateString()) return false;
+      
+      if (!cirugia.hora_inicio) return false;
+      const eventHour = parseInt(cirugia.hora_inicio.split(':')[0]);
       return eventHour === hour;
     });
   }
 
-  getEventsForDayHour(dayIndex: number, hour: number): CirugiaEvent[] {
+  getEventsForDayHour(dayIndex: number, hour: number): Cirugia[] {
     const weekDays = this.getWeekDays();
     const targetDay = weekDays[dayIndex];
     
     return this.cirugias().filter(cirugia => {
-      if (cirugia.fecha.toDateString() !== targetDay.toDateString()) return false;
-      const eventHour = parseInt(cirugia.horaInicio.split(':')[0]);
+      const cirugiaDate = new Date(cirugia.fecha_programada);
+      if (cirugiaDate.toDateString() !== targetDay.toDateString()) return false;
+      
+      if (!cirugia.hora_inicio) return false;
+      const eventHour = parseInt(cirugia.hora_inicio.split(':')[0]);
       return eventHour === hour;
     });
   }
@@ -205,6 +187,13 @@ export class AgendaCalendarComponent implements OnInit {
   isToday(date: Date): boolean {
     const today = new Date();
     return date.toDateString() === today.toDateString();
+  }
+
+  isTomorrow(dateString: string): boolean {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const date = new Date(dateString);
+    return date.toDateString() === tomorrow.toDateString();
   }
 
   getCurrentPeriodTitle(): string {
@@ -258,6 +247,11 @@ export class AgendaCalendarComponent implements OnInit {
     return `${hour.toString().padStart(2, '0')}:00`;
   }
 
+  formatHora(hora?: string): string {
+    if (!hora) return 'Sin hora';
+    return hora.substring(0, 5); // HH:MM
+  }
+
   setView(view: 'month' | 'week' | 'day') {
     this.currentView.set(view);
   }
@@ -300,9 +294,85 @@ export class AgendaCalendarComponent implements OnInit {
     this.currentDate.set(current);
   }
 
-  selectEvent(event: CirugiaEvent) {
-    this.selectedEvent.set(event);
+  selectEvent(event: Cirugia) {
+    this.selectedEventDetails.set(event);
+    this.showModal.set(true);
     console.log('Evento seleccionado:', event);
-    // Aquí podrías abrir un modal o navegar al detalle
+  }
+
+  closeModal() {
+    this.showModal.set(false);
+    this.selectedEventDetails.set(null);
+  }
+
+  // Método para navegar al detalle/edición
+  navigateToEvent(event: Cirugia) {
+    // Aquí puedes navegar al formulario de edición
+    // this.router.navigate(['/internal/agenda/editar', event.id]);
+    this.closeModal();
+  }
+
+  // Métodos helper para obtener datos con fallback (igual que en agenda-list)
+  getHospitalNombre(cirugia: Cirugia): string {
+    return cirugia.hospital_data?.nombre || 'Hospital no especificado';
+  }
+
+  getTipoCirugiaNombre(cirugia: Cirugia): string {
+    return cirugia.tipo_cirugia_data?.nombre || 'Tipo no especificado';
+  }
+
+  getTecnicoNombre(cirugia: Cirugia): string {
+    return cirugia.tecnico_asignado?.full_name || 'Sin asignar';
+  }
+
+  getDuracionEstimada(cirugia: Cirugia): string {
+    if (cirugia.duracion_estimada) {
+      const horas = Math.floor(cirugia.duracion_estimada / 60);
+      const minutos = cirugia.duracion_estimada % 60;
+      if (horas > 0) {
+        return `${horas}h ${minutos}m`;
+      }
+      return `${minutos}m`;
+    }
+    return 'No estimada';
+  }
+
+  getTimeAgo(dateString: string): string {
+    if (!dateString) return 'Reciente';
+    
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} min`;
+    } else if (diffInMinutes < 1440) {
+      return `${Math.floor(diffInMinutes / 60)}h`;
+    } else {
+      return `${Math.floor(diffInMinutes / 1440)}d`;
+    }
+  }
+
+  // Determinar el tipo de urgencia basado en el estado y prioridad
+  getTipoUrgencia(cirugia: Cirugia): 'programada' | 'urgente' {
+    return (cirugia.estado === 'urgencia' || cirugia.prioridad === 'urgencia') ? 'urgente' : 'programada';
+  }
+
+  // Obtener la hora de fin estimada
+  getHoraFin(cirugia: Cirugia): string {
+    if (!cirugia.hora_inicio || !cirugia.duracion_estimada) return '';
+    
+    const [horas, minutos] = cirugia.hora_inicio.split(':').map(Number);
+    const inicioEnMinutos = horas * 60 + minutos;
+    const finEnMinutos = inicioEnMinutos + cirugia.duracion_estimada;
+    
+    const horaFin = Math.floor(finEnMinutos / 60);
+    const minutosFin = finEnMinutos % 60;
+    
+    return `${horaFin.toString().padStart(2, '0')}:${minutosFin.toString().padStart(2, '0')}`;
+  }
+
+  refreshData() {
+    this.loadCirugias();
   }
 }
