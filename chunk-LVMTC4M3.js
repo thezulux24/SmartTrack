@@ -1,4 +1,4 @@
-import{a as v}from"./chunk-FT475XF5.js";import{b as t,c as n,d as c,g as s,k as _,n as p,r as g}from"./chunk-MUJJ6JXK.js";import{a as d,b as u}from"./chunk-FK42CRUA.js";var b=class l{supabase=g(v);getProductos(){return t(this.supabase.client.from("productos").select(`
+import{Fa as v,b as t,c as n,d as c,g as s,k as _,n as p,r as g}from"./chunk-QDKNTWK2.js";import{a as d,b as u}from"./chunk-FK42CRUA.js";var b=class l{supabase=g(v);getProductos(){return t(this.supabase.client.from("productos").select(`
           *,
           inventario:inventario(
             id,
