@@ -1,4 +1,4 @@
-import{o as m}from"./chunk-IWA6XHIC.js";import{G as u,L as p,Q as f,h as o,j as c,m as s,u as n}from"./chunk-3GALTHTS.js";import{a as l,b as _}from"./chunk-FK42CRUA.js";var h=class d{constructor(i){this.supabase=i}getCirugias(){return o(this.supabase.client.from("cirugias").select(`
+import{a as m}from"./chunk-FT475XF5.js";import{b as o,c,d as s,g as n,k as u,n as p,q as f}from"./chunk-MUJJ6JXK.js";import{a as l,b as _}from"./chunk-FK42CRUA.js";var h=class d{constructor(i){this.supabase=i}getCirugias(){return o(this.supabase.client.from("cirugias").select(`
           *,
           tecnico_asignado:profiles!cirugias_tecnico_asignado_id_fkey(
             id,

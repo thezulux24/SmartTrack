@@ -1,0 +1,1 @@
+import"./chunk-FK42CRUA.js";var t=[{path:"",loadComponent:()=>import("./chunk-GXHXLXYV.js").then(o=>o.ClientesListComponent)},{path:"nuevo",loadComponent:()=>import("./chunk-FS4D3VLO.js").then(o=>o.ClienteFormComponent)},{path:"editar/:id",loadComponent:()=>import("./chunk-FS4D3VLO.js").then(o=>o.ClienteFormComponent)}];export{t as clientesRoutes};
