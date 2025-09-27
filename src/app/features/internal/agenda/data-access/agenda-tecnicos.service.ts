@@ -1,205 +1,238 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
-import { AgendaTecnico, AgendaTecnicoCreate, Profile } from './models';
+import { from, Observable } from 'rxjs';
+import { Cirugia } from './models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AgendaTecnicosService {
-  constructor(private supabase: SupabaseService) {}
+  private supabase = inject(SupabaseService);
 
-  getAgendaTecnicos(): Observable<AgendaTecnico[]> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('agenda_tecnicos')
-        .select(`
-          *,
-          tecnico:profiles(full_name, email, phone)
-        `)
-        .order('fecha', { ascending: true })
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data || []);
-            observer.complete();
-          }
-        });
-    });
+  // Obtener cirugías asignadas al técnico actual
+  getMyCirugias(): Observable<Cirugia[]> {
+    return from(
+      this.getTechnicianCirugias()
+    );
   }
 
-  getAgendaPorTecnico(tecnicoId: string, fechaInicio?: string, fechaFin?: string): Observable<AgendaTecnico[]> {
-    return new Observable(observer => {
-      let query = this.supabase.client
-        .from('agenda_tecnicos')
-        .select('*')
-        .eq('tecnico_id', tecnicoId);
-
-      if (fechaInicio) {
-        query = query.gte('fecha', fechaInicio);
-      }
-      if (fechaFin) {
-        query = query.lte('fecha', fechaFin);
+  private async getTechnicianCirugias(): Promise<Cirugia[]> {
+    try {
+      // Obtener el ID del usuario actual
+      const currentUserId = await this.supabase.getCurrentUserId();
+      
+      if (!currentUserId) {
+        throw new Error('Usuario no autenticado');
       }
 
-      query
-        .order('fecha', { ascending: true })
-        .order('hora_inicio', { ascending: true })
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data || []);
-            observer.complete();
-          }
-        });
-    });
-  }
-
-  getAgendaPorFecha(fecha: string): Observable<AgendaTecnico[]> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('agenda_tecnicos')
+      const { data, error } = await this.supabase.client
+        .from('cirugias')
         .select(`
           *,
-          tecnico:profiles(full_name, email)
+          hospital_data:hospital_id(id, nombre, direccion, telefono, contacto_principal),
+          tipo_cirugia_data:tipo_cirugia_id(id, nombre, descripcion, duracion_promedio),
+          tecnico_asignado:tecnico_asignado_id(id, full_name, email, phone),
+          usuario_creador:usuario_creador_id(id, full_name, email)
         `)
-        .eq('fecha', fecha)
-        .order('hora_inicio', { ascending: true })
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data || []);
-            observer.complete();
-          }
-        });
-    });
+        .eq('tecnico_asignado_id', currentUserId) // Solo cirugías asignadas a este técnico
+        .order('fecha_programada', { ascending: true });
+
+      if (error) {
+        console.error('Error loading technician cirugias:', error);
+        throw error;
+      }
+
+      console.log('✅ Cirugías del técnico cargadas:', data);
+      return data || [];
+    } catch (error) {
+      console.error('❌ Error in getTechnicianCirugias:', error);
+      throw error;
+    }
   }
 
-  createDisponibilidad(agenda: AgendaTecnicoCreate): Observable<AgendaTecnico> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('agenda_tecnicos')
-        .insert(agenda)
-        .select()
-        .single()
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data);
-            observer.complete();
-          }
-        });
-    });
+  // Obtener cirugías del técnico para un rango de fechas específico
+  getMyCirugiasForDateRange(startDate: string, endDate: string): Observable<Cirugia[]> {
+    return from(
+      this.getTechnicianCirugiasForDateRange(startDate, endDate)
+    );
   }
 
-  updateDisponibilidad(id: string, updates: Partial<AgendaTecnico>): Observable<AgendaTecnico> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('agenda_tecnicos')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single()
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data);
-            observer.complete();
-          }
-        });
-    });
-  }
+  private async getTechnicianCirugiasForDateRange(startDate: string, endDate: string): Promise<Cirugia[]> {
+    try {
+      const currentUserId = await this.supabase.getCurrentUserId();
+      
+      if (!currentUserId) {
+        throw new Error('Usuario no autenticado');
+      }
 
-  deleteDisponibilidad(id: string): Observable<void> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('agenda_tecnicos')
-        .delete()
-        .eq('id', id)
-        .then(({ error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next();
-            observer.complete();
-          }
-        });
-    });
-  }
-
-  getTecnicosDisponibles(fecha: string, horaInicio: string, horaFin: string): Observable<Profile[]> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('agenda_tecnicos')
+      const { data, error } = await this.supabase.client
+        .from('cirugias')
         .select(`
-          tecnico_id,
-          tecnico:profiles(*)
+          *,
+          hospital_data:hospital_id(id, nombre, direccion, telefono, contacto_principal),
+          tipo_cirugia_data:tipo_cirugia_id(id, nombre, descripcion, duracion_promedio),
+          tecnico_asignado:tecnico_asignado_id(id, full_name, email, phone),
+          usuario_creador:usuario_creador_id(id, full_name, email)
         `)
-        .eq('fecha', fecha)
-        .eq('disponible', true)
-        .lte('hora_inicio', horaInicio)
-        .gte('hora_fin', horaFin)
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            const tecnicos = (data?.map(item => {
-              const t = item?.tecnico;
-              if (Array.isArray(t)) return t[0] ?? null;
-              return t ?? null;
-            }).filter((t): t is Profile => !!t) as Profile[]) || [];
-            observer.next(tecnicos);
-            observer.complete();
-          }
-        });
-    });
+        .eq('tecnico_asignado_id', currentUserId)
+        .gte('fecha_programada', startDate)
+        .lte('fecha_programada', endDate)
+        .order('fecha_programada', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('❌ Error getting cirugias for date range:', error);
+      throw error;
+    }
   }
 
-  marcarNoDisponible(tecnicoId: string, fecha: string, motivo: string): Observable<void> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('agenda_tecnicos')
+  // Obtener estadísticas del técnico
+  async getTechnicianStats(): Promise<{
+    totalCirugias: number;
+    cirugiasPendientes: number;
+    cirugiasCompletadas: number;
+    cirugiasHoy: number;
+  }> {
+    try {
+      const currentUserId = await this.supabase.getCurrentUserId();
+      
+      if (!currentUserId) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+
+      // Total cirugías asignadas
+      const { data: totalData, error: totalError } = await this.supabase.client
+        .from('cirugias')
+        .select('id', { count: 'exact' })
+        .eq('tecnico_asignado_id', currentUserId);
+
+      if (totalError) throw totalError;
+
+      // Cirugías pendientes
+      const { data: pendientesData, error: pendientesError } = await this.supabase.client
+        .from('cirugias')
+        .select('id', { count: 'exact' })
+        .eq('tecnico_asignado_id', currentUserId)
+        .in('estado', ['programada', 'en_curso']);
+
+      if (pendientesError) throw pendientesError;
+
+      // Cirugías completadas
+      const { data: completadasData, error: completadasError } = await this.supabase.client
+        .from('cirugias')
+        .select('id', { count: 'exact' })
+        .eq('tecnico_asignado_id', currentUserId)
+        .eq('estado', 'completada');
+
+      if (completadasError) throw completadasError;
+
+      // Cirugías de hoy
+      const { data: hoyData, error: hoyError } = await this.supabase.client
+        .from('cirugias')
+        .select('id', { count: 'exact' })
+        .eq('tecnico_asignado_id', currentUserId)
+        .gte('fecha_programada', today)
+        .lt('fecha_programada', `${today}T23:59:59`);
+
+      if (hoyError) throw hoyError;
+
+      return {
+        totalCirugias: totalData?.length || 0,
+        cirugiasPendientes: pendientesData?.length || 0,
+        cirugiasCompletadas: completadasData?.length || 0,
+        cirugiasHoy: hoyData?.length || 0
+      };
+    } catch (error) {
+      console.error('❌ Error getting technician stats:', error);
+      return {
+        totalCirugias: 0,
+        cirugiasPendientes: 0,
+        cirugiasCompletadas: 0,
+        cirugiasHoy: 0
+      };
+    }
+  }
+
+  // Marcar cirugía como completada (si el técnico tiene permisos)
+  async markCirugiaAsCompleted(cirugiaId: string): Promise<void> {
+    try {
+      const currentUserId = await this.supabase.getCurrentUserId();
+      
+      if (!currentUserId) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      // Verificar que la cirugía esté asignada al técnico actual
+      const { data: cirugia, error: checkError } = await this.supabase.client
+        .from('cirugias')
+        .select('id, tecnico_asignado_id')
+        .eq('id', cirugiaId)
+        .eq('tecnico_asignado_id', currentUserId)
+        .single();
+
+      if (checkError || !cirugia) {
+        throw new Error('No tienes permisos para modificar esta cirugía');
+      }
+
+      // Actualizar el estado
+      const { error } = await this.supabase.client
+        .from('cirugias')
         .update({ 
-          disponible: false, 
-          motivo_no_disponible: motivo 
+          estado: 'completada',
+          updated_at: new Date().toISOString(),
+          updated_by: currentUserId
         })
-        .eq('tecnico_id', tecnicoId)
-        .eq('fecha', fecha)
-        .then(({ error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next();
-            observer.complete();
-          }
-        });
-    });
+        .eq('id', cirugiaId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('❌ Error marking cirugia as completed:', error);
+      throw error;
+    }
   }
 
-  getTecnicosSoporteTecnico(): Observable<Profile[]> {
-    return new Observable(observer => {
-      this.supabase.client
-        .from('profiles')
-        .select('*')
-        .eq('role', 'soporte_tecnico')
-        .eq('is_active', true)
-        .order('full_name', { ascending: true })
-        .then(({ data, error }) => {
-          if (error) {
-            observer.error(error);
-          } else {
-            observer.next(data || []);
-            observer.complete();
-          }
-        });
-    });
+  // Agregar notas del técnico a una cirugía
+  async addTechnicianNotes(cirugiaId: string, notes: string): Promise<void> {
+    try {
+      const currentUserId = await this.supabase.getCurrentUserId();
+      
+      if (!currentUserId) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      // Verificar que la cirugía esté asignada al técnico actual
+      const { data: cirugia, error: checkError } = await this.supabase.client
+        .from('cirugias')
+        .select('id, tecnico_asignado_id, notas')
+        .eq('id', cirugiaId)
+        .eq('tecnico_asignado_id', currentUserId)
+        .single();
+
+      if (checkError || !cirugia) {
+        throw new Error('No tienes permisos para modificar esta cirugía');
+      }
+
+      // Agregar las notas del técnico a las notas existentes
+      const existingNotes = cirugia.notas || '';
+      const technicianNote = `[Técnico - ${new Date().toLocaleDateString()}]: ${notes}`;
+      const updatedNotes = existingNotes ? `${existingNotes}\n\n${technicianNote}` : technicianNote;
+
+      const { error } = await this.supabase.client
+        .from('cirugias')
+        .update({ 
+          notas: updatedNotes,
+          updated_at: new Date().toISOString(),
+          updated_by: currentUserId
+        })
+        .eq('id', cirugiaId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('❌ Error adding technician notes:', error);
+      throw error;
+    }
   }
-
-
-  
 }

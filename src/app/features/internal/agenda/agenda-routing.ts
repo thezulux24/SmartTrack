@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AgendaTecnicoComponent } from './agenda-tecnico/agenda-tecnico.component';
 
 export const AGENDA_ROUTES: Routes = [
   {
@@ -26,6 +27,9 @@ export const AGENDA_ROUTES: Routes = [
     path: 'detalle/:id',
     loadComponent: () => import('./cirugia-detail/cirugia-detail.component').then(c => c.CirugiaDetailComponent)
   },
+
+  { path: 'mi-agenda', loadComponent: () => import('./agenda-tecnico/agenda-tecnico.component').then(c => c.AgendaTecnicoComponent) }, // Nueva ruta para técnicos
+
 
   
 ];

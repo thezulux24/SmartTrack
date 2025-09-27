@@ -1,8 +1,8 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CirugiasService } from '../../data-access/cirugias.service';
-import { Cirugia } from '../../data-access/models';
+import { AgendaTecnicosService } from '../data-access/agenda-tecnicos.service';
+import { Cirugia } from '../data-access/models';
 
 interface CalendarDay {
   date: Date;
@@ -19,13 +19,14 @@ interface Alert {
 }
 
 @Component({
-  selector: 'app-agenda-calendar',
+  selector: 'app-agenda-tecnico',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './agenda-calendar.component.html'
+  templateUrl: './agenda-tecnico.component.html',
+  styleUrl: './agenda-tecnico.component.css'
 })
-export class AgendaCalendarComponent implements OnInit {
-  private cirugiasService = inject(CirugiasService);
+export class AgendaTecnicoComponent implements OnInit {
+  private technicianAgendaService = inject(AgendaTecnicosService);
 
   // Signals para el estado
   currentView = signal<'month' | 'week' | 'day'>('month');
@@ -34,10 +35,14 @@ export class AgendaCalendarComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   
-  // Datos reales
+  // Datos reales - solo cirugías del técnico
   cirugias = signal<Cirugia[]>([]);
 
-  // Alertas generadas basadas en las cirugías reales
+  // Modal para detalles
+  showModal = signal(false);
+  selectedEventDetails = signal<Cirugia | null>(null);
+
+  // Alertas específicas del técnico
   alerts = computed<Alert[]>(() => {
     const alerts: Alert[] = [];
     const hoy = new Date();
@@ -45,33 +50,42 @@ export class AgendaCalendarComponent implements OnInit {
     manana.setDate(hoy.getDate() + 1);
 
     this.cirugias().forEach(cirugia => {
-      // Alertas de urgencia
-      if (cirugia.estado === 'urgencia' || cirugia.prioridad === 'urgencia') {
-        alerts.push({
-          tipo: 'urgente',
-          titulo: 'Cirugía de Urgencia',
-          mensaje: `${cirugia.paciente_nombre} - ${this.getTipoCirugiaNombre(cirugia)}`,
-          tiempo: this.getTimeAgo(cirugia.created_at || '')
-        });
+      // Alertas de cirugías de hoy
+      if (this.isToday(new Date(cirugia.fecha_programada))) {
+        if (cirugia.estado === 'programada') {
+          alerts.push({
+            tipo: 'info',
+            titulo: 'Cirugía Programada Hoy',
+            mensaje: `${cirugia.paciente_nombre} - ${this.formatHora(cirugia.hora_inicio)}`,
+            tiempo: 'Hoy'
+          });
+        } else if (cirugia.estado === 'en_curso') {
+          alerts.push({
+            tipo: 'urgente',
+            titulo: 'Cirugía en Curso',
+            mensaje: `${cirugia.paciente_nombre} - ${this.getTipoCirugiaNombre(cirugia)}`,
+            tiempo: 'En curso'
+          });
+        }
       }
 
-      // Alertas de cirugías sin técnico asignado para mañana
-      if (!cirugia.tecnico_asignado_id && this.isTomorrow(cirugia.fecha_programada)) {
+      // Cirugías de mañana
+      if (this.isTomorrow(cirugia.fecha_programada) && cirugia.estado === 'programada') {
         alerts.push({
           tipo: 'advertencia',
-          titulo: 'Sin Técnico Asignado',
-          mensaje: `Cirugía de ${cirugia.paciente_nombre} no tiene técnico asignado`,
+          titulo: 'Cirugía Mañana',
+          mensaje: `${cirugia.paciente_nombre} - ${this.formatHora(cirugia.hora_inicio)}`,
           tiempo: 'Mañana'
         });
       }
 
-      // Cirugías próximas (hoy)
-      if (this.isToday(new Date(cirugia.fecha_programada)) && cirugia.estado === 'programada') {
+      // Cirugías urgentes asignadas
+      if (cirugia.prioridad === 'urgencia' && cirugia.estado !== 'completada') {
         alerts.push({
-          tipo: 'info',
-          titulo: 'Cirugía Programada Hoy',
-          mensaje: `${cirugia.paciente_nombre} - ${this.formatHora(cirugia.hora_inicio)}`,
-          tiempo: 'Hoy'
+          tipo: 'urgente',
+          titulo: 'Cirugía Urgente Asignada',
+          mensaje: `${cirugia.paciente_nombre} - ${this.getTipoCirugiaNombre(cirugia)}`,
+          tiempo: this.getTimeAgo(cirugia.created_at || '')
         });
       }
     });
@@ -80,29 +94,26 @@ export class AgendaCalendarComponent implements OnInit {
   });
 
   weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-  hours = Array.from({ length: 24 }, (_, i) => i); // 00:00 a 23:00
+hours = Array.from({ length: 24 }, (_, i) => i); // 00:00 a 23:00
 
-  // Nuevo signal para controlar el modal
-  showModal = signal(false);
-  selectedEventDetails = signal<Cirugia | null>(null);
 
   ngOnInit() {
-    this.loadCirugias();
+    this.loadMyCirugias();
   }
 
-  loadCirugias() {
+  loadMyCirugias() {
     this.loading.set(true);
     this.error.set(null);
     
-    this.cirugiasService.getCirugias().subscribe({
+    this.technicianAgendaService.getMyCirugias().subscribe({
       next: (cirugias) => {
-        console.log('✅ Cirugías cargadas para calendario:', cirugias);
+        console.log('✅ Mis cirugías cargadas:', cirugias);
         this.cirugias.set(cirugias);
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('❌ Error loading cirugias for calendar:', err);
-        this.error.set('Error al cargar las cirugías');
+        console.error('❌ Error loading my cirugias:', err);
+        this.error.set('Error al cargar mis cirugías asignadas');
         this.loading.set(false);
       }
     });
@@ -297,7 +308,7 @@ export class AgendaCalendarComponent implements OnInit {
   selectEvent(event: Cirugia) {
     this.selectedEventDetails.set(event);
     this.showModal.set(true);
-    console.log('Evento seleccionado:', event);
+    console.log('Mi cirugía seleccionada:', event);
   }
 
   closeModal() {
@@ -305,14 +316,13 @@ export class AgendaCalendarComponent implements OnInit {
     this.selectedEventDetails.set(null);
   }
 
-  // Método para navegar al detalle/edición
   navigateToEvent(event: Cirugia) {
-    // Aquí puedes navegar al formulario de edición
-    // this.router.navigate(['/internal/agenda/editar', event.id]);
+    // Aquí puedes navegar al detalle de la cirugía
+    // this.router.navigate(['/internal/agenda/detalle', event.id]);
     this.closeModal();
   }
 
-  // Métodos helper para obtener datos con fallback (igual que en agenda-list)
+  // Métodos helper (iguales que en el calendario principal)
   getHospitalNombre(cirugia: Cirugia): string {
     return cirugia.hospital_data?.nombre || 'Hospital no especificado';
   }
@@ -353,12 +363,10 @@ export class AgendaCalendarComponent implements OnInit {
     }
   }
 
-  // Determinar el tipo de urgencia basado en el estado y prioridad
   getTipoUrgencia(cirugia: Cirugia): 'programada' | 'urgente' {
     return (cirugia.estado === 'urgencia' || cirugia.prioridad === 'urgencia') ? 'urgente' : 'programada';
   }
 
-  // Obtener la hora de fin estimada
   getHoraFin(cirugia: Cirugia): string {
     if (!cirugia.hora_inicio || !cirugia.duracion_estimada) return '';
     
@@ -373,6 +381,6 @@ export class AgendaCalendarComponent implements OnInit {
   }
 
   refreshData() {
-    this.loadCirugias();
+    this.loadMyCirugias();
   }
 }
