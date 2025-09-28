@@ -94,7 +94,7 @@ export class AgendaTecnicoComponent implements OnInit {
   });
 
   weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-hours = Array.from({ length: 24 }, (_, i) => i); // 00:00 a 23:00
+ hours = Array.from({ length: 24 }, (_, i) => i); // 00:00 a 23:00
 
 
   ngOnInit() {
