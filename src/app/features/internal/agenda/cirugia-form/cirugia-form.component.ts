@@ -1,14 +1,13 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule} from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { combineLatest } from 'rxjs';
 
 import { CirugiasService } from '../data-access/cirugias.service';
 import { HospitalesService } from '../data-access/hospitales.service';
 import { TiposCirugiaService } from '../data-access/tipos-cirugia.service';
 import { TecnicosService } from '../data-access/tecnicos.service';
+import { KitService } from '../../../../shared/services/kit.service';
 import { Hospital, TipoCirugia, TecnicoAsignado, Cirugia, CirugiaCreate } from '../data-access/models';
 
 @Component({
@@ -19,18 +18,22 @@ import { Hospital, TipoCirugia, TecnicoAsignado, Cirugia, CirugiaCreate } from '
   styleUrl: './cirugia-form.component.css'
 })
 export class CirugiaFormComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private cirugiasService = inject(CirugiasService);
-  private hospitalesService = inject(HospitalesService);
-  private tiposCirugiaService = inject(TiposCirugiaService);
-  private tecnicosService = inject(TecnicosService);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly cirugiasService = inject(CirugiasService);
+  private readonly hospitalesService = inject(HospitalesService);
+  private readonly tiposCirugiaService = inject(TiposCirugiaService);
+  private readonly tecnicosService = inject(TecnicosService);
+  private readonly kitService = inject(KitService);
 
   // Signals
   loading = signal(false);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
+  cirugiaCreada = signal<Cirugia | null>(null);
+  cirugiaEditada = signal<Cirugia | null>(null);
+  tieneKit = signal<boolean>(false);
   
   // Data signals
   hospitales = signal<Hospital[]>([]);
@@ -176,6 +179,10 @@ export class CirugiaFormComponent implements OnInit {
       next: (cirugia) => {
         console.log('✅ Cirugía cargada:', cirugia);
         this.populateForm(cirugia);
+        this.cirugiaEditada.set(cirugia);
+        if (this.cirugiaId) {
+          this.verificarKit(this.cirugiaId);
+        }
         this.loading.set(false);
       },
       error: (err) => {
@@ -272,9 +279,8 @@ export class CirugiaFormComponent implements OnInit {
       next: (cirugia) => {
         console.log('✅ Cirugía creada exitosamente:', cirugia);
         this.success.set('Cirugía creada exitosamente');
-        setTimeout(() => {
-          this.router.navigate(['/internal/agenda']);
-        }, 1500);
+        this.cirugiaCreada.set(cirugia);
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('❌ Error creating cirugia:', err);
@@ -333,6 +339,29 @@ export class CirugiaFormComponent implements OnInit {
   }
 
   onCancel() {
+    this.router.navigate(['/internal/agenda']);
+  }
+
+  private verificarKit(cirugiaId: string) {
+    this.kitService.tieneKit(cirugiaId).subscribe({
+      next: (tiene) => {
+        this.tieneKit.set(tiene);
+      },
+      error: (err) => {
+        console.error('Error verificando kit:', err);
+        this.tieneKit.set(false);
+      }
+    });
+  }
+
+  onCrearKit() {
+    const cirugia = this.cirugiaCreada() || this.cirugiaEditada();
+    if (cirugia) {
+      this.router.navigate(['/internal/agenda/kit-builder', cirugia.id]);
+    }
+  }
+
+  onVolverAgenda() {
     this.router.navigate(['/internal/agenda']);
   }
 

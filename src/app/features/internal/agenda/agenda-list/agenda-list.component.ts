@@ -1,8 +1,9 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { CirugiasService } from '../data-access/cirugias.service';
 import { Cirugia } from '../data-access/models';
+import { KitService } from '../../../../shared/services/kit.service';
 
 @Component({
   selector: 'app-agenda-list',
@@ -17,6 +18,7 @@ export class AgendaListComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   cirugias = signal<Cirugia[]>([]);
+  kitstatus = signal<Record<string, boolean>>({});
   
   // Signals para filtros
   searchTerm = signal('');
@@ -58,7 +60,9 @@ export class AgendaListComponent implements OnInit {
     return result;
   });
 
-  constructor(private cirugiasService: CirugiasService) {}
+  private readonly cirugiasService = inject(CirugiasService);
+  private readonly router = inject(Router);
+  private readonly kitService = inject(KitService);
 
   ngOnInit() {
     this.loadData();
@@ -71,6 +75,7 @@ export class AgendaListComponent implements OnInit {
     this.cirugiasService.getCirugias().subscribe({
       next: (cirugias) => {
         this.cirugias.set(cirugias);
+        this.verificarKitsStatus(cirugias);
         this.loading.set(false);
       },
       error: (err) => {
@@ -332,4 +337,33 @@ export class AgendaListComponent implements OnInit {
     { value: 'cancelada', label: 'Cancelada' },
     { value: 'urgencia', label: 'Urgencia' }
   ];
+
+  // Verificar estado de kits para todas las cirugías
+  private verificarKitsStatus(cirugias: Cirugia[]) {
+    const statusMap: Record<string, boolean> = {};
+    
+    // Verificar cada cirugía de forma paralela
+    cirugias.forEach(cirugia => 
+      this.kitService.tieneKit(cirugia.id).subscribe({
+        next: (tieneKit) => {
+          statusMap[cirugia.id] = tieneKit;
+          this.kitstatus.set({ ...this.kitstatus(), ...statusMap });
+        },
+        error: () => {
+          statusMap[cirugia.id] = false;
+          this.kitstatus.set({ ...this.kitstatus(), ...statusMap });
+        }
+      })
+    );
+  }
+
+  // Método para verificar si una cirugía tiene kit
+  tieneKit(cirugiaId: string): boolean {
+    return this.kitstatus()[cirugiaId] || false;
+  }
+
+  // Nuevo método para navegar a crear kit
+  onCrearKit(cirugiaId: string) {
+    this.router.navigate(['/internal/agenda/kit-builder', cirugiaId]);
+  }
 }

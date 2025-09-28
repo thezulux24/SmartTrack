@@ -73,7 +73,8 @@
       </div>
     }
 
-    @if (success()) {
+    <!-- Mensaje de éxito simple (sin cirugía creada) -->
+    @if (success() && !cirugiaCreada()) {
       <div class="px-4 py-4">
         <div class="max-w-lg mx-auto">
           <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl shadow-md">
@@ -88,10 +89,107 @@
       </div>
     }
 
+    <!-- Estado de cirugía creada exitosamente con opciones -->
+    @if (cirugiaCreada()) {
+      <div class="px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-green-50 border border-green-200 rounded-xl shadow-md p-6 text-center">
+            <div class="mb-4">
+              <svg class="w-12 h-12 text-green-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-green-800 mb-2">¡Cirugía creada exitosamente!</h3>
+              <p class="text-green-700 text-sm mb-1">
+                <span class="font-medium">{{ cirugiaCreada()?.numero_cirugia }}</span>
+              </p>
+              <p class="text-green-600 text-sm">
+                {{ cirugiaCreada()?.paciente_nombre }} - {{ cirugiaCreada()?.medico_cirujano }}
+              </p>
+            </div>
+            
+            <div class="space-y-3">
+              <p class="text-sm text-gray-700 mb-4">
+                ¿Qué te gustaría hacer ahora?
+              </p>
+              
+              <div class="space-y-2">
+                <button type="button" 
+                        (click)="onCrearKit()"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition duration-200 shadow-md">
+                  <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  Crear Kit Quirúrgico
+                </button>
+                
+                <button type="button" 
+                        (click)="onVolverAgenda()"
+                        class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 px-4 py-3 rounded-lg font-medium transition duration-200">
+                  <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                  </svg>
+                  Volver a la Agenda
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Estado de cirugía editada - Opción de crear kit -->
+    @if (isEditing && cirugiaEditada() && !tieneKit()) {
+      <div class="px-4 py-4">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl shadow-md p-4">
+            <div class="flex items-start space-x-3">
+              <svg class="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-blue-800 mb-1">Esta cirugía no tiene kit asignado</h3>
+                <p class="text-sm text-blue-700 mb-3">
+                  Para completar la preparación, puedes crear un kit quirúrgico con los productos necesarios.
+                </p>
+                <button type="button" 
+                        (click)="onCrearKit()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md">
+                  <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  Crear Kit Quirúrgico
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Indicador de kit existente -->
+    @if (isEditing && cirugiaEditada() && tieneKit()) {
+      <div class="px-4 py-4">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-green-50 border border-green-200 rounded-xl shadow-md p-4">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-medium text-green-800">Kit quirúrgico creado</p>
+                <p class="text-xs text-green-600">Esta cirugía ya tiene su kit asignado</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
     <!-- Contenido principal -->
-    <main class="px-4 py-6">
-      <!-- Form -->
-      <form [formGroup]="cirugiaForm" (ngSubmit)="onSubmit()" class="max-w-lg mx-auto space-y-6">
+    @if (!cirugiaCreada()) {
+      <main class="px-4 py-6">
+        <!-- Form -->
+        <form [formGroup]="cirugiaForm" (ngSubmit)="onSubmit()" class="max-w-lg mx-auto space-y-6">
         
         <!-- Información del Paciente -->
         <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
@@ -378,22 +476,10 @@
         </div>
       </form>
 
-      <!-- Debug Info (remover en producción) -->
-      @if (!loading() && !error()) {
-        <div class="max-w-lg mx-auto mt-6">
-          <div class="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl text-sm">
-            <p class="font-medium text-gray-900 dark:text-white mb-2">Debug Info:</p>
-            <div class="space-y-1 text-gray-600 dark:text-gray-400">
-              <p>Hospitales: {{ hospitales().length }} <button (click)="debugHospitales()" class="text-blue-600 underline ml-2">Ver en consola</button></p>
-              <p>Tipos: {{ tiposCirugia().length }} <button (click)="debugTipos()" class="text-blue-600 underline ml-2">Ver en consola</button></p>
-              <p>Técnicos: {{ tecnicos().length }} <button (click)="debugTecnicos()" class="text-blue-600 underline ml-2">Ver en consola</button></p>
-            </div>
-          </div>
-        </div>
-      }
-
       <!-- Bottom spacing para móvil -->
       <div class="h-6"></div>
     </main>
   }
-</section>
+}
+  </section>
+  

@@ -177,3 +177,101 @@ CREATE TABLE public.tipos_cirugia (
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT tipos_cirugia_pkey PRIMARY KEY (id)
 );
+
+-- Tabla para gestionar los kits de cirugía
+CREATE TABLE public.kits_cirugia (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cirugia_id uuid NOT NULL,
+  numero_kit character varying NOT NULL UNIQUE,
+  qr_code character varying NOT NULL UNIQUE,
+  estado character varying DEFAULT 'preparando'::character varying, -- preparando, listo, enviado, en_uso, devuelto, facturado
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_preparacion timestamp with time zone,
+  fecha_envio timestamp with time zone,
+  fecha_recepcion timestamp with time zone,
+  fecha_devolucion timestamp with time zone,
+  comercial_id uuid,
+  tecnico_id uuid,
+  logistica_id uuid,
+  observaciones text,
+  ubicacion_actual character varying,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT kits_cirugia_pkey PRIMARY KEY (id),
+  CONSTRAINT kits_cirugia_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
+  CONSTRAINT kits_cirugia_comercial_id_fkey FOREIGN KEY (comercial_id) REFERENCES public.profiles(id),
+  CONSTRAINT kits_cirugia_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id),
+  CONSTRAINT kits_cirugia_logistica_id_fkey FOREIGN KEY (logistica_id) REFERENCES public.profiles(id)
+);
+
+-- Tabla para el detalle de productos en cada kit
+CREATE TABLE public.kit_productos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  kit_id uuid NOT NULL,
+  producto_id uuid NOT NULL,
+  cantidad_solicitada integer NOT NULL DEFAULT 1,
+  cantidad_preparada integer DEFAULT 0,
+  cantidad_enviada integer DEFAULT 0,
+  cantidad_utilizada integer DEFAULT 0,
+  cantidad_devuelta integer DEFAULT 0,
+  precio_unitario numeric,
+  lote character varying,
+  fecha_vencimiento date,
+  observaciones text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT kit_productos_pkey PRIMARY KEY (id),
+  CONSTRAINT kit_productos_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
+  CONSTRAINT kit_productos_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id)
+);
+
+-- Tabla para trazabilidad del flujo del kit
+CREATE TABLE public.kit_trazabilidad (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  kit_id uuid NOT NULL,
+  accion character varying NOT NULL, -- creado, preparado, enviado, recibido, escaneado, devuelto, etc.
+  estado_anterior character varying,
+  estado_nuevo character varying NOT NULL,
+  usuario_id uuid NOT NULL,
+  ubicacion character varying,
+  coordenadas_lat numeric,
+  coordenadas_lng numeric,
+  timestamp timestamp with time zone DEFAULT now(),
+  observaciones text,
+  metadata jsonb, -- Para datos adicionales como fotos, firmas digitales, etc.
+  CONSTRAINT kit_trazabilidad_pkey PRIMARY KEY (id),
+  CONSTRAINT kit_trazabilidad_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
+  CONSTRAINT kit_trazabilidad_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
+);
+
+-- Tabla para códigos QR y su gestión
+CREATE TABLE public.qr_codes (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  codigo character varying NOT NULL UNIQUE,
+  tipo character varying NOT NULL DEFAULT 'kit'::character varying, -- kit, producto, ubicacion
+  referencia_id uuid NOT NULL, -- ID del kit, producto, etc.
+  es_activo boolean DEFAULT true,
+  fecha_generacion timestamp with time zone DEFAULT now(),
+  fecha_expiracion timestamp with time zone,
+  veces_escaneado integer DEFAULT 0,
+  ultimo_escaneo timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT qr_codes_pkey PRIMARY KEY (id)
+);
+
+-- Tabla para registrar escaneos de QR
+CREATE TABLE public.qr_escaneos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  qr_code_id uuid NOT NULL,
+  usuario_id uuid,
+  fecha_escaneo timestamp with time zone DEFAULT now(),
+  ubicacion character varying,
+  coordenadas_lat numeric,
+  coordenadas_lng numeric,
+  dispositivo_info jsonb,
+  accion_realizada character varying,
+  resultado character varying DEFAULT 'exitoso'::character varying,
+  observaciones text,
+  CONSTRAINT qr_escaneos_pkey PRIMARY KEY (id),
+  CONSTRAINT qr_escaneos_qr_code_id_fkey FOREIGN KEY (qr_code_id) REFERENCES public.qr_codes(id),
+  CONSTRAINT qr_escaneos_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
+);

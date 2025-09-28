@@ -1,0 +1,320 @@
+
+
+/* =================================
+   ESTILOS GLOBALES SMARTTRACK
+   ================================= */
+
+/* Layout Containers */
+.page-container {
+  @apply bg-gray-50 dark:bg-gray-900 min-h-screen;
+}
+
+.form-container {
+  @apply max-w-lg mx-auto;
+}
+
+.content-wrapper {
+  @apply px-4 py-6;
+}
+
+/* Headers */
+.header-primary {
+  @apply bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg;
+}
+
+.header-secondary {
+  @apply bg-gradient-to-r from-lime-600 to-green-700 text-white shadow-lg;
+}
+
+.header-auth {
+  @apply px-4 py-4;
+}
+
+.header-nav {
+  @apply flex justify-between items-center mb-3;
+}
+
+.header-logo {
+  @apply flex items-center space-x-3;
+}
+
+.header-logo img {
+  @apply h-8 brightness-0 invert;
+}
+
+.header-logo span {
+  @apply text-lg font-semibold;
+}
+
+.header-title {
+  @apply text-center;
+}
+
+.header-title h1 {
+  @apply text-2xl font-bold mb-1;
+}
+
+.header-title p {
+  @apply text-green-100 text-sm;
+}
+
+/* Cards */
+.card {
+  @apply bg-white rounded-lg shadow dark:border dark:bg-gray-800 dark:border-gray-700;
+}
+
+.card-form {
+  @apply w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700;
+}
+
+.card-content {
+  @apply bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6;
+}
+
+.card-section {
+  @apply bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center;
+}
+
+/* Forms */
+.form {
+  @apply space-y-4 md:space-y-6;
+}
+
+.form-group {
+  @apply space-y-4;
+}
+
+.form-section {
+  @apply space-y-6;
+}
+
+/* Labels */
+.label {
+  @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white;
+}
+
+.label-form {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+}
+
+/* Inputs */
+.input {
+  @apply bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
+         focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
+         dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
+         dark:focus:ring-lime-400 dark:focus:border-lime-400;
+}
+
+.input-form {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 
+         focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white;
+}
+
+.input-error {
+  @apply border-red-500;
+}
+
+/* Buttons */
+.btn {
+  @apply font-medium rounded-lg text-sm px-5 py-2.5 text-center focus:ring-4 focus:outline-none transition duration-200;
+}
+
+.btn-primary {
+  @apply w-full text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-lime-300 
+         font-bold dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500;
+}
+
+.btn-secondary {
+  @apply bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium 
+         transition duration-200 shadow-md backdrop-blur-sm;
+}
+
+.btn-success {
+  @apply bg-green-600 hover:bg-green-700 text-white focus:ring-green-300;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white focus:ring-red-300;
+}
+
+.btn-outline {
+  @apply border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 
+         dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700;
+}
+
+.btn-icon {
+  @apply inline-flex items-center space-x-2;
+}
+
+/* Links */
+.link {
+  @apply text-lime-600 hover:underline dark:text-lime-400;
+}
+
+.link-primary {
+  @apply font-medium text-lime-600 hover:underline dark:text-lime-400;
+}
+
+/* Text Styles */
+.text-muted {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+.text-error {
+  @apply text-red-500 text-xs mt-1;
+}
+
+.text-success {
+  @apply text-green-600 dark:text-green-400;
+}
+
+.title-section {
+  @apply text-lg font-semibold text-gray-900 dark:text-white mb-4;
+}
+
+/* Logo Styles */
+.logo-main {
+  @apply w-48 mb-2;
+}
+
+.logo-header {
+  @apply h-8 brightness-0 invert;
+}
+
+/* Auth Specific */
+.auth-container {
+  @apply bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center px-6 py-8 mx-auto;
+}
+
+.auth-header {
+  @apply flex flex-col items-center mb-6;
+}
+
+.auth-title {
+  @apply text-xl font-semibold text-gray-900 dark:text-white mb-4;
+}
+
+.auth-subtitle {
+  @apply text-sm text-gray-600 dark:text-gray-300;
+}
+
+.auth-form-container {
+  @apply p-6 space-y-4 md:space-y-6 sm:p-8;
+}
+
+/* Loading States */
+.loading-container {
+  @apply animate-pulse space-y-4;
+}
+
+.loading-bar {
+  @apply h-4 bg-gray-200 rounded;
+}
+
+.loading-bar-lg {
+  @apply h-4 bg-gray-200 rounded w-3/4 mx-auto;
+}
+
+.loading-bar-md {
+  @apply h-4 bg-gray-200 rounded w-2/3 mx-auto;
+}
+
+.loading-bar-sm {
+  @apply h-4 bg-gray-200 rounded w-1/2 mx-auto;
+}
+
+.loading-text {
+  @apply text-sm text-gray-500 mt-4;
+}
+
+/* Error States */
+.error-container {
+  @apply mb-6 bg-red-50 border border-red-200 rounded-lg p-4;
+}
+
+.error-content {
+  @apply flex;
+}
+
+.error-icon {
+  @apply w-5 h-5 text-red-400;
+}
+
+.error-text {
+  @apply ml-3 text-sm text-red-800;
+}
+
+/* Checkbox */
+.checkbox {
+  @apply w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-lime-300 
+         dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-lime-400 dark:ring-offset-gray-800;
+}
+
+.checkbox-label {
+  @apply text-gray-500 dark:text-gray-300;
+}
+
+/* Flex Utilities */
+.flex-between {
+  @apply flex items-center justify-between;
+}
+
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-start {
+  @apply flex items-start;
+}
+
+.flex-end {
+  @apply flex items-end;
+}
+
+/* Spacing */
+.space-form {
+  @apply space-y-4 md:space-y-6;
+}
+
+.space-section {
+  @apply space-y-6;
+}
+
+.space-content {
+  @apply space-y-4;
+}
+
+/* Common Icons in buttons */
+.icon-back {
+  @apply w-4 h-4 inline mr-1;
+}
+
+.icon-sm {
+  @apply w-4 h-4;
+}
+
+.icon-md {
+  @apply w-5 h-5;
+}
+
+.icon-lg {
+  @apply w-6 h-6;
+}
+
+/* Focus states for accessibility */
+.focus-lime {
+  @apply focus:ring-2 focus:ring-lime-500 focus:border-transparent;
+}
+
+.focus-green {
+  @apply focus:ring-2 focus:ring-green-500 focus:border-transparent;
+}
+
+/* Animation utilities */
+.fade-in {
+  @apply transition-opacity duration-300 ease-in-out;
+}
+
+.slide-in {
+  @apply transition-transform duration-300 ease-in-out;
+}
