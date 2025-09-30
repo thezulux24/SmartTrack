@@ -1,0 +1,486 @@
+/* Dashboard Logística - Estilos personalizados */
+
+.min-h-screen {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Animaciones para las métricas */
+.animate-counter {
+  animation: counterAnimation 0.5s ease-out;
+}
+
+@keyframes counterAnimation {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Efectos hover para las tarjetas de métricas */
+.metric-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Estados de prioridad para despachos */
+.priority-normal {
+  background-color: rgba(243, 244, 246, 0.5);
+}
+
+.priority-alta {
+  background-color: rgba(254, 243, 199, 0.5);
+}
+
+.priority-urgente {
+  background-color: rgba(254, 226, 226, 0.5);
+}
+
+.priority-critica {
+  background-color: rgba(248, 113, 113, 0.2);
+  border-left: 4px solid #dc2626;
+}
+
+/* Indicadores de estado en tiempo real */
+.status-indicator {
+  position: relative;
+  display: inline-block;
+}
+
+.status-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-preparando::after {
+  background-color: #6b7280;
+}
+
+.status-en-ruta::after {
+  background-color: #f59e0b;
+}
+
+.status-entregado::after {
+  background-color: #10b981;
+}
+
+.status-retrasado::after {
+  background-color: #ef4444;
+}
+
+.status-recolectando::after {
+  background-color: #8b5cf6;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+/* Tabla estilo aeropuerto */
+.airport-table {
+  font-family: 'Courier New', monospace;
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+}
+
+.airport-table thead {
+  background: linear-gradient(145deg, #1f2937, #374151);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.airport-table tbody tr:nth-child(even) {
+  background-color: rgba(249, 250, 251, 0.5);
+}
+
+.airport-table tbody tr:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+/* Indicadores de tiempo real */
+.live-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.live-indicator::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background-color: #10b981;
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Estados de mensajeros */
+.mensajero-card {
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.mensajero-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.15);
+  transform: translateY(-3px);
+}
+
+.mensajero-disponible {
+  border-left: 4px solid #10b981;
+}
+
+.mensajero-en-ruta {
+  border-left: 4px solid #f59e0b;
+}
+
+.mensajero-entregando {
+  border-left: 4px solid #3b82f6;
+}
+
+.mensajero-recolectando {
+  border-left: 4px solid #8b5cf6;
+}
+
+.mensajero-descanso {
+  border-left: 4px solid #6b7280;
+}
+
+/* Alertas críticas */
+.alert-critical {
+  position: relative;
+  overflow: hidden;
+}
+
+.alert-critical::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #dc2626, #fbbf24, #dc2626);
+  animation: alertFlow 2s linear infinite;
+}
+
+@keyframes alertFlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Métricas en tiempo real */
+.metric-card {
+  position: relative;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.metric-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Progreso de entregas */
+.progress-bar {
+  height: 4px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Botones de acción */
+.action-button {
+  position: relative;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.action-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.action-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Navegación de pestañas */
+.tab-navigation {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.tab-button {
+  position: relative;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background: white;
+  color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.tab-button:hover:not(.active) {
+  color: #374151;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Efectos de carga */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Notificaciones toast */
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+
+.toast-error {
+  border-left-color: #ef4444;
+}
+
+.toast-success {
+  border-left-color: #10b981;
+}
+
+.toast-warning {
+  border-left-color: #f59e0b;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .metric-card {
+    padding: 12px;
+  }
+  
+  .airport-table {
+    font-size: 14px;
+  }
+  
+  .mensajero-card {
+    margin-bottom: 16px;
+  }
+  
+  .tab-button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-cols-7 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-cols-8 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .px-6 {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Modo alto contraste */
+@media (prefers-contrast: high) {
+  .high-contrast-card {
+    border: 2px solid #000;
+  }
+  
+  .high-contrast-text {
+    color: #000;
+  }
+}
+
+/* Tema oscuro - se maneja con clases dark: de Tailwind */
+.dashboard-dark {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+.card-dark {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
