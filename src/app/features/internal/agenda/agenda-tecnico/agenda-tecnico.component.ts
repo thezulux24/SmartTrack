@@ -56,14 +56,14 @@ export class AgendaTecnicoComponent implements OnInit {
           alerts.push({
             tipo: 'info',
             titulo: 'Cirugía Programada Hoy',
-            mensaje: `${cirugia.paciente_nombre} - ${this.formatHora(cirugia.hora_inicio)}`,
+            mensaje: `${this.getClienteNombre(cirugia)} - ${this.formatHora(cirugia.hora_inicio)}`,
             tiempo: 'Hoy'
           });
         } else if (cirugia.estado === 'en_curso') {
           alerts.push({
             tipo: 'urgente',
             titulo: 'Cirugía en Curso',
-            mensaje: `${cirugia.paciente_nombre} - ${this.getTipoCirugiaNombre(cirugia)}`,
+            mensaje: `${this.getClienteNombre(cirugia)} - ${this.getTipoCirugiaNombre(cirugia)}`,
             tiempo: 'En curso'
           });
         }
@@ -74,7 +74,7 @@ export class AgendaTecnicoComponent implements OnInit {
         alerts.push({
           tipo: 'advertencia',
           titulo: 'Cirugía Mañana',
-          mensaje: `${cirugia.paciente_nombre} - ${this.formatHora(cirugia.hora_inicio)}`,
+          mensaje: `${this.getClienteNombre(cirugia)} - ${this.formatHora(cirugia.hora_inicio)}`,
           tiempo: 'Mañana'
         });
       }
@@ -84,7 +84,7 @@ export class AgendaTecnicoComponent implements OnInit {
         alerts.push({
           tipo: 'urgente',
           titulo: 'Cirugía Urgente Asignada',
-          mensaje: `${cirugia.paciente_nombre} - ${this.getTipoCirugiaNombre(cirugia)}`,
+          mensaje: `${this.getClienteNombre(cirugia)} - ${this.getTipoCirugiaNombre(cirugia)}`,
           tiempo: this.getTimeAgo(cirugia.created_at || '')
         });
       }
@@ -382,5 +382,27 @@ export class AgendaTecnicoComponent implements OnInit {
 
   refreshData() {
     this.loadMyCirugias();
+  }
+
+  // Métodos helper para obtener información del cliente
+  getClienteNombre(cirugia: Cirugia): string {
+    if (cirugia.cliente) {
+      return `${cirugia.cliente.nombre} ${cirugia.cliente.apellido}`;
+    }
+    return 'Cliente no especificado';
+  }
+
+  getClienteDocumento(cirugia: Cirugia): string | null {
+    if (cirugia.cliente) {
+      return `${cirugia.cliente.documento_tipo}: ${cirugia.cliente.documento_numero}`;
+    }
+    return null;
+  }
+
+  getClienteTelefono(cirugia: Cirugia): string | null {
+    if (cirugia.cliente) {
+      return cirugia.cliente.telefono || null;
+    }
+    return null;
   }
 }

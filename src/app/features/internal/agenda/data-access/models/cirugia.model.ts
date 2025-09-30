@@ -2,19 +2,18 @@ import { Producto, Profile } from "./index";
 import { TecnicoAsignado } from "./agenda-tecnico.model";
 import { Hospital } from "./hospital.model";
 import { TipoCirugia } from "./tipo-cirugia.model";
+import { Cliente } from "../../../../../shared/services/clientes.service";
 
 export interface Cirugia {
   id: string;
   numero_cirugia: string;
-  paciente_nombre: string;
-  paciente_documento?: string;
-  paciente_telefono?: string;
   
-  // FK - Referencias reales
+  // FK - Referencias reales (cliente_id ahora es obligatorio)
+  cliente_id: string;
   hospital_id: string;
   tipo_cirugia_id: string;
   
-  // Campos de texto (legacy/temporal)
+  // Campos de texto (legacy/temporal) - pueden removerse eventualmente
   hospital?: string;
   tipo_cirugia?: string;
   
@@ -31,6 +30,7 @@ export interface Cirugia {
   updated_at: string;
   
   // Relaciones expandidas
+  cliente?: Cliente;
   tecnico_asignado?: TecnicoAsignado;
   hospital_data?: Hospital;
   tipo_cirugia_data?: TipoCirugia;
@@ -38,9 +38,7 @@ export interface Cirugia {
 
 export interface CirugiaCreate {
   numero_cirugia: string;
-  paciente_nombre: string;
-  paciente_documento?: string;
-  paciente_telefono?: string;
+  cliente_id: string; // Ahora es obligatorio
   hospital_id: string;
   tipo_cirugia_id: string;
   medico_cirujano: string;

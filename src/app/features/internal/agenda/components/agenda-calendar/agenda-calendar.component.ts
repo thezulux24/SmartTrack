@@ -50,7 +50,7 @@ export class AgendaCalendarComponent implements OnInit {
         alerts.push({
           tipo: 'urgente',
           titulo: 'Cirugía de Urgencia',
-          mensaje: `${cirugia.paciente_nombre} - ${this.getTipoCirugiaNombre(cirugia)}`,
+          mensaje: `${this.getClienteNombre(cirugia)} - ${this.getTipoCirugiaNombre(cirugia)}`,
           tiempo: this.getTimeAgo(cirugia.created_at || '')
         });
       }
@@ -60,7 +60,7 @@ export class AgendaCalendarComponent implements OnInit {
         alerts.push({
           tipo: 'advertencia',
           titulo: 'Sin Técnico Asignado',
-          mensaje: `Cirugía de ${cirugia.paciente_nombre} no tiene técnico asignado`,
+          mensaje: `Cirugía de ${this.getClienteNombre(cirugia)} no tiene técnico asignado`,
           tiempo: 'Mañana'
         });
       }
@@ -70,7 +70,7 @@ export class AgendaCalendarComponent implements OnInit {
         alerts.push({
           tipo: 'info',
           titulo: 'Cirugía Programada Hoy',
-          mensaje: `${cirugia.paciente_nombre} - ${this.formatHora(cirugia.hora_inicio)}`,
+          mensaje: `${this.getClienteNombre(cirugia)} - ${this.formatHora(cirugia.hora_inicio)}`,
           tiempo: 'Hoy'
         });
       }
@@ -374,5 +374,27 @@ export class AgendaCalendarComponent implements OnInit {
 
   refreshData() {
     this.loadCirugias();
+  }
+
+  // Métodos helper para obtener información del cliente
+  getClienteNombre(cirugia: Cirugia): string {
+    if (cirugia.cliente) {
+      return `${cirugia.cliente.nombre} ${cirugia.cliente.apellido}`;
+    }
+    return 'Cliente no especificado';
+  }
+
+  getClienteDocumento(cirugia: Cirugia): string | null {
+    if (cirugia.cliente) {
+      return `${cirugia.cliente.documento_tipo}: ${cirugia.cliente.documento_numero}`;
+    }
+    return null;
+  }
+
+  getClienteTelefono(cirugia: Cirugia): string | null {
+    if (cirugia.cliente) {
+      return cirugia.cliente.telefono || null;
+    }
+    return null;
   }
 }

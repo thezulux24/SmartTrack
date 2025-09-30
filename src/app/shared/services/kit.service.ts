@@ -72,9 +72,8 @@ export class KitService {
         kit_id: kit.id,
         usuario_id: (await this.supabase.client.auth.getUser()).data.user?.id,
         accion: 'kit_creado',
-        descripcion: 'Kit creado por comercial',
-        observaciones: 'Kit inicial creado con productos solicitados',
-        created_at: new Date().toISOString()
+        estado_nuevo: 'preparando',
+        observaciones: 'Kit inicial creado con productos solicitados'
       });
 
     // 4. Retornar el kit completo
@@ -355,7 +354,8 @@ export class KitService {
           kit_id: qrCode.referencia_id,
           usuario_id: usuarioId,
           accion: 'qr_escaneado',
-          descripcion: `Código QR escaneado: ${codigoQr}`
+          estado_nuevo: 'escaneado',
+          observaciones: `Código QR escaneado: ${codigoQr}`
         });
     }
 
@@ -373,9 +373,13 @@ export class KitService {
           kit_id: request.kit_id,
           usuario_id: request.usuario_id,
           accion: request.accion,
-          descripcion: request.descripcion,
+          estado_anterior: request.estado_anterior,
+          estado_nuevo: request.estado_nuevo,
           ubicacion: request.ubicacion,
-          observaciones: request.observaciones
+          coordenadas_lat: request.coordenadas_lat,
+          coordenadas_lng: request.coordenadas_lng,
+          observaciones: request.observaciones,
+          metadata: request.metadata
         })
         .select(`
           *,
@@ -402,6 +406,55 @@ export class KitService {
           usuario:profiles(*)
         `)
         .eq('kit_id', kitId)
+        .order('timestamp', { ascending: true })
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data || [];
+      })
+    );
+  }
+
+  /**
+   * Obtener un kit específico por ID
+   */
+  getKit(kitId: string): Observable<KitCirugia> {
+    return from(
+      this.supabase.client
+        .from('kits_cirugia')
+        .select(`
+          *,
+          cirugia:cirugias(
+            *,
+            hospital:hospitales(*),
+            tipo_cirugia:tipos_cirugia(*)
+          ),
+          comercial:profiles!comercial_id(*),
+          tecnico:profiles!tecnico_id(*),
+          logistica:profiles!logistica_id(*)
+        `)
+        .eq('id', kitId)
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      })
+    );
+  }
+
+  /**
+   * Obtener productos de un kit
+   */
+  getKitProductos(kitId: string): Observable<KitProducto[]> {
+    return from(
+      this.supabase.client
+        .from('kit_productos')
+        .select(`
+          *,
+          producto:productos(*)
+        `)
+        .eq('kit_id', kitId)
         .order('created_at', { ascending: true })
     ).pipe(
       map(({ data, error }) => {
@@ -410,6 +463,8 @@ export class KitService {
       })
     );
   }
+
+
 
   /**
    * Obtener todos los kits (con paginación)

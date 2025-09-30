@@ -118,9 +118,13 @@ export interface RegistrarTrazabilidadRequest {
   kit_id: string;
   usuario_id: string;
   accion: string;
-  descripcion?: string;
+  estado_anterior?: string;
+  estado_nuevo: string;
   ubicacion?: string;
+  coordenadas_lat?: number;
+  coordenadas_lng?: number;
   observaciones?: string;
+  metadata?: any;
 }
 
 export interface RegistrarConsumoRequest {

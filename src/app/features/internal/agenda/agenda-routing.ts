@@ -31,6 +31,14 @@ export const AGENDA_ROUTES: Routes = [
     path: 'kit-builder/:id',
     loadComponent: () => import('./kit-builder/kit-builder.component').then(c => c.KitBuilderComponent)
   },
+  {
+    path: 'kit-builder/:id/edit',
+    loadComponent: () => import('./kit-builder/kit-builder.component').then(c => c.KitBuilderComponent)
+  },
+  {
+    path: 'kit-detail/:id',
+    loadComponent: () => import('./kit-detail/kit-detail.component').then(c => c.KitDetailComponent)
+  },
 
   { path: 'mi-agenda', loadComponent: () => import('./agenda-tecnico/agenda-tecnico.component').then(c => c.AgendaTecnicoComponent) }, // Nueva ruta para técnicos
 

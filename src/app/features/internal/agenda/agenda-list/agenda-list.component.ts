@@ -1,6 +1,7 @@
 import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { CirugiasService } from '../data-access/cirugias.service';
 import { Cirugia } from '../data-access/models';
 import { KitService } from '../../../../shared/services/kit.service';
@@ -33,7 +34,7 @@ export class AgendaListComponent implements OnInit {
     if (this.searchTerm()) {
       const term = this.searchTerm().toLowerCase();
       result = result.filter(cirugia => 
-        cirugia.paciente_nombre.toLowerCase().includes(term) ||
+        this.getClienteNombre(cirugia).toLowerCase().includes(term) ||
         // ✅ Usar las relaciones FK en lugar de campos legacy
         (cirugia.hospital_data?.nombre || cirugia.hospital || '').toLowerCase().includes(term) ||
         (cirugia.tipo_cirugia_data?.nombre || cirugia.tipo_cirugia || '').toLowerCase().includes(term) ||
@@ -117,6 +118,13 @@ export class AgendaListComponent implements OnInit {
 
   getTecnicoNombre(cirugia: Cirugia): string {
     return cirugia.tecnico_asignado?.full_name || 'Sin asignar';
+  }
+
+  getClienteNombre(cirugia: Cirugia): string {
+    if (cirugia.cliente) {
+      return `${cirugia.cliente.nombre} ${cirugia.cliente.apellido}`;
+    }
+    return 'Cliente no especificado';
   }
 
   getDuracionEstimada(cirugia: Cirugia): string {
@@ -362,8 +370,28 @@ export class AgendaListComponent implements OnInit {
     return this.kitstatus()[cirugiaId] || false;
   }
 
-  // Nuevo método para navegar a crear kit
+  // Método actualizado para manejar kits (crear o ver detalles)
+  async onManejarKit(cirugiaId: string) {
+    try {
+      // Verificar si ya existe un kit para esta cirugía
+      const kit = await firstValueFrom(this.kitService.getKitPorCirugia(cirugiaId));
+      
+      if (kit) {
+        // Si existe kit, ir a los detalles
+        this.router.navigate(['/internal/agenda/kit-detail', kit.id]);
+      } else {
+        // Si no existe kit, ir a crearlo
+        this.router.navigate(['/internal/agenda/kit-builder', cirugiaId]);
+      }
+    } catch (error) {
+      console.error('Error verificando kit:', error);
+      // En caso de error, ir a crear kit
+      this.router.navigate(['/internal/agenda/kit-builder', cirugiaId]);
+    }
+  }
+
+  // Método heredado para compatibilidad
   onCrearKit(cirugiaId: string) {
-    this.router.navigate(['/internal/agenda/kit-builder', cirugiaId]);
+    this.onManejarKit(cirugiaId);
   }
 }

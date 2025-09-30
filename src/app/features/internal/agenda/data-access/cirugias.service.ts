@@ -15,6 +15,16 @@ export class CirugiasService {
         .from('cirugias')
         .select(`
           *,
+          cliente:clientes!cirugias_cliente_id_fkey(
+            id,
+            nombre,
+            apellido,
+            documento_tipo,
+            documento_numero,
+            telefono,
+            email,
+            ciudad
+          ),
           tecnico_asignado:profiles!cirugias_tecnico_asignado_id_fkey(
             id,
             full_name,
@@ -59,6 +69,16 @@ export class CirugiasService {
         .from('cirugias')
         .select(`
           *,
+          cliente:clientes!cirugias_cliente_id_fkey(
+            id,
+            nombre,
+            apellido,
+            documento_tipo,
+            documento_numero,
+            telefono,
+            email,
+            ciudad
+          ),
           tecnico_asignado:profiles!cirugias_tecnico_asignado_id_fkey(
             id,
             full_name,

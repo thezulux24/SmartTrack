@@ -175,7 +175,7 @@ export class CirugiaDetailComponent implements OnInit {
     if (navigator.share) {
       navigator.share({
         title: `Cirugía ${cirugia.numero_cirugia}`,
-        text: `${cirugia.paciente_nombre} - ${cirugia.tipo_cirugia_data?.nombre}`,
+        text: `${this.getClienteNombre()} - ${cirugia.tipo_cirugia_data?.nombre}`,
         url: window.location.href
       }).catch(console.error);
     } else {
@@ -191,5 +191,41 @@ export class CirugiaDetailComponent implements OnInit {
   // Método para imprimir (futuro)
   imprimirDetalle() {
     window.print();
+  }
+
+  // Métodos helper para obtener información del cliente
+  getClienteNombre(): string {
+    const cirugia = this.cirugia();
+    if (!cirugia?.cliente) return 'Sin información';
+    
+    return `${cirugia.cliente.nombre} ${cirugia.cliente.apellido}`.trim();
+  }
+
+  getClienteDocumento(): string | null {
+    const cirugia = this.cirugia();
+    if (!cirugia?.cliente) return null;
+    
+    return `${cirugia.cliente.documento_tipo}: ${cirugia.cliente.documento_numero}`;
+  }
+
+  getClienteTelefono(): string | null {
+    const cirugia = this.cirugia();
+    if (!cirugia?.cliente) return null;
+    
+    return cirugia.cliente.telefono || null;
+  }
+
+  getClienteEmail(): string | null {
+    const cirugia = this.cirugia();
+    if (!cirugia) return null;
+    
+    return cirugia.cliente?.email || null;
+  }
+
+  getClienteCiudad(): string | null {
+    const cirugia = this.cirugia();
+    if (!cirugia) return null;
+    
+    return cirugia.cliente?.ciudad || null;
   }
 }

@@ -29,6 +29,8 @@ export class KitBuilderComponent implements OnInit {
   productosSugeridos = signal<any[]>([]);
   productosEncontrados = signal<any[]>([]);
   productosSeleccionados = signal<any[]>([]);
+  categorias = signal<string[]>([]);
+  marcas = signal<string[]>([]);
 
   // Form
   form = this.fb.group({
@@ -39,13 +41,28 @@ export class KitBuilderComponent implements OnInit {
   // Propiedades
   busquedaProducto = '';
   cirugiaId = '';
+  kitId = '';
+  modoEdicion = false;
+  categoriaSeleccionada = '';
+  marcaSeleccionada = '';
+  filtroStock = '';
+  todosLosProductos: any[] = [];
 
   // Computed
   productosFormArray = computed(() => this.form.get('productos') as FormArray);
 
   ngOnInit() {
     this.cirugiaId = this.route.snapshot.paramMap.get('id') || '';
-    if (this.cirugiaId) {
+    
+    // Detectar si está en modo edición basado en la URL
+    this.modoEdicion = this.route.snapshot.url.some(segment => segment.path === 'edit');
+    
+    if (this.modoEdicion) {
+      // En modo edición, el id es el kitId
+      this.kitId = this.cirugiaId;
+      this.cargarDatosEdicion();
+    } else if (this.cirugiaId) {
+      // En modo creación, el id es el cirugiaId
       this.cargarDatos();
     } else {
       this.error.set('ID de cirugía no proporcionado');
@@ -76,6 +93,9 @@ export class KitBuilderComponent implements OnInit {
       if (cirugia.tipo_cirugia?.productos_comunes) {
         await this.cargarProductosSugeridos(cirugia.tipo_cirugia.productos_comunes);
       }
+
+      // Cargar todos los productos para los filtros
+      await this.cargarTodosLosProductos();
 
     } catch (error: any) {
       console.error('Error cargando datos:', error);
@@ -114,12 +134,7 @@ export class KitBuilderComponent implements OnInit {
     }
   }
 
-  async buscarProductos() {
-    if (this.busquedaProducto.length < 2) {
-      this.productosEncontrados.set([]);
-      return;
-    }
-
+  async cargarTodosLosProductos() {
     try {
       const { data: productos, error } = await this.supabase.client
         .from('productos')
@@ -127,22 +142,79 @@ export class KitBuilderComponent implements OnInit {
           *,
           inventario:inventario(cantidad)
         `)
-        .or(`nombre.ilike.%${this.busquedaProducto}%,codigo.ilike.%${this.busquedaProducto}%`)
         .eq('es_activo', true)
-        .limit(10);
+        .order('nombre');
 
       if (error) throw error;
 
-      // Calcular stock disponible y filtrar ya seleccionados
+      // Calcular stock disponible
       const productosConStock = productos?.map(p => ({
         ...p,
+        stock_total: p.inventario?.reduce((sum: number, inv: any) => sum + inv.cantidad, 0) || 0,
         stock_disponible: p.inventario?.reduce((sum: number, inv: any) => sum + inv.cantidad, 0) || 0
-      })).filter(p => !this.productosSeleccionados().some(ps => ps.id === p.id)) || [];
+      })) || [];
 
-      this.productosEncontrados.set(productosConStock);
+      this.todosLosProductos = productosConStock;
+      
+      // Extraer categorías y marcas únicas
+      const categoriasUnicas = [...new Set(productosConStock.map(p => p.categoria).filter(Boolean))];
+      const marcasUnicas = [...new Set(productosConStock.map(p => p.marca).filter(Boolean))];
+      
+      this.categorias.set(categoriasUnicas);
+      this.marcas.set(marcasUnicas);
+      
+      // Aplicar filtros iniciales
+      this.buscarProductos();
     } catch (error) {
-      console.error('Error buscando productos:', error);
+      console.error('Error cargando productos:', error);
     }
+  }
+
+  buscarProductos() {
+    let productosFiltrados = [...this.todosLosProductos];
+
+    // Filtro por búsqueda de texto
+    if (this.busquedaProducto.trim()) {
+      const termino = this.busquedaProducto.toLowerCase().trim();
+      productosFiltrados = productosFiltrados.filter(p => 
+        p.nombre?.toLowerCase().includes(termino) ||
+        p.codigo?.toLowerCase().includes(termino) ||
+        p.descripcion?.toLowerCase().includes(termino)
+      );
+    }
+
+    // Filtro por categoría
+    if (this.categoriaSeleccionada) {
+      productosFiltrados = productosFiltrados.filter(p => p.categoria === this.categoriaSeleccionada);
+    }
+
+    // Filtro por marca
+    if (this.marcaSeleccionada) {
+      productosFiltrados = productosFiltrados.filter(p => p.marca === this.marcaSeleccionada);
+    }
+
+    // Filtro por stock
+    if (this.filtroStock) {
+      switch (this.filtroStock) {
+        case 'disponible':
+          productosFiltrados = productosFiltrados.filter(p => (p.stock_total || 0) > 0);
+          break;
+        case 'bajo':
+          productosFiltrados = productosFiltrados.filter(p => {
+            const stock = p.stock_total || 0;
+            const minimo = p.stock_minimo || 0;
+            return stock > 0 && stock <= minimo;
+          });
+          break;
+        case 'agotado':
+          productosFiltrados = productosFiltrados.filter(p => (p.stock_total || 0) === 0);
+          break;
+      }
+    }
+
+    // Limitar resultados para mejor rendimiento
+    const resultados = productosFiltrados.slice(0, 20);
+    this.productosEncontrados.set(resultados);
   }
 
   agregarProducto(producto: any) {
@@ -192,20 +264,27 @@ export class KitBuilderComponent implements OnInit {
       this.error.set(null);
 
       const formValue = this.form.value;
-      const request: CreateKitRequest = {
-        cirugia_id: this.cirugiaId,
-        productos: (formValue.productos as any[]) || [],
-        observaciones: formValue.observaciones_generales || undefined
-      };
 
-      await firstValueFrom(this.kitService.crearKit(request));
+      if (this.modoEdicion) {
+        // Modo edición - actualizar kit existente
+        await this.actualizarKit(formValue);
+      } else {
+        // Modo creación - crear nuevo kit
+        const request: CreateKitRequest = {
+          cirugia_id: this.cirugiaId,
+          productos: (formValue.productos as any[]) || [],
+          observaciones: formValue.observaciones_generales || undefined
+        };
+
+        await firstValueFrom(this.kitService.crearKit(request));
+      }
       
       // Navegar de vuelta a la agenda
       this.router.navigate(['/internal/agenda']);
       
     } catch (error: any) {
-      console.error('Error creando kit:', error);
-      this.error.set(error.message || 'Error creando el kit');
+      console.error('Error procesando kit:', error);
+      this.error.set(error.message || 'Error procesando el kit');
     } finally {
       this.creandoKit.set(false);
     }
@@ -213,6 +292,81 @@ export class KitBuilderComponent implements OnInit {
 
   volver() {
     this.router.navigate(['/internal/agenda']);
+  }
+
+  async cargarDatosEdicion() {
+    try {
+      this.loading.set(true);
+      this.error.set(null);
+
+      // Cargar datos del kit existente
+      const kit = await firstValueFrom(this.kitService.getKit(this.kitId));
+      const productos = await firstValueFrom(this.kitService.getKitProductos(this.kitId));
+      
+      // Establecer cirugiaId desde el kit
+      this.cirugiaId = kit.cirugia_id;
+      
+      // Cargar datos de la cirugía
+      const { data: cirugia, error: cirugiaError } = await this.supabase.client
+        .from('cirugias')
+        .select(`
+          *,
+          hospital:hospitales(*),
+          tipo_cirugia:tipos_cirugia(*)
+        `)
+        .eq('id', this.cirugiaId)
+        .single();
+
+      if (cirugiaError) throw cirugiaError;
+      this.cirugia.set(cirugia);
+
+      // Cargar todos los productos
+      await this.cargarTodosLosProductos();
+
+      // Llenar el formulario con los productos del kit existente
+      this.llenarFormularioConProductos(productos);
+
+      // Llenar observaciones generales
+      this.form.patchValue({
+        observaciones_generales: kit.observaciones || ''
+      });
+
+    } catch (error: any) {
+      console.error('Error cargando datos para edición:', error);
+      this.error.set(error.message || 'Error cargando la información del kit');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  private llenarFormularioConProductos(productos: any[]) {
+    const productosArray = this.form.get('productos') as FormArray;
+    
+    // Limpiar productos existentes
+    while (productosArray.length !== 0) {
+      productosArray.removeAt(0);
+    }
+
+    // Agregar productos del kit
+    productos.forEach(producto => {
+      const productoFormGroup = this.fb.group({
+        producto_id: [producto.producto_id, Validators.required],
+        nombre: [producto.producto?.nombre || ''],
+        codigo: [producto.producto?.codigo || ''],
+        cantidad_solicitada: [producto.cantidad_solicitada, [Validators.required, Validators.min(1)]],
+        observaciones: [producto.observaciones || '']
+      });
+
+      productosArray.push(productoFormGroup);
+    });
+
+    // Actualizar la lista de productos seleccionados
+    const productosSeleccionados = productos.map(p => ({
+      id: p.producto_id,
+      nombre: p.producto?.nombre,
+      codigo: p.producto?.codigo
+    }));
+    this.productosSeleccionados.set(productosSeleccionados);
   }
 
   formatearFecha(fecha: string): string {
@@ -224,5 +378,91 @@ export class KitBuilderComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  // Métodos helper para las cards de productos
+  getStockIcon(producto: any): string {
+    const stock = producto.stock_total || producto.stock_disponible || 0;
+    const minimo = producto.stock_minimo || 0;
+    
+    if (stock === 0) return '🔴';
+    if (stock <= minimo) return '🟡';
+    return '🟢';
+  }
+
+  getStockColorClass(producto: any): string {
+    const stock = producto.stock_total || producto.stock_disponible || 0;
+    const minimo = producto.stock_minimo || 0;
+    
+    if (stock === 0) return 'text-red-600 dark:text-red-400';
+    if (stock <= minimo) return 'text-yellow-600 dark:text-yellow-400';
+    return 'text-green-600 dark:text-green-400';
+  }
+
+  isProductoAgregado(productoId: string): boolean {
+    const productos = this.form.get('productos') as FormArray;
+    return productos.controls.some(control => control.get('producto_id')?.value === productoId);
+  }
+
+  private async actualizarKit(formValue: any) {
+    // TODO: Implementar método updateKit en KitService
+    // Por ahora, simularemos la actualización eliminando y recreando
+    console.log('Actualizando kit:', this.kitId, formValue);
+    
+    // Actualizar observaciones del kit
+    const { error: updateError } = await this.supabase.client
+      .from('kits_cirugia')
+      .update({
+        observaciones: formValue.observaciones_generales || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', this.kitId);
+
+    if (updateError) throw updateError;
+
+    // Eliminar productos existentes
+    const { error: deleteError } = await this.supabase.client
+      .from('kit_productos')
+      .delete()
+      .eq('kit_id', this.kitId);
+
+    if (deleteError) throw deleteError;
+
+    // Insertar productos actualizados
+    const productos = (formValue.productos as any[]) || [];
+    if (productos.length > 0) {
+      const productosParaInsertar = productos.map(p => ({
+        kit_id: this.kitId,
+        producto_id: p.producto_id,
+        cantidad_solicitada: p.cantidad_solicitada,
+        cantidad_entregada: 0,
+        observaciones: p.observaciones
+      }));
+
+      const { error: insertError } = await this.supabase.client
+        .from('kit_productos')
+        .insert(productosParaInsertar);
+
+      if (insertError) throw insertError;
+    }
+
+    // Registrar trazabilidad
+    await this.supabase.client
+      .from('kit_trazabilidad')
+      .insert({
+        kit_id: this.kitId,
+        usuario_id: '00000000-0000-0000-0000-000000000000', // TODO: Obtener usuario actual
+        accion: 'editado',
+        estado_nuevo: 'preparando',
+        observaciones: 'Kit editado y productos actualizados'
+      });
+  }
+
+  // Método helper para obtener información del cliente
+  getClienteNombre(): string {
+    const cirugia = this.cirugia();
+    if (!cirugia?.cliente) return 'Sin información';
+    
+    return `${cirugia.cliente.nombre} ${cirugia.cliente.apellido}`.trim();
   }
 }

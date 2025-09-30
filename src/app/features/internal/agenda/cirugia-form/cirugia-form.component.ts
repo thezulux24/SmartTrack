@@ -2,12 +2,14 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule} from '@angular/common';
+import { of } from 'rxjs';
 
 import { CirugiasService } from '../data-access/cirugias.service';
 import { HospitalesService } from '../data-access/hospitales.service';
 import { TiposCirugiaService } from '../data-access/tipos-cirugia.service';
 import { TecnicosService } from '../data-access/tecnicos.service';
 import { KitService } from '../../../../shared/services/kit.service';
+import { ClientesService, Cliente } from '../../../../shared/services/clientes.service';
 import { Hospital, TipoCirugia, TecnicoAsignado, Cirugia, CirugiaCreate } from '../data-access/models';
 
 @Component({
@@ -26,6 +28,7 @@ export class CirugiaFormComponent implements OnInit {
   private readonly tiposCirugiaService = inject(TiposCirugiaService);
   private readonly tecnicosService = inject(TecnicosService);
   private readonly kitService = inject(KitService);
+  private readonly clientesService = inject(ClientesService);
 
   // Signals
   loading = signal(false);
@@ -34,6 +37,8 @@ export class CirugiaFormComponent implements OnInit {
   cirugiaCreada = signal<Cirugia | null>(null);
   cirugiaEditada = signal<Cirugia | null>(null);
   tieneKit = signal<boolean>(false);
+  clienteEncontrado = signal<Cliente | null>(null);
+  buscandoCliente = signal<boolean>(false);
   
   // Data signals
   hospitales = signal<Hospital[]>([]);
@@ -46,6 +51,12 @@ export class CirugiaFormComponent implements OnInit {
   cirugiaId: string | null = null;
 
   // Options
+  documentoTipoOptions = [
+    { value: 'cedula', label: 'Cédula' },
+    { value: 'pasaporte', label: 'Pasaporte' },
+    { value: 'tarjeta_identidad', label: 'Tarjeta de Identidad' }
+  ];
+  
   estadosOptions = [
     { value: 'programada', label: 'Programada' },
     { value: 'en_curso', label: 'En Curso' },
@@ -63,10 +74,13 @@ export class CirugiaFormComponent implements OnInit {
 
   constructor() {
     this.cirugiaForm = this.fb.group({
-      // Información del paciente
-      paciente_nombre: ['', [Validators.required, Validators.minLength(2)]],
-      paciente_documento: [''],
-      paciente_telefono: [''],
+      // Información del cliente
+      documento_numero: ['', [Validators.required, Validators.minLength(6)]],
+      documento_tipo: ['cedula', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      apellido: ['', [Validators.required, Validators.minLength(2)]],
+      telefono: [''],
+      email: ['', [Validators.email]],
       
       // Información de la cirugía
       hospital_id: ['', Validators.required],
@@ -197,10 +211,8 @@ export class CirugiaFormComponent implements OnInit {
     // Convertir fecha a formato input
     const fechaFormateada = new Date(cirugia.fecha_programada).toISOString().split('T')[0];
     
+    // Llenar campos del formulario (no incluye campos de paciente legacy)
     this.cirugiaForm.patchValue({
-      paciente_nombre: cirugia.paciente_nombre,
-      paciente_documento: cirugia.paciente_documento,
-      paciente_telefono: cirugia.paciente_telefono,
       hospital_id: cirugia.hospital_id,
       tipo_cirugia_id: cirugia.tipo_cirugia_id,
       medico_cirujano: cirugia.medico_cirujano,
@@ -211,6 +223,64 @@ export class CirugiaFormComponent implements OnInit {
       prioridad: cirugia.prioridad,
       tecnico_asignado_id: cirugia.tecnico_asignado_id,
       notas: cirugia.notas
+    });
+
+    // Llenar campos del cliente si existe
+    if (cirugia.cliente) {
+      this.clienteEncontrado.set(cirugia.cliente);
+      this.llenarCamposCliente(cirugia.cliente);
+    }
+  }
+
+  // Métodos para manejo de clientes
+  onDocumentoChange() {
+    const documento = this.cirugiaForm.get('documento_numero')?.value;
+    if (documento && documento.length >= 6) {
+      this.buscarClientePorDocumento(documento);
+    } else {
+      this.clienteEncontrado.set(null);
+      this.limpiarCamposCliente();
+    }
+  }
+
+  private buscarClientePorDocumento(documento: string) {
+    this.buscandoCliente.set(true);
+    this.clientesService.buscarPorDocumento(documento).subscribe({
+      next: (cliente) => {
+        if (cliente) {
+          console.log('✅ Cliente encontrado:', cliente);
+          this.clienteEncontrado.set(cliente);
+          this.llenarCamposCliente(cliente);
+        } else {
+          console.log('ℹ️ Cliente no encontrado');
+          this.clienteEncontrado.set(null);
+        }
+        this.buscandoCliente.set(false);
+      },
+      error: (error) => {
+        console.error('❌ Error buscando cliente:', error);
+        this.clienteEncontrado.set(null);
+        this.buscandoCliente.set(false);
+      }
+    });
+  }
+
+  private llenarCamposCliente(cliente: Cliente) {
+    this.cirugiaForm.patchValue({
+      documento_tipo: cliente.documento_tipo,
+      nombre: cliente.nombre,
+      apellido: cliente.apellido,
+      telefono: cliente.telefono,
+      email: cliente.email
+    });
+  }
+
+  private limpiarCamposCliente() {
+    this.cirugiaForm.patchValue({
+      nombre: '',
+      apellido: '',
+      telefono: '',
+      email: ''
     });
   }
 
@@ -235,19 +305,10 @@ export class CirugiaFormComponent implements OnInit {
     console.log('📝 Enviando formulario...');
     console.log('🔍 Form válido:', this.cirugiaForm.valid);
     console.log('📊 Form values:', this.cirugiaForm.value);
-    console.log('❌ Form errors:', this.cirugiaForm.errors);
 
     if (this.cirugiaForm.invalid) {
       console.log('⚠️ Formulario inválido, marcando campos...');
       this.markFormGroupTouched();
-      
-      // Debug: Mostrar errores específicos
-      Object.keys(this.cirugiaForm.controls).forEach(key => {
-        const control = this.cirugiaForm.get(key);
-        if (control?.errors) {
-          console.log(`❌ Campo ${key} tiene errores:`, control.errors);
-        }
-      });
       return;
     }
 
@@ -255,21 +316,63 @@ export class CirugiaFormComponent implements OnInit {
     this.error.set(null);
 
     const formData = this.cirugiaForm.value;
-    
-    // Generar número de cirugía si es nueva
-    if (!this.isEditing) {
-      formData.numero_cirugia = this.generateNumeroCirugia();
+
+    // Primero manejar el cliente
+    this.procesarCliente(formData).subscribe({
+      next: (cliente: Cliente) => {
+        console.log('✅ Cliente procesado:', cliente);
+        this.crearCirugiaConCliente(formData, cliente);
+      },
+      error: (error: any) => {
+        console.error('❌ Error procesando cliente:', error);
+        this.error.set('Error al procesar información del cliente');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private procesarCliente(formData: any) {
+    const clienteData = {
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      documento_tipo: formData.documento_tipo,
+      documento_numero: formData.documento_numero,
+      telefono: formData.telefono,
+      email: formData.email
+    };
+
+    // Si ya tenemos el cliente encontrado, lo usamos
+    if (this.clienteEncontrado()) {
+      return of(this.clienteEncontrado()!);
     }
 
-    // Formatear fecha para la base de datos
-    formData.fecha_programada = new Date(formData.fecha_programada).toISOString();
+    // Si no, crear o buscar cliente
+    return this.clientesService.buscarOCrear(clienteData);
+  }
 
-    console.log('💾 Datos a enviar:', formData);
+  private crearCirugiaConCliente(formData: any, cliente: Cliente) {
+    // Preparar datos de cirugía
+    const cirugiaData: CirugiaCreate = {
+      numero_cirugia: this.isEditing ? formData.numero_cirugia : this.generateNumeroCirugia(),
+      cliente_id: cliente.id,
+      hospital_id: formData.hospital_id,
+      tipo_cirugia_id: formData.tipo_cirugia_id,
+      medico_cirujano: formData.medico_cirujano,
+      fecha_programada: new Date(formData.fecha_programada).toISOString(),
+      hora_inicio: formData.hora_inicio,
+      duracion_estimada: formData.duracion_estimada,
+      estado: formData.estado,
+      prioridad: formData.prioridad,
+      tecnico_asignado_id: formData.tecnico_asignado_id,
+      notas: formData.notas
+    };
+
+    console.log('💾 Datos de cirugía a enviar:', cirugiaData);
 
     if (this.isEditing && this.cirugiaId) {
-      this.updateCirugia(formData);
+      this.updateCirugia(cirugiaData as any);
     } else {
-      this.createCirugia(formData);
+      this.createCirugia(cirugiaData);
     }
   }
 
@@ -376,5 +479,13 @@ export class CirugiaFormComponent implements OnInit {
 
   debugTecnicos() {
     console.log('👨‍⚕️ Debug Técnicos:', this.tecnicos());
+  }
+
+  // Método helper para obtener información del cliente
+  getClienteNombreCreada(): string {
+    const cirugia = this.cirugiaCreada();
+    if (!cirugia?.cliente) return 'Sin información';
+    
+    return `${cirugia.cliente.nombre} ${cirugia.cliente.apellido}`.trim();
   }
 }

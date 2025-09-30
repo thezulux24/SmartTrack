@@ -22,9 +22,9 @@
       
       <!-- Título principal -->
       <div class="text-center">
-        <h1 class="text-2xl font-bold mb-1">Crear Kit Quirúrgico</h1>
+        <h1 class="text-2xl font-bold mb-1">{{ modoEdicion ? 'Editar Kit Quirúrgico' : 'Crear Kit Quirúrgico' }}</h1>
         <p class="text-green-100 text-sm" *ngIf="cirugia()">
-          {{ cirugia()?.numero_cirugia }} - {{ cirugia()?.paciente_nombre }}
+          {{ cirugia()?.numero_cirugia }} - {{ getClienteNombre() }}
         </p>
       </div>
     </div>
@@ -80,8 +80,8 @@
           
           <div class="space-y-3 text-sm">
             <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-              <span class="font-medium text-gray-600 dark:text-gray-400">Paciente:</span>
-              <span class="text-gray-900 dark:text-white">{{ cirugia()?.paciente_nombre }}</span>
+              <span class="font-medium text-gray-600 dark:text-gray-400">Cliente:</span>
+              <span class="text-gray-900 dark:text-white">{{ getClienteNombre() }}</span>
             </div>
             <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
               <span class="font-medium text-gray-600 dark:text-gray-400">Médico:</span>
@@ -131,51 +131,166 @@
           </div>
         }
 
-        <!-- Buscador de Productos -->
+        <!-- Filtros de Búsqueda -->
         <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
             <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
               </svg>
             </div>
-            <span>Buscar Productos</span>
+            <span>Filtros de Búsqueda</span>
           </h2>
           
-          <div class="mb-4">
-            <input type="text" 
-                   [(ngModel)]="busquedaProducto"
-                   (input)="buscarProductos()"
-                   placeholder="Buscar por nombre o código..."
-                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
-                   [ngModelOptions]="{standalone: true}">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Búsqueda -->
+            <div>
+              <label for="busqueda" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
+              <input type="text" 
+                     id="busqueda"
+                     [(ngModel)]="busquedaProducto"
+                     (input)="buscarProductos()"
+                     placeholder="Buscar por nombre o código..."
+                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                     [ngModelOptions]="{standalone: true}">
+            </div>
+
+            <!-- Categoría -->
+            <div>
+              <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
+              <select id="categoria"
+                      [(ngModel)]="categoriaSeleccionada"
+                      (change)="buscarProductos()"
+                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                      [ngModelOptions]="{standalone: true}">
+                <option value="">Todas las categorías</option>
+                <option *ngFor="let categoria of categorias()" [value]="categoria">
+                  {{ categoria | titlecase }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Stock disponible -->
+            <div>
+              <label for="stockFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Disponibilidad</label>
+              <select id="stockFilter"
+                      [(ngModel)]="filtroStock"
+                      (change)="buscarProductos()"
+                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                      [ngModelOptions]="{standalone: true}">
+                <option value="">Todos los productos</option>
+                <option value="disponible">Solo con stock</option>
+                <option value="bajo">Stock bajo</option>
+                <option value="agotado">Agotados</option>
+              </select>
+            </div>
+
+            <!-- Marca -->
+            <div>
+              <label for="marca" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Marca</label>
+              <select id="marca"
+                      [(ngModel)]="marcaSeleccionada"
+                      (change)="buscarProductos()"
+                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                      [ngModelOptions]="{standalone: true}">
+                <option value="">Todas las marcas</option>
+                <option *ngFor="let marca of marcas()" [value]="marca">
+                  {{ marca }}
+                </option>
+              </select>
+            </div>
           </div>
 
-          @if (productosEncontrados().length > 0) {
-            <div class="space-y-3 max-h-60 overflow-y-auto">
+          <!-- Resumen de resultados -->
+          <div class="text-center pt-2 border-t border-gray-200 dark:border-gray-600">
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+              📦 {{ productosEncontrados().length }} productos encontrados
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos Disponibles -->
+        @if (productosEncontrados().length > 0) {
+          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+              <span>Productos Disponibles ({{ productosEncontrados().length }})</span>
+            </h2>
+            
+            <div class="space-y-4 max-h-96 overflow-y-auto">
               @for (producto of productosEncontrados(); track producto.id) {
-                <div class="flex justify-between items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
-                  <div class="flex-1">
-                    <p class="font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ producto.codigo }} - Stock: {{ producto.stock_disponible }}</p>
+                <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                  <div class="flex justify-between items-start mb-3">
+                    <div class="flex-1">
+                      <h4 class="font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</h4>
+                      <p class="text-sm text-gray-600 dark:text-gray-400">{{ producto.codigo }}</p>
+                      <div class="flex items-center space-x-2 mt-2">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                          {{ producto.categoria | titlecase }}
+                        </span>
+                        @if (producto.marca) {
+                          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                            {{ producto.marca }}
+                          </span>
+                        }
+                      </div>
+                    </div>
+                    <div class="text-right ml-4">
+                      <div class="flex items-center space-x-2">
+                        <span class="text-lg">{{ getStockIcon(producto) }}</span>
+                        <div>
+                          <div class="text-sm font-bold" [ngClass]="getStockColorClass(producto)">
+                            {{ producto.stock_total || producto.stock_disponible || 0 }}
+                          </div>
+                          <div class="text-xs text-gray-500 dark:text-gray-400">unidades</div>
+                        </div>
+                      </div>
+                      @if (producto.precio) {
+                        <div class="text-sm font-semibold text-gray-900 dark:text-white mt-1">
+                          ${{ producto.precio | number:'1.0-0' }}
+                        </div>
+                      }
+                    </div>
                   </div>
+
+                  @if (producto.descripcion) {
+                    <div class="text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded mb-3">
+                      {{ producto.descripcion }}
+                    </div>
+                  }
+
                   <button type="button" 
                           (click)="agregarProducto(producto)"
-                          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md">
-                    Agregar
+                          [disabled]="isProductoAgregado(producto.id)"
+                          class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 disabled:cursor-not-allowed">
+                    @if (isProductoAgregado(producto.id)) {
+                      <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      Ya agregado
+                    } @else {
+                      <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                      </svg>
+                      Agregar
+                    }
                   </button>
                 </div>
               }
             </div>
-          }
-        </div>
+          </div>
+        }
 
         <!-- Productos Seleccionados -->
         <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
               </svg>
             </div>
             <span>Productos del Kit ({{ productosFormArray().length }})</span>
@@ -258,14 +373,21 @@
             @if (creandoKit()) {
               <svg class="animate-spin w-5 h-5 inline mr-2" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Creando Kit...
+              {{ modoEdicion ? 'Guardando cambios...' : 'Creando Kit...' }}
             } @else {
-              <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              Crear Kit
+              @if (modoEdicion) {
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Guardar Cambios
+              } @else {
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Crear Kit
+              }
             }
           </button>
         </div>

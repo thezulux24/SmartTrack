@@ -154,7 +154,7 @@
             <input type="text" 
                    [value]="searchTerm()"
                    (input)="onSearchChange($event)"
-                   placeholder="Paciente, hospital, médico..."
+                   placeholder="Cliente, hospital, médico..."
                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 
                           focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </div>
@@ -220,7 +220,7 @@
                   Sin Kit
                 </span>
               </div>
-              <p class="text-gray-600 dark:text-gray-300 font-medium">{{ cirugia.paciente_nombre }}</p>
+              <p class="text-gray-600 dark:text-gray-300 font-medium">{{ getClienteNombre(cirugia) }}</p>
               <div class="flex items-center space-x-1 mt-2">
                 <span [class]="getPrioridadBadgeClass(cirugia.prioridad)" 
                       class="px-2 py-1 rounded-full text-xs font-medium">
@@ -279,25 +279,16 @@
                 Editar
               </button>
               
-              <!-- Botón Crear Kit si no tiene -->
-              <button *ngIf="!tieneKit(cirugia.id)"
-                      (click)="onCrearKit(cirugia.id)"
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 
-                             rounded-lg text-sm font-medium transition duration-200 flex items-center justify-center">
+              <!-- Botón inteligente de Kit -->
+              <button (click)="onManejarKit(cirugia.id)"
+                      [class]="tieneKit(cirugia.id) 
+                        ? 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 flex items-center justify-center'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 flex items-center justify-center'">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  <path *ngIf="!tieneKit(cirugia.id)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  <path *ngIf="tieneKit(cirugia.id)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                 </svg>
-                Kit
-              </button>
-              
-              <!-- Indicador de Kit existente -->
-              <button *ngIf="tieneKit(cirugia.id)"
-                      disabled
-                      class="bg-green-100 text-green-700 px-4 py-2 
-                             rounded-lg text-sm font-medium cursor-not-allowed flex items-center justify-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
+                {{ tieneKit(cirugia.id) ? 'Ver Kit' : 'Crear Kit' }}
                 Kit OK
               </button>
               <button (click)="cambiarEstado(cirugia)"
