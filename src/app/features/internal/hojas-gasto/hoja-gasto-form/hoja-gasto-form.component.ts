@@ -63,11 +63,8 @@ export class HojaGastoFormComponent implements OnInit {
   cirugias = signal<CirugiaOption[]>([]);
   kitItems = signal<Array<{ id: string; nombre: string; categoria: CategoriaProducto; precio: number; cantidad_requerida: number }>>([]);
 
-  // Parámetros de entrada
-  hojaId = input<string | null>(null);
-
   // Computadas
-  isEditMode = computed(() => !!this.hojaId());
+  isEditMode = computed(() => !!this.hojaGasto() || !!this.route.snapshot.paramMap.get('id'));
   pageTitle = computed(() => this.isEditMode() ? 'Editar Hoja de Gasto' : 'Nueva Hoja de Gasto');
   submitButtonText = computed(() => this.isEditMode() ? 'Actualizar Hoja' : 'Crear Hoja');
 
@@ -99,24 +96,32 @@ export class HojaGastoFormComponent implements OnInit {
     this.error.set(null);
 
     try {
-      // Si es modo edición, cargar la hoja de gasto
-      const hojaId = this.route.snapshot.paramMap.get('id');
-      if (hojaId) {
-        this.hojaGastoService.getHojaGasto(hojaId).subscribe({
-          next: (hoja: HojaGasto | null) => {
-            if (hoja) {
-              this.hojaGasto.set(hoja);
-              this.populateForm(hoja);
-            }
-          },
-          error: (error: any) => {
-            console.error('Error cargando hoja de gasto:', error);
-            this.error.set('Error al cargar la hoja de gasto');
-          }
-        });
+      // Obtener el ID de la hoja de la ruta si existe
+      const hojaIdFromRoute = this.route.snapshot.paramMap.get('id');
+      console.log('📋 ID de hoja desde ruta:', hojaIdFromRoute);
+      console.log('📋 isEditMode:', this.isEditMode());
+      
+      // Si es modo edición, cargar la hoja de gasto PRIMERO
+      if (hojaIdFromRoute) {
+        console.log('🔄 MODO EDICIÓN: Cargando hoja de gasto...');
+        
+        // Esperar a que se cargue la hoja de gasto antes de cargar cirugías
+        const hoja = await firstValueFrom(this.hojaGastoService.getHojaGasto(hojaIdFromRoute));
+        
+        if (hoja) {
+          console.log('✅ Hoja de gasto cargada:', hoja);
+          this.hojaGasto.set(hoja);
+          this.populateForm(hoja);
+        } else {
+          console.error('❌ No se encontró la hoja de gasto');
+          this.error.set('No se encontró la hoja de gasto');
+          return;
+        }
+      } else {
+        console.log('🆕 MODO CREACIÓN: Nueva hoja de gasto');
       }
 
-      // Cargar cirugías disponibles (simulado - deberías reemplazar con tu servicio real)
+      // Cargar cirugías disponibles DESPUÉS de cargar la hoja (si existe)
       await this.loadCirugias();
 
     } catch (error) {
@@ -135,15 +140,40 @@ export class HojaGastoFormComponent implements OnInit {
       const cirugias = await firstValueFrom(this.cirugiasService.getCirugiasConKits());
       
       console.log('✅ Cirugías cargadas:', cirugias.length, cirugias);
-      
-      this.cirugias.set(cirugias);
-      
-      if (cirugias.length === 0) {
-        console.warn('⚠️ No se encontraron cirugías completadas con kits en la base de datos');
-        this.error.set('No hay cirugías completadas con kits disponibles para crear hojas de gasto.');
+      console.log('🔍 Modo edición:', this.isEditMode(), 'Hoja actual:', this.hojaGasto()?.id);
+
+      // Si NO estamos en modo edición, filtrar cirugías que ya tienen hoja de gasto
+      if (!this.isEditMode()) {
+        console.log('🔍 Modo CREACIÓN: Filtrando cirugías que ya tienen hojas de gasto...');
+        
+        // Obtener todas las hojas de gasto existentes
+        const hojasExistentes = await firstValueFrom(this.hojaGastoService.getHojasGasto({}));
+        const cirugiasConHoja = new Set(hojasExistentes.map(h => h.cirugia_id));
+        
+        console.log('📋 Cirugías que ya tienen hoja de gasto:', Array.from(cirugiasConHoja));
+        
+        // Filtrar solo cirugías sin hoja de gasto
+        const cirugiasDisponibles = cirugias.filter(c => !cirugiasConHoja.has(c.id));
+        
+        console.log('✅ Cirugías disponibles (sin hoja de gasto):', cirugiasDisponibles.length);
+        
+        this.cirugias.set(cirugiasDisponibles);
+        
+        if (cirugiasDisponibles.length === 0) {
+          console.warn('⚠️ No hay cirugías disponibles sin hoja de gasto');
+          this.error.set('No hay cirugías disponibles. Todas las cirugías completadas ya tienen una hoja de gasto asignada.');
+        }
       } else {
-        console.log('✅ Se encontraron', cirugias.length, 'cirugías con kits');
+        // En modo edición, mostrar todas las cirugías
+        console.log('✅ Modo EDICIÓN: Mostrando todas las cirugías');
+        this.cirugias.set(cirugias);
+        
+        if (cirugias.length === 0) {
+          console.warn('⚠️ No se encontraron cirugías con kits');
+          this.error.set('No hay cirugías con kits disponibles.');
+        }
       }
+      
     } catch (error) {
       console.error('❌ Error cargando cirugías con kits:', error);
       this.error.set('Error al cargar las cirugías disponibles. Por favor, inténtelo de nuevo.');
@@ -317,7 +347,16 @@ export class HojaGastoFormComponent implements OnInit {
           error: (error: any) => {
             console.error('❌ Error creando hoja de gasto:', error);
             console.error('📋 Detalle completo:', JSON.stringify(error, null, 2));
-            this.error.set('Error al crear la hoja de gasto: ' + (error.message || 'Error desconocido'));
+            
+            // Mostrar mensaje específico si es una hoja duplicada
+            let errorMessage = 'Error al crear la hoja de gasto';
+            if (error.message && error.message.includes('Ya existe una hoja de gasto')) {
+              errorMessage = error.message;
+            } else if (error.message) {
+              errorMessage += ': ' + error.message;
+            }
+            
+            this.error.set(errorMessage);
             this.saving.set(false);
           }
         });

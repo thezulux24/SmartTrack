@@ -47,6 +47,54 @@ export class HojaGastoService {
     return from(this.removeHojaGasto(id));
   }
 
+  // Verificar si existe una hoja de gasto para una cirugía
+  existeHojaGastoPorCirugia(cirugiaId: string): Observable<boolean> {
+    return from(
+      this.supabase.client
+        .from('hojas_gasto')
+        .select('id')
+        .eq('cirugia_id', cirugiaId)
+        .limit(1)
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) {
+          console.error('Error verificando hoja de gasto existente:', error);
+          return false;
+        }
+        return data !== null && data.length > 0;
+      })
+    );
+  }
+
+  // Obtener hoja de gasto por cirugía ID
+  getHojaGastoPorCirugia(cirugiaId: string): Observable<HojaGasto | null> {
+    return from(
+      this.supabase.client
+        .from('hojas_gasto')
+        .select(`
+          *,
+          hoja_gasto_items(*)
+        `)
+        .eq('cirugia_id', cirugiaId)
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) {
+          if (error.code === 'PGRST116') {
+            return null; // No encontrado
+          }
+          console.error('Error obteniendo hoja de gasto por cirugía:', error);
+          throw error;
+        }
+        return this.mapToHojaGasto(data);
+      }),
+      catchError(error => {
+        console.error('Error in getHojaGastoPorCirugia:', error);
+        return of(null);
+      })
+    );
+  }
+
   // Recalcular totales
   recalcularTotales(hojaGasto: HojaGasto): HojaGasto {
     const totales = {
@@ -148,6 +196,26 @@ export class HojaGastoService {
   private async insertHojaGasto(request: CreateHojaGastoRequest): Promise<HojaGasto> {
     try {
       console.log('📝 Creando hoja de gasto con request:', request);
+
+      // VALIDAR: Verificar que no exista ya una hoja de gasto para esta cirugía
+      const { data: existingHoja, error: checkError } = await this.supabase.client
+        .from('hojas_gasto')
+        .select('id, numero_hoja, estado')
+        .eq('cirugia_id', request.cirugia_id)
+        .limit(1);
+
+      if (checkError) {
+        console.error('❌ Error verificando hoja existente:', checkError);
+        throw checkError;
+      }
+
+      if (existingHoja && existingHoja.length > 0) {
+        const hojaExistente = existingHoja[0];
+        console.warn('⚠️ Ya existe una hoja de gasto para esta cirugía:', hojaExistente);
+        throw new Error(`Ya existe una hoja de gasto (${hojaExistente.numero_hoja}) para esta cirugía. No se pueden crear hojas duplicadas.`);
+      }
+
+      console.log('✅ No hay hojas de gasto existentes para esta cirugía, continuando...');
 
       // Generar número de hoja
       const numeroHoja = await this.generateNumeroHoja();
