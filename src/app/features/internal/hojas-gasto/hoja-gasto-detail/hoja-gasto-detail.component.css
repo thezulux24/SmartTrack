@@ -1,0 +1,385 @@
+/* Contenedor principal */
+section {
+  background-color: var(--bg-color-secondary, #f9fafb);
+  transition: background-color 0.3s ease;
+}
+
+/* Estados de carga */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Gradiente del header */
+.gradient-green {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+/* Botones del header */
+.btn-header {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(8px);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-header:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Tarjetas */
+.detail-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  margin-bottom: 16px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estados de las hojas */
+.estado-badge {
+  display: inline-flex;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.estado-pendiente {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.estado-en-proceso {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.estado-completada {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.estado-validada {
+  background-color: #e9d5ff;
+  color: #6b21a8;
+}
+
+.estado-facturada {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+/* Tarjetas de items por categoría */
+.item-implante {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.item-instrumental {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.item-medicamento {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+/* Totales por categoría */
+.total-implantes {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.total-instrumental {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.total-medicamentos {
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Botones de acción */
+.btn-primary {
+  background-color: #059669;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.btn-secondary:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-warning {
+  background-color: #7c3aed;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.btn-warning:hover {
+  background-color: #6d28d9;
+  transform: translateY(-1px);
+}
+
+/* Iconos de categorías */
+.categoria-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Formato de moneda */
+.moneda {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 600;
+}
+
+/* Secciones de información */
+.info-section {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.info-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .detail-card {
+    margin: 0 -8px 16px -8px;
+    border-radius: 8px;
+  }
+  
+  .item-implante,
+  .item-instrumental,
+  .item-medicamento {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .btn-primary,
+  .btn-secondary,
+  .btn-warning {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
+
+/* Estados de loading específicos */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .detail-card {
+    background-color: #1f2937;
+    border: 1px solid #374151;
+  }
+  
+  .item-implante {
+    background-color: #450a0a;
+    border-color: #991b1b;
+  }
+  
+  .item-instrumental {
+    background-color: #1e3a8a;
+    border-color: #1d4ed8;
+  }
+  
+  .item-medicamento {
+    background-color: #14532d;
+    border-color: #16a34a;
+  }
+  
+  .loading-skeleton {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    background-size: 200% 100%;
+  }
+  
+  /* Estados en modo oscuro */
+  .estado-pendiente {
+    background-color: #451a03;
+    color: #fbbf24;
+  }
+  
+  .estado-en-proceso {
+    background-color: #1e3a8a;
+    color: #60a5fa;
+  }
+  
+  .estado-completada {
+    background-color: #14532d;
+    color: #4ade80;
+  }
+  
+  .estado-validada {
+    background-color: #581c87;
+    color: #c084fc;
+  }
+  
+  .estado-facturada {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+}
+
+/* Mejoras para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .detail-card,
+  button:hover,
+  .loading-skeleton {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Focus states para accesibilidad */
+button:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Estilos para impresión */
+@media print {
+  .bg-gradient-to-r,
+  button,
+  .btn-header {
+    display: none;
+  }
+  
+  .detail-card {
+    background: white !important;
+    box-shadow: none;
+    border: 1px solid #000;
+    page-break-inside: avoid;
+  }
+  
+  .item-implante,
+  .item-instrumental,
+  .item-medicamento {
+    background: white !important;
+    border: 1px solid #000 !important;
+  }
+  
+  .estado-badge {
+    border: 1px solid #000 !important;
+    color: #000 !important;
+    background: white !important;
+  }
+}
+
+/* Animaciones de transición suaves */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Efectos hover para las tarjetas */
+.detail-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para separadores */
+hr {
+  border: none;
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 12px 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  hr {
+    background-color: #4b5563;
+  }
+}

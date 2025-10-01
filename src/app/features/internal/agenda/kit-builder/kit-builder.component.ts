@@ -435,7 +435,7 @@ export class KitBuilderComponent implements OnInit {
         kit_id: this.kitId,
         producto_id: p.producto_id,
         cantidad_solicitada: p.cantidad_solicitada,
-        cantidad_entregada: 0,
+        cantidad_preparada: 0,
         observaciones: p.observaciones
       }));
 

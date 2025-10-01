@@ -397,6 +397,113 @@ export class CirugiasService {
     );
   }
 
+  /**
+   * Obtener cirugías con sus kits y productos para hojas de gasto
+   */
+  getCirugiasConKits(): Observable<any[]> {
+    console.log('🔍 Ejecutando consulta getCirugiasConKits...');
+    
+    return from(
+      this.supabase.client
+        .from('cirugias')
+        .select(`
+          id,
+          numero_cirugia,
+          fecha_programada,
+          tecnico_asignado_id,
+          estado,
+          cliente:clientes!cirugias_cliente_id_fkey(
+            id,
+            nombre,
+            apellido
+          ),
+          tecnico_asignado:profiles!cirugias_tecnico_asignado_id_fkey(
+            id,
+            full_name
+          ),
+          kits:kits_cirugia(
+            id,
+            numero_kit,
+            estado,
+            productos:kit_productos(
+              id,
+              producto_id,
+              cantidad_solicitada,
+              precio_unitario,
+              observaciones,
+              producto:productos(
+                id,
+                nombre,
+                categoria,
+                precio
+              )
+            )
+          )
+        `)
+        .order('fecha_programada', { ascending: false })
+        .limit(20)
+    ).pipe(
+      map(response => {
+        console.log('🔍 Respuesta raw de Supabase:', response);
+        
+        if (response.error) {
+          console.error('❌ Error en consulta Supabase:', response.error);
+          throw new Error(response.error.message || 'Error al cargar cirugías con kits');
+        }
+        
+        const rawData = response.data || [];
+        console.log('📊 Datos raw recibidos:', rawData.length, 'cirugías');
+        console.log('📊 Primera cirugía:', rawData[0]);
+        
+        // Filtrar solo cirugías que tienen kits
+        const cirugiasConKits = rawData.filter(c => c.kits && c.kits.length > 0);
+        console.log('🔍 Cirugías con kits:', cirugiasConKits.length);
+        
+        // Transformar los datos al formato esperado por el componente
+        const transformedData = cirugiasConKits.map(cirugia => ({
+          id: cirugia.id,
+          numero_cirugia: cirugia.numero_cirugia,
+          fecha_cirugia: cirugia.fecha_programada,
+          tecnico_asignado_id: cirugia.tecnico_asignado_id,
+          cliente: cirugia.cliente,
+          tecnico: {
+            nombre: (cirugia.tecnico_asignado as any)?.full_name?.split(' ')[0] || 'Sin',
+            apellido: (cirugia.tecnico_asignado as any)?.full_name?.split(' ').slice(1).join(' ') || 'Asignar'
+          },
+          kit: cirugia.kits?.[0] ? {
+            nombre: `Kit ${cirugia.kits[0].numero_kit}`,
+            items: cirugia.kits[0].productos?.map(p => ({
+              id: p.producto?.id || p.id,
+              nombre: p.producto?.nombre || 'Producto sin nombre',
+              categoria: this.mapCategoria(p.producto?.categoria || ''),
+              precio: p.precio_unitario || p.producto?.precio || 0,
+              cantidad_requerida: p.cantidad_solicitada || 1,
+              producto_id: p.producto_id // UUID real del producto
+            })) || []
+          } : null
+        })).filter(c => c.kit && c.kit.items.length > 0);
+        
+        console.log('✅ Datos transformados final:', transformedData);
+        return transformedData;
+      }),
+      catchError(error => {
+        console.error('❌ Service error loading cirugias con kits:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private mapCategoria(categoria: string): string {
+    const mappings: { [key: string]: string } = {
+      'implantes': 'productos',
+      'instrumentos': 'productos',
+      'medicamentos': 'productos',
+      'transporte': 'transporte',
+      'otros': 'otros'
+    };
+    return mappings[categoria] || 'productos';
+  }
+
   // Método para obtener estadísticas/KPIs
   getCirugiaStats(): Observable<any> {
     return from(

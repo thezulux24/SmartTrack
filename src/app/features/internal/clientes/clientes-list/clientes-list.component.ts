@@ -93,7 +93,7 @@ export class ClientesListComponent implements OnInit {
     }
   }
 
-  getEstadoBadgeClass(estado: string): string {
+  getEstadoBadgeClass(estado: string | undefined): string {
     switch (estado) {
       case 'activo':
         return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
@@ -106,7 +106,7 @@ export class ClientesListComponent implements OnInit {
     }
   }
 
-  getEstadoLabel(estado: string): string {
+  getEstadoLabel(estado: string | undefined): string {
     switch (estado) {
       case 'activo':
         return 'Activo';
@@ -115,7 +115,7 @@ export class ClientesListComponent implements OnInit {
       case 'suspendido':
         return 'Suspendido';
       default:
-        return estado;
+        return estado || 'Sin estado';
     }
   }
 

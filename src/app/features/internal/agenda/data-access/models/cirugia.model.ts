@@ -2,7 +2,7 @@ import { Producto, Profile } from "./index";
 import { TecnicoAsignado } from "./agenda-tecnico.model";
 import { Hospital } from "./hospital.model";
 import { TipoCirugia } from "./tipo-cirugia.model";
-import { Cliente } from "../../../../../shared/services/clientes.service";
+import { Cliente } from "../../../clientes/data-acces/clientes.service";
 
 export interface Cirugia {
   id: string;

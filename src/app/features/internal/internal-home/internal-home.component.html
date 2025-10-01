@@ -196,9 +196,9 @@
         </div>
       </div>
 
-      <!-- Hoja de Gasto -->
-      <div
-        class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100">
+      <!-- Hojas de Gasto CON ENLACE -->
+      <a [routerLink]="['/internal/hojas-gasto']"
+        class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 border border-gray-100">
         <div class="flex items-start space-x-4">
           <div
             class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -209,16 +209,15 @@
             </svg>
           </div>
           <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Hoja de Gasto</h3>
-            <p class="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">Registro digital</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Gestionar hojas de gasto digitales y
-              facturación</p>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Hojas de Gasto</h3>
+            <p class="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">Registro digital de gastos</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Gestionar gastos quirúrgicos, validación y facturación automática</p>
           </div>
           <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </div>
-      </div>
+      </a>
 
 <a [routerLink]="['/internal/agenda/mi-agenda']"
   class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700

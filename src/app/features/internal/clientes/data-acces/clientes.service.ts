@@ -15,7 +15,7 @@ export interface Cliente {
   ciudad?: string;
   pais?: string;
   observaciones?: string;
-  estado: 'activo' | 'inactivo' | 'suspendido';
+  estado?: 'activo' | 'inactivo' | 'suspendido';
   created_at?: string;
   updated_at?: string;
   created_by?: string;
@@ -60,6 +60,8 @@ export class ClientesService {
       switchMap(userId => {
         const clienteData = {
           ...cliente,
+          estado: cliente.estado || 'activo',
+          pais: cliente.pais || 'Ecuador',
           created_by: userId,
           updated_by: userId
         };
@@ -140,6 +142,39 @@ export class ClientesService {
           if (error) throw error;
           return data || [];
         })
+    );
+  }
+
+  /**
+   * Buscar cliente por número de documento
+   */
+  buscarPorDocumento(documento: string): Observable<Cliente | null> {
+    return from(
+      this.supabase.client
+        .from('clientes')
+        .select('*')
+        .eq('documento_numero', documento)
+        .maybeSingle()
+        .then(({ data, error }) => {
+          if (error) throw error;
+          return data;
+        })
+    );
+  }
+
+  /**
+   * Buscar un cliente existente o crear uno nuevo
+   */
+  buscarOCrear(clienteData: Omit<Cliente, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'>): Observable<Cliente> {
+    // Primero intentar buscar por documento
+    return this.buscarPorDocumento(clienteData.documento_numero).pipe(
+      switchMap(clienteExistente => {
+        if (clienteExistente) {
+          return from(Promise.resolve(clienteExistente));
+        }
+        // Si no existe, crear nuevo
+        return this.createCliente(clienteData);
+      })
     );
   }
 }

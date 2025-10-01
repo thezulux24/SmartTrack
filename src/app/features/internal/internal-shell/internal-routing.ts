@@ -21,6 +21,11 @@ export default [
     loadChildren: () => import('../clientes/clientes-routing').then(m => m.clientesRoutes),
   },
 
+  {
+    path: 'hojas-gasto',
+    loadChildren: () => import('../hojas-gasto/hojas-gasto-routing')
+  },
+
     {
         path: '**', redirectTo: ''
     }

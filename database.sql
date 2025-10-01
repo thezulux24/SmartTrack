@@ -43,9 +43,6 @@ CREATE TABLE public.cirugia_seguimiento (
 CREATE TABLE public.cirugias (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   numero_cirugia character varying NOT NULL UNIQUE,
-  paciente_nombre character varying NOT NULL,
-  paciente_documento character varying,
-  paciente_telefono character varying,
   medico_cirujano character varying NOT NULL,
   fecha_programada timestamp with time zone NOT NULL,
   hora_inicio time without time zone,
@@ -59,7 +56,7 @@ CREATE TABLE public.cirugias (
   updated_at timestamp with time zone DEFAULT now(),
   hospital_id uuid NOT NULL,
   tipo_cirugia_id uuid NOT NULL,
-  cliente_id uuid,
+  cliente_id uuid NOT NULL,
   CONSTRAINT cirugias_pkey PRIMARY KEY (id),
   CONSTRAINT cirugias_tecnico_asignado_id_fkey FOREIGN KEY (tecnico_asignado_id) REFERENCES public.profiles(id),
   CONSTRAINT cirugias_usuario_creador_id_fkey FOREIGN KEY (usuario_creador_id) REFERENCES public.profiles(id),
@@ -89,6 +86,47 @@ CREATE TABLE public.clientes (
   CONSTRAINT clientes_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id),
   CONSTRAINT clientes_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES auth.users(id)
 );
+CREATE TABLE public.hoja_gasto_items (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  hoja_gasto_id uuid NOT NULL,
+  producto_id uuid,
+  categoria character varying NOT NULL CHECK (categoria::text = ANY (ARRAY['productos'::character varying, 'transporte'::character varying, 'otros'::character varying]::text[])),
+  descripcion character varying NOT NULL,
+  cantidad integer DEFAULT 1,
+  precio_unitario numeric NOT NULL DEFAULT 0,
+  precio_total numeric NOT NULL DEFAULT 0,
+  fecha_gasto date,
+  comprobante_url character varying,
+  observaciones text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT hoja_gasto_items_pkey PRIMARY KEY (id),
+  CONSTRAINT hoja_gasto_items_hoja_gasto_id_fkey FOREIGN KEY (hoja_gasto_id) REFERENCES public.hojas_gasto(id),
+  CONSTRAINT hoja_gasto_items_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id)
+);
+CREATE TABLE public.hojas_gasto (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  numero_hoja character varying NOT NULL UNIQUE,
+  cirugia_id uuid NOT NULL,
+  tecnico_id uuid NOT NULL,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_cirugia date NOT NULL,
+  estado character varying DEFAULT 'borrador'::character varying CHECK (estado::text = ANY (ARRAY['borrador'::character varying, 'revision'::character varying, 'aprobada'::character varying, 'rechazada'::character varying]::text[])),
+  observaciones text,
+  total_productos numeric DEFAULT 0,
+  total_transporte numeric DEFAULT 0,
+  total_otros numeric DEFAULT 0,
+  total_general numeric DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  created_by uuid,
+  updated_by uuid,
+  CONSTRAINT hojas_gasto_pkey PRIMARY KEY (id),
+  CONSTRAINT hojas_gasto_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
+  CONSTRAINT hojas_gasto_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id),
+  CONSTRAINT hojas_gasto_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id),
+  CONSTRAINT hojas_gasto_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES auth.users(id)
+);
 CREATE TABLE public.hospitales (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   nombre character varying NOT NULL,
@@ -113,6 +151,65 @@ CREATE TABLE public.inventario (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT inventario_pkey PRIMARY KEY (id),
   CONSTRAINT inventario_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id)
+);
+CREATE TABLE public.kit_productos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  kit_id uuid NOT NULL,
+  producto_id uuid NOT NULL,
+  cantidad_solicitada integer NOT NULL DEFAULT 1,
+  cantidad_preparada integer DEFAULT 0,
+  cantidad_enviada integer DEFAULT 0,
+  cantidad_utilizada integer DEFAULT 0,
+  cantidad_devuelta integer DEFAULT 0,
+  precio_unitario numeric,
+  lote character varying,
+  fecha_vencimiento date,
+  observaciones text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT kit_productos_pkey PRIMARY KEY (id),
+  CONSTRAINT kit_productos_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
+  CONSTRAINT kit_productos_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id)
+);
+CREATE TABLE public.kit_trazabilidad (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  kit_id uuid NOT NULL,
+  accion character varying NOT NULL,
+  estado_anterior character varying,
+  estado_nuevo character varying NOT NULL,
+  usuario_id uuid NOT NULL,
+  ubicacion character varying,
+  coordenadas_lat numeric,
+  coordenadas_lng numeric,
+  timestamp timestamp with time zone DEFAULT now(),
+  observaciones text,
+  metadata jsonb,
+  CONSTRAINT kit_trazabilidad_pkey PRIMARY KEY (id),
+  CONSTRAINT kit_trazabilidad_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
+  CONSTRAINT kit_trazabilidad_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.kits_cirugia (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cirugia_id uuid NOT NULL,
+  numero_kit character varying NOT NULL UNIQUE,
+  qr_code character varying NOT NULL UNIQUE,
+  estado character varying DEFAULT 'preparando'::character varying,
+  fecha_creacion timestamp with time zone DEFAULT now(),
+  fecha_preparacion timestamp with time zone,
+  fecha_envio timestamp with time zone,
+  fecha_recepcion timestamp with time zone,
+  fecha_devolucion timestamp with time zone,
+  comercial_id uuid,
+  tecnico_id uuid,
+  logistica_id uuid,
+  observaciones text,
+  ubicacion_actual character varying,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT kits_cirugia_pkey PRIMARY KEY (id),
+  CONSTRAINT kits_cirugia_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
+  CONSTRAINT kits_cirugia_comercial_id_fkey FOREIGN KEY (comercial_id) REFERENCES public.profiles(id),
+  CONSTRAINT kits_cirugia_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id),
+  CONSTRAINT kits_cirugia_logistica_id_fkey FOREIGN KEY (logistica_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.movimientos_inventario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -166,89 +263,11 @@ CREATE TABLE public.profiles (
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
-CREATE TABLE public.tipos_cirugia (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  nombre character varying NOT NULL UNIQUE,
-  descripcion text,
-  duracion_promedio integer,
-  productos_comunes jsonb,
-  especialidad character varying,
-  es_activo boolean DEFAULT true,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT tipos_cirugia_pkey PRIMARY KEY (id)
-);
-
--- Tabla para gestionar los kits de cirugía
-CREATE TABLE public.kits_cirugia (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  cirugia_id uuid NOT NULL,
-  numero_kit character varying NOT NULL UNIQUE,
-  qr_code character varying NOT NULL UNIQUE,
-  estado character varying DEFAULT 'preparando'::character varying, -- preparando, listo, enviado, en_uso, devuelto, facturado
-  fecha_creacion timestamp with time zone DEFAULT now(),
-  fecha_preparacion timestamp with time zone,
-  fecha_envio timestamp with time zone,
-  fecha_recepcion timestamp with time zone,
-  fecha_devolucion timestamp with time zone,
-  comercial_id uuid,
-  tecnico_id uuid,
-  logistica_id uuid,
-  observaciones text,
-  ubicacion_actual character varying,
-  created_at timestamp with time zone DEFAULT now(),
-  updated_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT kits_cirugia_pkey PRIMARY KEY (id),
-  CONSTRAINT kits_cirugia_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
-  CONSTRAINT kits_cirugia_comercial_id_fkey FOREIGN KEY (comercial_id) REFERENCES public.profiles(id),
-  CONSTRAINT kits_cirugia_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id),
-  CONSTRAINT kits_cirugia_logistica_id_fkey FOREIGN KEY (logistica_id) REFERENCES public.profiles(id)
-);
-
--- Tabla para el detalle de productos en cada kit
-CREATE TABLE public.kit_productos (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  kit_id uuid NOT NULL,
-  producto_id uuid NOT NULL,
-  cantidad_solicitada integer NOT NULL DEFAULT 1,
-  cantidad_preparada integer DEFAULT 0,
-  cantidad_enviada integer DEFAULT 0,
-  cantidad_utilizada integer DEFAULT 0,
-  cantidad_devuelta integer DEFAULT 0,
-  precio_unitario numeric,
-  lote character varying,
-  fecha_vencimiento date,
-  observaciones text,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT kit_productos_pkey PRIMARY KEY (id),
-  CONSTRAINT kit_productos_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
-  CONSTRAINT kit_productos_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id)
-);
-
--- Tabla para trazabilidad del flujo del kit
-CREATE TABLE public.kit_trazabilidad (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  kit_id uuid NOT NULL,
-  accion character varying NOT NULL, -- creado, preparado, enviado, recibido, escaneado, devuelto, etc.
-  estado_anterior character varying,
-  estado_nuevo character varying NOT NULL,
-  usuario_id uuid NOT NULL,
-  ubicacion character varying,
-  coordenadas_lat numeric,
-  coordenadas_lng numeric,
-  timestamp timestamp with time zone DEFAULT now(),
-  observaciones text,
-  metadata jsonb, -- Para datos adicionales como fotos, firmas digitales, etc.
-  CONSTRAINT kit_trazabilidad_pkey PRIMARY KEY (id),
-  CONSTRAINT kit_trazabilidad_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
-  CONSTRAINT kit_trazabilidad_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
-);
-
--- Tabla para códigos QR y su gestión
 CREATE TABLE public.qr_codes (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   codigo character varying NOT NULL UNIQUE,
-  tipo character varying NOT NULL DEFAULT 'kit'::character varying, -- kit, producto, ubicacion
-  referencia_id uuid NOT NULL, -- ID del kit, producto, etc.
+  tipo character varying NOT NULL DEFAULT 'kit'::character varying,
+  referencia_id uuid NOT NULL,
   es_activo boolean DEFAULT true,
   fecha_generacion timestamp with time zone DEFAULT now(),
   fecha_expiracion timestamp with time zone,
@@ -257,8 +276,6 @@ CREATE TABLE public.qr_codes (
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT qr_codes_pkey PRIMARY KEY (id)
 );
-
--- Tabla para registrar escaneos de QR
 CREATE TABLE public.qr_escaneos (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   qr_code_id uuid NOT NULL,
@@ -274,4 +291,15 @@ CREATE TABLE public.qr_escaneos (
   CONSTRAINT qr_escaneos_pkey PRIMARY KEY (id),
   CONSTRAINT qr_escaneos_qr_code_id_fkey FOREIGN KEY (qr_code_id) REFERENCES public.qr_codes(id),
   CONSTRAINT qr_escaneos_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.tipos_cirugia (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nombre character varying NOT NULL UNIQUE,
+  descripcion text,
+  duracion_promedio integer,
+  productos_comunes jsonb,
+  especialidad character varying,
+  es_activo boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT tipos_cirugia_pkey PRIMARY KEY (id)
 );

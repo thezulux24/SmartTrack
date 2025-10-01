@@ -9,7 +9,7 @@ import { HospitalesService } from '../data-access/hospitales.service';
 import { TiposCirugiaService } from '../data-access/tipos-cirugia.service';
 import { TecnicosService } from '../data-access/tecnicos.service';
 import { KitService } from '../../../../shared/services/kit.service';
-import { ClientesService, Cliente } from '../../../../shared/services/clientes.service';
+import { ClientesService, Cliente } from '../../clientes/data-acces/clientes.service';
 import { Hospital, TipoCirugia, TecnicoAsignado, Cirugia, CirugiaCreate } from '../data-access/models';
 
 @Component({
@@ -351,6 +351,11 @@ export class CirugiaFormComponent implements OnInit {
   }
 
   private crearCirugiaConCliente(formData: any, cliente: Cliente) {
+    // Verificar que el cliente tenga ID
+    if (!cliente.id) {
+      throw new Error('El cliente no tiene un ID válido');
+    }
+
     // Preparar datos de cirugía
     const cirugiaData: CirugiaCreate = {
       numero_cirugia: this.isEditing ? formData.numero_cirugia : this.generateNumeroCirugia(),

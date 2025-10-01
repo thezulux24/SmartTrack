@@ -1,0 +1,484 @@
+import { Injectable, inject } from '@angular/core';
+import { Observable, from, map, catchError, of } from 'rxjs';
+import { SupabaseService } from '../../../../shared/data-access/supabase.service';
+import { 
+  HojaGasto, 
+  HojaGastoItem, 
+  CreateHojaGastoRequest, 
+  UpdateHojaGastoRequest, 
+  HojaGastoFilters,
+  EstadoHojaGasto,
+  CategoriaProducto
+} from './hoja-gasto.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HojaGastoService {
+  private supabase = inject(SupabaseService);
+
+  // Obtener todas las hojas de gasto con filtros
+  getHojasGasto(filters?: HojaGastoFilters): Observable<HojaGasto[]> {
+    return from(this.fetchHojasGasto(filters));
+  }
+
+  // Obtener una hoja de gasto específica
+  getHojaGasto(id: string): Observable<HojaGasto | null> {
+    return from(this.fetchHojaGasto(id) as Promise<HojaGasto | null>);
+  }
+
+  // Crear nueva hoja de gasto
+  createHojaGasto(request: CreateHojaGastoRequest): Observable<HojaGasto> {
+    return from(this.insertHojaGasto(request) as Promise<HojaGasto>);
+  }
+
+  // Actualizar hoja de gasto existente
+  updateHojaGasto(id: string, request: UpdateHojaGastoRequest): Observable<HojaGasto> {
+    return from(this.updateHojaGastoData(id, request) as Promise<HojaGasto>);
+  }
+
+  // Cambiar estado de hoja de gasto
+  cambiarEstado(id: string, nuevoEstado: EstadoHojaGasto): Observable<HojaGasto> {
+    return from(this.updateEstado(id, nuevoEstado));
+  }
+
+  // Eliminar hoja de gasto
+  deleteHojaGasto(id: string): Observable<boolean> {
+    return from(this.removeHojaGasto(id));
+  }
+
+  // Recalcular totales
+  recalcularTotales(hojaGasto: HojaGasto): HojaGasto {
+    const totales = {
+      total_productos: 0,
+      total_transporte: 0,
+      total_otros: 0,
+      total_general: 0
+    };
+
+    const items = hojaGasto.items || hojaGasto.hoja_gasto_items || [];
+    items.forEach(item => {
+      const subtotal = item.subtotal || item.precio_total || (item.cantidad * item.precio_unitario);
+      totales.total_general += subtotal;
+
+      switch (item.categoria) {
+        case 'productos':
+          totales.total_productos += subtotal;
+          break;
+        case 'transporte':
+          totales.total_transporte += subtotal;
+          break;
+        case 'otros':
+          totales.total_otros += subtotal;
+          break;
+      }
+    });
+
+    return {
+      ...hojaGasto,
+      ...totales
+    };
+  }
+
+  // === Métodos privados para interacción con Supabase ===
+
+  private async fetchHojasGasto(filters?: HojaGastoFilters): Promise<HojaGasto[]> {
+    try {
+      let query = this.supabase.client
+        .from('hojas_gasto')
+        .select(`
+          *,
+          hoja_gasto_items(*)
+        `);
+
+      // Aplicar filtros
+      if (filters?.estado) {
+        query = query.eq('estado', filters.estado);
+      }
+      if (filters?.fecha_desde) {
+        query = query.gte('fecha_cirugia', filters.fecha_desde);
+      }
+      if (filters?.fecha_hasta) {
+        query = query.lte('fecha_cirugia', filters.fecha_hasta);
+      }
+      if (filters?.tecnico_id) {
+        query = query.eq('tecnico_id', filters.tecnico_id);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching hojas gasto:', error);
+        throw error;
+      }
+
+      return this.mapToHojasGasto(data || []);
+    } catch (error) {
+      console.error('Error in fetchHojasGasto:', error);
+      throw error;
+    }
+  }
+
+  private async fetchHojaGasto(id: string): Promise<HojaGasto | null> {
+    try {
+      const { data, error } = await this.supabase.client
+        .from('hojas_gasto')
+        .select(`
+          *,
+          hoja_gasto_items(*)
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null; // No encontrado
+        }
+        console.error('Error fetching hoja gasto:', error);
+        throw error;
+      }
+
+      return this.mapToHojaGasto(data);
+    } catch (error) {
+      console.error('Error in fetchHojaGasto:', error);
+      throw error;
+    }
+  }
+
+  private async insertHojaGasto(request: CreateHojaGastoRequest): Promise<HojaGasto> {
+    try {
+      console.log('📝 Creando hoja de gasto con request:', request);
+
+      // Generar número de hoja
+      const numeroHoja = await this.generateNumeroHoja();
+      console.log('🔢 Número de hoja generado:', numeroHoja);
+
+      // Calcular totales
+      let total_productos = 0;
+      let total_transporte = 0;
+      let total_otros = 0;
+      let total_general = 0;
+
+      if (request.items && request.items.length > 0) {
+        request.items.forEach(item => {
+          const cantidad = item.cantidad_usada || item.cantidad || 0;
+          const subtotal = cantidad * item.precio_unitario;
+          total_general += subtotal;
+
+          switch (item.categoria) {
+            case 'productos':
+              total_productos += subtotal;
+              break;
+            case 'transporte':
+              total_transporte += subtotal;
+              break;
+            case 'otros':
+              total_otros += subtotal;
+              break;
+          }
+        });
+      }
+
+      console.log('💰 Totales calculados:', { total_productos, total_transporte, total_otros, total_general });
+
+      // Preparar datos para insertar - SIN total_alojamiento
+      const hojaGastoData = {
+        numero_hoja: numeroHoja,
+        cirugia_id: request.cirugia_id,
+        tecnico_id: request.tecnico_id,
+        fecha_cirugia: request.fecha_cirugia,
+        estado: 'borrador',
+        total_productos,
+        total_transporte,
+        total_otros,
+        total_general,
+        observaciones: request.observaciones || null
+      };
+
+      console.log('📤 Datos EXACTOS a insertar (SIN alojamiento):', hojaGastoData);
+      console.log('🔍 Verificando que NO existe total_alojamiento:', Object.keys(hojaGastoData));
+
+      // Insertar hoja de gasto
+      const { data: hojaData, error: hojaError } = await this.supabase.client
+        .from('hojas_gasto')
+        .insert(hojaGastoData)
+        .select()
+        .single();
+
+      if (hojaError) {
+        console.error('❌ Error inserting hoja gasto:', hojaError);
+        console.error('📋 Error details:', JSON.stringify(hojaError, null, 2));
+        throw hojaError;
+      }
+
+      console.log('✅ Hoja de gasto creada:', hojaData);
+
+      // Insertar items
+      if (request.items && request.items.length > 0) {
+        const itemsToInsert = request.items.map(item => ({
+          hoja_gasto_id: hojaData.id,
+          producto_id: item.producto_id,
+          categoria: item.categoria,
+          descripcion: item.descripcion || item.nombre_producto || '',
+          cantidad: item.cantidad || item.cantidad_usada || 0,
+          precio_unitario: item.precio_unitario,
+          precio_total: (item.cantidad || item.cantidad_usada || 0) * item.precio_unitario,
+          fecha_gasto: item.fecha_gasto,
+          comprobante_url: item.comprobante_url,
+          observaciones: item.observaciones
+        }));
+
+        const { error: itemsError } = await this.supabase.client
+          .from('hoja_gasto_items')
+          .insert(itemsToInsert);
+
+        if (itemsError) {
+          console.error('Error inserting hoja gasto items:', itemsError);
+          // Revertir la hoja de gasto si fallan los items
+          await this.supabase.client.from('hojas_gasto').delete().eq('id', hojaData.id);
+          throw itemsError;
+        }
+      }
+
+      // Obtener la hoja completa con items
+      return await this.fetchHojaGasto(hojaData.id) as HojaGasto;
+    } catch (error) {
+      console.error('Error in insertHojaGasto:', error);
+      throw error;
+    }
+  }
+
+  private async updateHojaGastoData(id: string, request: UpdateHojaGastoRequest): Promise<HojaGasto> {
+    try {
+      // Calcular totales de los nuevos items
+      let total_productos = 0;
+      let total_transporte = 0;
+      let total_otros = 0;
+      let total_general = 0;
+
+      if (request.items && request.items.length > 0) {
+        request.items.forEach(item => {
+          const cantidad = item.cantidad_usada || item.cantidad || 0;
+          const subtotal = cantidad * item.precio_unitario;
+          total_general += subtotal;
+
+          switch (item.categoria) {
+            case 'productos':
+              total_productos += subtotal;
+              break;
+            case 'transporte':
+              total_transporte += subtotal;
+              break;
+            case 'otros':
+              total_otros += subtotal;
+              break;
+          }
+        });
+      }
+
+      // Actualizar hoja de gasto - SIN total_alojamiento
+      const updateData: any = {
+        updated_at: new Date().toISOString()
+      };
+
+      if (request.estado) {
+        updateData.estado = request.estado;
+      }
+      if (request.observaciones !== undefined) {
+        updateData.observaciones = request.observaciones;
+      }
+      if (request.items && request.items.length > 0) {
+        updateData.total_productos = total_productos;
+        updateData.total_transporte = total_transporte;
+        updateData.total_otros = total_otros;
+        updateData.total_general = total_general;
+      }
+
+      console.log('📤 Update data EXACTOS (SIN alojamiento):', updateData);
+      console.log('🔍 Verificando keys de update:', Object.keys(updateData));
+
+      const { error: hojaError } = await this.supabase.client
+        .from('hojas_gasto')
+        .update(updateData)
+        .eq('id', id);
+
+      if (hojaError) {
+        console.error('Error updating hoja gasto:', hojaError);
+        throw hojaError;
+      }
+
+      // Actualizar items si se proporcionan
+      if (request.items && request.items.length > 0) {
+        // Eliminar items existentes
+        const { error: deleteError } = await this.supabase.client
+          .from('hoja_gasto_items')
+          .delete()
+          .eq('hoja_gasto_id', id);
+
+        if (deleteError) {
+          console.error('Error deleting existing items:', deleteError);
+          throw deleteError;
+        }
+
+        // Insertar nuevos items
+        const itemsToInsert = request.items.map(item => ({
+          hoja_gasto_id: id,
+          producto_id: item.producto_id,
+          categoria: item.categoria,
+          descripcion: item.descripcion || item.nombre_producto || '',
+          cantidad: item.cantidad || item.cantidad_usada || 0,
+          precio_unitario: item.precio_unitario,
+          precio_total: (item.cantidad || item.cantidad_usada || 0) * item.precio_unitario,
+          fecha_gasto: item.fecha_gasto,
+          comprobante_url: item.comprobante_url,
+          observaciones: item.observaciones
+        }));
+
+        const { error: itemsError } = await this.supabase.client
+          .from('hoja_gasto_items')
+          .insert(itemsToInsert);
+
+        if (itemsError) {
+          console.error('Error inserting updated items:', itemsError);
+          throw itemsError;
+        }
+      }
+
+      // Obtener la hoja actualizada
+      return await this.fetchHojaGasto(id) as HojaGasto;
+    } catch (error) {
+      console.error('Error in updateHojaGastoData:', error);
+      throw error;
+    }
+  }
+
+  private async updateEstado(id: string, nuevoEstado: EstadoHojaGasto): Promise<HojaGasto> {
+    try {
+      const { error } = await this.supabase.client
+        .from('hojas_gasto')
+        .update({ 
+          estado: nuevoEstado, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating estado:', error);
+        throw error;
+      }
+
+      return await this.fetchHojaGasto(id) as HojaGasto;
+    } catch (error) {
+      console.error('Error in updateEstado:', error);
+      throw error;
+    }
+  }
+
+  private async removeHojaGasto(id: string): Promise<boolean> {
+    try {
+      // Eliminar items primero
+      await this.supabase.client
+        .from('hoja_gasto_items')
+        .delete()
+        .eq('hoja_gasto_id', id);
+
+      // Eliminar hoja de gasto
+      const { error } = await this.supabase.client
+        .from('hojas_gasto')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting hoja gasto:', error);
+        throw error;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in removeHojaGasto:', error);
+      throw error;
+    }
+  }
+
+  private async generateNumeroHoja(): Promise<string> {
+    const year = new Date().getFullYear();
+    const month = String(new Date().getMonth() + 1).padStart(2, '0');
+    
+    // Obtener el último número del mes
+    const { data, error } = await this.supabase.client
+      .from('hojas_gasto')
+      .select('numero_hoja')
+      .like('numero_hoja', `HG-${year}${month}-%`)
+      .order('numero_hoja', { ascending: false })
+      .limit(1);
+
+    let nextNumber = 1;
+    if (data && data.length > 0) {
+      const lastNumber = data[0].numero_hoja.split('-')[2];
+      nextNumber = parseInt(lastNumber) + 1;
+    }
+
+    return `HG-${year}${month}-${String(nextNumber).padStart(3, '0')}`;
+  }
+
+  // === Métodos de mapeo ===
+
+  private mapToHojasGasto(data: any[]): HojaGasto[] {
+    return data.map(item => this.mapToHojaGasto(item));
+  }
+
+  private mapToHojaGasto(data: any): HojaGasto {
+    return {
+      id: data.id,
+      numero_hoja: data.numero_hoja,
+      cirugia_id: data.cirugia_id,
+      tecnico_id: data.tecnico_id,
+      fecha_cirugia: data.fecha_cirugia,
+      fecha_creacion: data.fecha_creacion || data.created_at,
+      estado: data.estado as EstadoHojaGasto,
+      total_productos: data.total_productos || 0,
+      total_transporte: data.total_transporte || 0,
+      total_otros: data.total_otros || 0,
+      total_general: data.total_general || 0,
+      observaciones: data.observaciones,
+      created_at: data.created_at,
+      updated_at: data.updated_at,
+      created_by: data.created_by,
+      updated_by: data.updated_by,
+      items: data.hoja_gasto_items?.map((item: any) => ({
+        id: item.id,
+        hoja_gasto_id: item.hoja_gasto_id,
+        producto_id: item.producto_id,
+        categoria: item.categoria as CategoriaProducto,
+        descripcion: item.descripcion,
+        cantidad: item.cantidad,
+        precio_unitario: item.precio_unitario,
+        precio_total: item.precio_total,
+        fecha_gasto: item.fecha_gasto,
+        comprobante_url: item.comprobante_url,
+        observaciones: item.observaciones,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        // Alias para compatibilidad
+        nombre_producto: item.descripcion,
+        cantidad_usada: item.cantidad,
+        subtotal: item.precio_total
+      })) || [],
+      hoja_gasto_items: data.hoja_gasto_items?.map((item: any) => ({
+        id: item.id,
+        hoja_gasto_id: item.hoja_gasto_id,
+        producto_id: item.producto_id,
+        categoria: item.categoria as CategoriaProducto,
+        descripcion: item.descripcion,
+        cantidad: item.cantidad,
+        precio_unitario: item.precio_unitario,
+        precio_total: item.precio_total,
+        fecha_gasto: item.fecha_gasto,
+        comprobante_url: item.comprobante_url,
+        observaciones: item.observaciones,
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      })) || []
+    };
+  }
+}
