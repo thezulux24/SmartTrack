@@ -13,21 +13,6 @@ CREATE TABLE public.agenda_tecnicos (
   CONSTRAINT agenda_tecnicos_pkey PRIMARY KEY (id),
   CONSTRAINT agenda_tecnicos_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id)
 );
-CREATE TABLE public.cirugia_productos (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  cirugia_id uuid,
-  producto_id uuid,
-  cantidad_requerida integer NOT NULL DEFAULT 1,
-  cantidad_utilizada integer DEFAULT 0,
-  es_implante boolean DEFAULT false,
-  numero_lote character varying,
-  fecha_vencimiento date,
-  observaciones text,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT cirugia_productos_pkey PRIMARY KEY (id),
-  CONSTRAINT cirugia_productos_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
-  CONSTRAINT cirugia_productos_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id)
-);
 CREATE TABLE public.cirugia_seguimiento (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   cirugia_id uuid,
@@ -192,7 +177,7 @@ CREATE TABLE public.kits_cirugia (
   cirugia_id uuid NOT NULL,
   numero_kit character varying NOT NULL UNIQUE,
   qr_code character varying NOT NULL UNIQUE,
-  estado character varying DEFAULT 'preparando'::character varying,
+  estado character varying DEFAULT 'preparando'::character varying CHECK (estado::text = ANY (ARRAY['solicitado'::character varying, 'preparando'::character varying, 'listo_envio'::character varying, 'en_transito'::character varying, 'entregado'::character varying, 'en_uso'::character varying, 'devuelto'::character varying, 'finalizado'::character varying, 'cancelado'::character varying]::text[])),
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_preparacion timestamp with time zone,
   fecha_envio timestamp with time zone,
@@ -205,6 +190,10 @@ CREATE TABLE public.kits_cirugia (
   ubicacion_actual character varying,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  cliente_receptor_nombre text,
+  cliente_receptor_cedula text,
+  cliente_validacion_fecha timestamp with time zone,
+  cliente_validacion_qr text,
   CONSTRAINT kits_cirugia_pkey PRIMARY KEY (id),
   CONSTRAINT kits_cirugia_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
   CONSTRAINT kits_cirugia_comercial_id_fkey FOREIGN KEY (comercial_id) REFERENCES public.profiles(id),
@@ -274,7 +263,15 @@ CREATE TABLE public.qr_codes (
   veces_escaneado integer DEFAULT 0,
   ultimo_escaneo timestamp with time zone,
   created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT qr_codes_pkey PRIMARY KEY (id)
+  tipo_validacion character varying CHECK (tipo_validacion::text = ANY (ARRAY['entrega_cliente'::character varying, 'recepcion_tecnico'::character varying, 'devolucion_material'::character varying]::text[])),
+  kit_id uuid,
+  validado_por uuid,
+  fecha_validacion timestamp with time zone,
+  ubicacion_validacion text,
+  foto_evidencia text,
+  CONSTRAINT qr_codes_pkey PRIMARY KEY (id),
+  CONSTRAINT qr_codes_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
+  CONSTRAINT qr_codes_validado_por_fkey FOREIGN KEY (validado_por) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.qr_escaneos (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -288,9 +285,14 @@ CREATE TABLE public.qr_escaneos (
   accion_realizada character varying,
   resultado character varying DEFAULT 'exitoso'::character varying,
   observaciones text,
+  tipo_accion character varying CHECK (tipo_accion::text = ANY (ARRAY['entrega_kit'::character varying, 'recepcion_kit'::character varying, 'devolucion_kit'::character varying]::text[])),
+  kit_id uuid,
+  validado_por_nombre text,
+  firma_digital text,
   CONSTRAINT qr_escaneos_pkey PRIMARY KEY (id),
   CONSTRAINT qr_escaneos_qr_code_id_fkey FOREIGN KEY (qr_code_id) REFERENCES public.qr_codes(id),
-  CONSTRAINT qr_escaneos_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
+  CONSTRAINT qr_escaneos_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id),
+  CONSTRAINT qr_escaneos_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id)
 );
 CREATE TABLE public.tipos_cirugia (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

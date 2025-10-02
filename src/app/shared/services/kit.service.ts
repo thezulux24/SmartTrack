@@ -8,7 +8,8 @@ import {
   QrEscaneo,
   CreateKitRequest,
   UpdateKitEstadoRequest,
-  RegistrarTrazabilidadRequest
+  RegistrarTrazabilidadRequest,
+  EstadoKit
 } from '../models/kit.model';
 import { Observable, from, map } from 'rxjs';
 
@@ -204,20 +205,36 @@ export class KitService {
   /**
    * Actualizar el estado de un kit
    */
-  actualizarEstadoKit(kitId: string, request: UpdateKitEstadoRequest): Observable<KitCirugia> {
+  actualizarEstadoKit(kitId: string, nuevoEstado: EstadoKit, opciones?: {
+    observaciones?: string;
+    usuario_id?: string;
+    ubicacion_actual?: string;
+  }): Observable<KitCirugia> {
     const actualizacion: any = {
-      estado: request.estado,
+      estado: nuevoEstado,
       updated_at: new Date().toISOString()
     };
 
+    if (opciones?.observaciones) {
+      actualizacion.observaciones = opciones.observaciones;
+    }
+
+    if (opciones?.ubicacion_actual) {
+      actualizacion.ubicacion_actual = opciones.ubicacion_actual;
+    }
+
     // Actualizar fechas según el estado
-    switch (request.estado) {
-      case 'listo':
+    switch (nuevoEstado) {
+      case 'preparando':
         actualizacion.fecha_preparacion = new Date().toISOString();
         break;
-      case 'enviado':
+      case 'listo_envio':
+        actualizacion.fecha_preparacion = new Date().toISOString();
+        break;
+      case 'en_transito':
         actualizacion.fecha_envio = new Date().toISOString();
         break;
+      case 'entregado':
       case 'en_uso':
         actualizacion.fecha_recepcion = new Date().toISOString();
         break;
@@ -227,13 +244,15 @@ export class KitService {
     }
 
     // Agregar usuario responsable según el estado
-    if (request.usuario_id) {
-      switch (request.estado) {
-        case 'listo':
-          actualizacion.logistica_id = request.usuario_id;
+    if (opciones?.usuario_id) {
+      switch (nuevoEstado) {
+        case 'preparando':
+        case 'listo_envio':
+          actualizacion.logistica_id = opciones.usuario_id;
           break;
         case 'en_uso':
-          actualizacion.tecnico_id = request.usuario_id;
+        case 'entregado':
+          actualizacion.tecnico_id = opciones.usuario_id;
           break;
       }
     }
@@ -248,6 +267,18 @@ export class KitService {
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;
+        
+        // Registrar trazabilidad
+        this.supabase.client
+          .from('kit_trazabilidad')
+          .insert({
+            kit_id: kitId,
+            usuario_id: opciones?.usuario_id,
+            accion: `cambio_estado_${nuevoEstado}`,
+            estado_nuevo: nuevoEstado,
+            observaciones: opciones?.observaciones || `Estado cambiado a ${nuevoEstado}`
+          });
+        
         return data;
       })
     );

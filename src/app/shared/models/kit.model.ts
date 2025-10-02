@@ -1,9 +1,20 @@
+export type EstadoKit = 
+  | 'solicitado'
+  | 'preparando' 
+  | 'listo_envio'
+  | 'en_transito'
+  | 'entregado'
+  | 'en_uso'
+  | 'devuelto'
+  | 'finalizado'
+  | 'cancelado';
+
 export interface KitCirugia {
   id: string;
   cirugia_id: string;
   numero_kit: string;
   qr_code: string;
-  estado: 'preparando' | 'listo' | 'enviado' | 'en_uso' | 'devuelto' | 'facturado';
+  estado: EstadoKit;
   fecha_creacion: string;
   fecha_preparacion?: string;
   fecha_envio?: string;
@@ -16,9 +27,13 @@ export interface KitCirugia {
   ubicacion_actual?: string;
   created_at: string;
   updated_at: string;
+  cliente_receptor_nombre?: string;
+  cliente_receptor_cedula?: string;
+  cliente_validacion_fecha?: string;
+  cliente_validacion_qr?: string;
   
   // Relaciones
-  cirugia?: any; // Usaremos el modelo existente
+  cirugia?: any;
   productos?: KitProducto[];
   trazabilidad?: KitTrazabilidad[];
   comercial?: any;

@@ -1,0 +1,55 @@
+<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+  <!-- Header mejorado -->
+  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
+    <div class="px-4 py-4">
+      <!-- Top bar con logo y navegación -->
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center space-x-3">
+          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+               alt="Implameq" class="h-8 brightness-0 invert">
+          <span class="text-lg font-semibold">Preparación de Kit</span>
+        </div>
+        <a routerLink="/internal/logistica/kits-pendientes" 
+           class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
+          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Volver
+        </a>
+      </div>
+      
+      <!-- Título principal -->
+      <div class="text-center">
+        <h1 class="text-2xl font-bold mb-1">Preparación de Kit</h1>
+        <p class="text-green-100 text-sm">Componente en desarrollo</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="px-4 py-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
+        <div class="flex items-center justify-center h-64">
+          <div class="text-center">
+            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+              </path>
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Preparación de Kit en Desarrollo</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Esta funcionalidad estará disponible próximamente</p>
+            
+            <a routerLink="/internal/logistica/kits-pendientes" 
+               class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Volver a Kits Pendientes
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</section>

@@ -6,17 +6,17 @@ export default [
     loadComponent: () => import('../internal-home/internal-home.component')
   },
 
-      {
-        path: 'inventario',
-        loadChildren: () => import('../inventario/inventario-routing'),
-    },
+  {
+    path: 'inventario',
+    loadChildren: () => import('../inventario/inventario-routing'),
+  },
 
-      {
+  {
     path: 'agenda',
     loadChildren: () => import('../agenda/agenda-routing').then(m => m.AGENDA_ROUTES)
   },
 
-    {
+  {
     path: 'clientes',
     loadChildren: () => import('../clientes/clientes-routing').then(m => m.clientesRoutes),
   },
@@ -26,8 +26,13 @@ export default [
     loadChildren: () => import('../hojas-gasto/hojas-gasto-routing')
   },
 
-    {
-        path: '**', redirectTo: ''
-    }
+  {
+    path: 'logistica',
+    loadChildren: () => import('../logistica/logistica-routing').then(m => m.LOGISTICA_ROUTES)
+  },
+
+  {
+    path: '**', redirectTo: ''
+  }
 
 ] as Routes;
