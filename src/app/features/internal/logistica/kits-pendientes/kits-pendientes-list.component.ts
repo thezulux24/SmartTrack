@@ -1,6 +1,7 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { KitService } from '../../../../shared/services/kit.service';
 import { ProductosService } from '../../inventario/data-access/productos.service';
 import { KitCirugia } from '../../../../shared/models/kit.model';
@@ -38,10 +39,13 @@ export class KitsPendientesListComponent implements OnInit {
   async cargarKitsPendientes() {
     try {
       this.loading.set(true);
+      console.log('Cargando kits con estado: solicitado');
       
       // Obtener kits con estado 'solicitado'
       this.kitService.getKitsPorEstado('solicitado').subscribe({
         next: async (kits) => {
+          console.log('Kits recibidos:', kits.length, kits);
+          
           // Enriquecer con información de stock
           const kitsConStock = await Promise.all(
             kits.map(async (kit) => {
@@ -65,16 +69,18 @@ export class KitsPendientesListComponent implements OnInit {
             })
           );
 
+          console.log('Kits con stock procesados:', kitsConStock);
           this.kitsPendientes.set(kitsConStock);
           this.loading.set(false);
         },
         error: (error) => {
           console.error('Error cargando kits pendientes:', error);
+          alert(`Error al cargar kits: ${error.message || 'Error desconocido'}`);
           this.loading.set(false);
         }
       });
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error en cargarKitsPendientes:', error);
       this.loading.set(false);
     }
   }
@@ -84,12 +90,16 @@ export class KitsPendientesListComponent implements OnInit {
 
     try {
       this.procesando.set(true);
+      console.log('Aprobando kit:', kitId);
 
       // Cambiar estado a 'preparando'
-      await this.kitService.actualizarEstadoKit(kitId, 'preparando', {
-        observaciones: 'Kit aprobado por logística'
-      }).toPromise();
+      await firstValueFrom(
+        this.kitService.actualizarEstadoKit(kitId, 'preparando', {
+          observaciones: 'Kit aprobado por logística'
+        })
+      );
 
+      console.log('Kit aprobado exitosamente');
       // Navegar a la pantalla de preparación
       this.router.navigate(['/internal/logistica/kit-preparacion', kitId]);
     } catch (error) {
@@ -107,11 +117,15 @@ export class KitsPendientesListComponent implements OnInit {
 
     try {
       this.procesando.set(true);
+      console.log('Rechazando kit:', kitId, 'Motivo:', motivo);
 
-      await this.kitService.actualizarEstadoKit(kitId, 'cancelado', {
-        observaciones: `Rechazado por logística: ${motivo}`
-      }).toPromise();
+      await firstValueFrom(
+        this.kitService.actualizarEstadoKit(kitId, 'cancelado', {
+          observaciones: `Rechazado por logística: ${motivo}`
+        })
+      );
 
+      console.log('Kit rechazado exitosamente');
       // Recargar lista
       await this.cargarKitsPendientes();
     } catch (error) {
@@ -122,12 +136,30 @@ export class KitsPendientesListComponent implements OnInit {
     }
   }
 
-  obtenerNombrePaciente(kit: KitCirugia): string {
+  obtenerNombreCliente(kit: KitCirugia): string {
     const cliente = kit.cirugia?.cliente;
     if (cliente) {
       return `${cliente.nombre} ${cliente.apellido}`;
     }
     return 'N/A';
+  }
+
+  obtenerNombreHospital(kit: KitCirugia): string {
+    return kit.cirugia?.hospital?.nombre || 'N/A';
+  }
+
+  calcularStockTotal(producto: any): number {
+    if (!producto?.producto?.inventario) return 0;
+    
+    // Sumar todas las cantidades del inventario disponible
+    return producto.producto.inventario
+      .filter((inv: any) => inv.estado === 'disponible')
+      .reduce((total: number, inv: any) => total + (inv.cantidad || 0), 0);
+  }
+
+  tieneStockSuficiente(producto: any): boolean {
+    const stockTotal = this.calcularStockTotal(producto);
+    return stockTotal >= producto.cantidad_solicitada;
   }
 
   volver() {

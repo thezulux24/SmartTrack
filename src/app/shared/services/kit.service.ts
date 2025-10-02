@@ -36,7 +36,7 @@ export class KitService {
         cirugia_id: request.cirugia_id,
         numero_kit: codigoKit,
         qr_code: `QR-${codigoKit}`,
-        estado: 'preparando',
+        estado: 'solicitado',
         comercial_id: (await this.supabase.client.auth.getUser()).data.user?.id,
         observaciones: request.observaciones
       })
@@ -73,8 +73,8 @@ export class KitService {
         kit_id: kit.id,
         usuario_id: (await this.supabase.client.auth.getUser()).data.user?.id,
         accion: 'kit_creado',
-        estado_nuevo: 'preparando',
-        observaciones: 'Kit inicial creado con productos solicitados'
+        estado_nuevo: 'solicitado',
+        observaciones: 'Kit solicitado por comercial - Pendiente de aprobación logística'
       });
 
     // 4. Retornar el kit completo
@@ -151,13 +151,20 @@ export class KitService {
         .from('kits_cirugia')
         .select(`
           *,
-          cirugia:cirugias(*),
+          cirugia:cirugias(
+            *,
+            cliente:clientes(*),
+            hospital:hospitales(*)
+          ),
           comercial:profiles!comercial_id(*),
           tecnico:profiles!tecnico_id(*),
           logistica:profiles!logistica_id(*),
           productos:kit_productos(
             *,
-            producto:productos(*)
+            producto:productos(
+              *,
+              inventario:inventario(cantidad, ubicacion, estado)
+            )
           )
         `)
         .eq('estado', estado)
