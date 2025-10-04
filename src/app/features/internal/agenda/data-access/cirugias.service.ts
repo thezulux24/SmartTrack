@@ -2,12 +2,16 @@ import { Injectable } from '@angular/core';
 import { Observable, from, map, catchError, throwError, switchMap } from 'rxjs';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
 import { Cirugia, CirugiaCreate } from './models';
+import { TrazabilidadService } from '../../../../shared/services/trazabilidad.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CirugiasService {
-  constructor(private supabase: SupabaseService) {}
+  constructor(
+    private supabase: SupabaseService,
+    private trazabilidadService: TrazabilidadService
+  ) {}
 
   getCirugias(): Observable<Cirugia[]> {
     return from(
@@ -161,6 +165,28 @@ export class CirugiasService {
         }
         return response.data;
       }),
+      switchMap(cirugia => {
+        // Registrar en trazabilidad que la cirugía fue creada
+        return this.trazabilidadService.registrarEventoCirugia({
+          cirugia_id: cirugia.id,
+          accion: 'cirugia_creada',
+          estado_nuevo: cirugia.estado || 'programada',
+          observaciones: `Cirugía ${cirugia.numero_cirugia} creada - ${cirugia.tipo_cirugia_data?.nombre || 'Sin tipo'}`,
+          metadata: {
+            numero_cirugia: cirugia.numero_cirugia,
+            tipo_cirugia: cirugia.tipo_cirugia_data?.nombre,
+            hospital: cirugia.hospital_data?.nombre,
+            fecha_programada: cirugia.fecha_programada
+          }
+        }).pipe(
+          map(() => cirugia), // Retornar la cirugía creada
+          catchError(trazError => {
+            // Si falla la trazabilidad, loguear pero no fallar la creación
+            console.error('Error al registrar trazabilidad:', trazError);
+            return from([cirugia]); // Continuar con la cirugía creada
+          })
+        );
+      }),
       catchError(error => {
         console.error('Service error creating cirugia:', error);
         return throwError(() => error);
@@ -217,11 +243,11 @@ export class CirugiasService {
       switchMap(userResponse => {
         const user = userResponse.data.user;
         
-        // Primero obtenemos el estado anterior
+        // Primero obtenemos el estado anterior y datos de la cirugía
         return from(
           this.supabase.client
             .from('cirugias')
-            .select('estado')
+            .select('estado, numero_cirugia')
             .eq('id', id)
             .single()
         ).pipe(
@@ -231,6 +257,7 @@ export class CirugiasService {
             }
 
             const estadoAnterior = currentResponse.data.estado;
+            const numeroCirugia = currentResponse.data.numero_cirugia;
 
             // Actualizamos el estado
             return from(
@@ -247,28 +274,30 @@ export class CirugiasService {
                   throw new Error('Error al actualizar estado');
                 }
 
-                // Creamos el registro de seguimiento
-                return from(
-                  this.supabase.client
-                    .from('cirugia_seguimiento')
-                    .insert([{
-                      cirugia_id: id,
-                      estado_anterior: estadoAnterior,
-                      estado_nuevo: estado,
-                      comentario: comentario || `Estado cambiado a ${estado}`,
-                      usuario_id: user?.id || null
-                    }])
+                // Registrar en trazabilidad
+                return this.trazabilidadService.registrarEventoCirugia({
+                  cirugia_id: id,
+                  accion: 'estado_cambiado',
+                  estado_anterior: estadoAnterior,
+                  estado_nuevo: estado,
+                  observaciones: comentario || `Estado cambiado de ${estadoAnterior} a ${estado}`,
+                  metadata: {
+                    numero_cirugia: numeroCirugia
+                  }
+                }).pipe(
+                  catchError(trazError => {
+                    console.error('Error al registrar trazabilidad:', trazError);
+                    // No fallar si la trazabilidad falla
+                    return from([null]);
+                  })
                 );
               })
             );
           })
         );
       }),
-      map(response => {
-        if (response.error) {
-          console.error('Error updating estado:', response.error);
-          throw new Error(response.error.message || 'Error al actualizar estado');
-        }
+      map(() => {
+        // Retornar void
       }),
       catchError(error => {
         console.error('Service error updating estado:', error);

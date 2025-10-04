@@ -1,29 +1,22 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.agenda_tecnicos (
+CREATE TABLE public.cirugia_trazabilidad (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  tecnico_id uuid,
-  fecha date NOT NULL,
-  hora_inicio time without time zone NOT NULL,
-  hora_fin time without time zone NOT NULL,
-  disponible boolean DEFAULT true,
-  motivo_no_disponible character varying,
-  created_at timestamp with time zone DEFAULT now(),
-  CONSTRAINT agenda_tecnicos_pkey PRIMARY KEY (id),
-  CONSTRAINT agenda_tecnicos_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id)
-);
-CREATE TABLE public.cirugia_seguimiento (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  cirugia_id uuid,
+  cirugia_id uuid NOT NULL,
+  accion character varying NOT NULL,
   estado_anterior character varying,
   estado_nuevo character varying NOT NULL,
-  comentario text,
   usuario_id uuid NOT NULL,
-  fecha_cambio timestamp with time zone DEFAULT now(),
-  CONSTRAINT cirugia_seguimiento_pkey PRIMARY KEY (id),
-  CONSTRAINT cirugia_seguimiento_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
-  CONSTRAINT cirugia_seguimiento_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
+  ubicacion character varying,
+  coordenadas_lat numeric,
+  coordenadas_lng numeric,
+  timestamp timestamp with time zone DEFAULT now(),
+  observaciones text,
+  metadata jsonb,
+  CONSTRAINT cirugia_trazabilidad_pkey PRIMARY KEY (id),
+  CONSTRAINT cirugia_trazabilidad_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
+  CONSTRAINT cirugia_trazabilidad_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.cirugias (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -177,7 +170,7 @@ CREATE TABLE public.kits_cirugia (
   cirugia_id uuid NOT NULL,
   numero_kit character varying NOT NULL UNIQUE,
   qr_code character varying NOT NULL UNIQUE,
-  estado character varying DEFAULT 'preparando'::character varying CHECK (estado::text = ANY (ARRAY['solicitado'::character varying, 'preparando'::character varying, 'listo_envio'::character varying, 'en_transito'::character varying, 'entregado'::character varying, 'en_uso'::character varying, 'devuelto'::character varying, 'finalizado'::character varying, 'cancelado'::character varying]::text[])),
+  estado character varying DEFAULT 'preparando'::character varying CHECK (estado::text = ANY (ARRAY['solicitado'::character varying::text, 'preparando'::character varying::text, 'listo_envio'::character varying::text, 'en_transito'::character varying::text, 'entregado'::character varying::text, 'en_uso'::character varying::text, 'devuelto'::character varying::text, 'finalizado'::character varying::text, 'cancelado'::character varying::text])),
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_preparacion timestamp with time zone,
   fecha_envio timestamp with time zone,
