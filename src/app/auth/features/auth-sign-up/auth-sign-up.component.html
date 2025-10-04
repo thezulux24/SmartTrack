@@ -1,80 +1,86 @@
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col items-center justify-center px-6 py-8 mx-auto">
-  <!-- Logo y título -->
-  <div class="flex flex-col items-center mb-6">
-    <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Crea tu cuenta</h1>
-    <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
-         alt="Implameq Logo" 
-         class="w-48 mb-2">
-    <p class="text-sm text-gray-600 dark:text-gray-300">Implantes médico - Quirúrgicos</p>
-  </div>
-
-  <!-- Caja del formulario -->
-  <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-      <form class="space-y-4 md:space-y-6" [formGroup]="form" (ngSubmit)="submit()">
-        <!-- Nombre -->
-        <div>
-          <label for="full_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre completo</label>
-          <input 
-            type="text" 
-            name="full_name" 
-            id="full_name" 
-            placeholder="Juan Pérez" 
-            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                   focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
-                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                   dark:focus:ring-lime-400 dark:focus:border-lime-400">
+<div class="font-neo relative min-h-screen overflow-hidden bg-gradient-to-b from-[#0098A8] from-0% via-[#006B7A] via-60% to-[#10284C] to-100%">
+  <!-- Contenido principal -->
+  <div class="relative flex items-center justify-center min-h-screen px-6 py-12">
+    <div class="w-full max-w-md">
+      <!-- Logo y header -->
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="mb-4">
+          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp"
+               alt="Implameq" 
+               class="w-48 h-auto brightness-0 invert">
         </div>
+        <p class="text-sm text-white/90 mb-6">Implantes médico - Quirúrgicos</p>
+        <h1 class="text-3xl font-semibold text-white">Crea tu cuenta</h1>
+      </div>
 
-        <!-- Email -->
-        <div>
-          <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo electrónico</label>
-          <input 
-            type="email" 
-            name="email" 
-            id="email" 
-            placeholder="usuario@implameq.com" 
-            required
-            formControlName="email"
+      <!-- Tarjeta del formulario -->
+      <div class="bg-transparent border-2 border-white rounded-3xl p-8 mb-6">
+        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+          <!-- Nombre completo -->
+          <div class="space-y-2">
+            <label for="full_name" class="block text-sm font-medium text-white">
+              Nombre completo
+            </label>
+            <input 
+              id="full_name" 
+              type="text" 
+              formControlName="full_name"
+              placeholder="Escribe tu nombre aquí"
+              class="w-full bg-accent border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all">
+          </div>
 
-            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                   focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
-                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                   dark:focus:ring-lime-400 dark:focus:border-lime-400">
-        </div>
+          <!-- Email field -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-white">
+              Correo electrónico
+            </label>
+            <input 
+              id="email" 
+              type="email" 
+              required 
+              formControlName="email"
+              placeholder="Escribe tu correo electrónico aquí"
+              class="w-full bg-accent border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all">
+          </div>
 
-        <!-- Password -->
-        <div>
-          <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contraseña</label>
-          <input 
-            type="password" 
-            name="password" 
-            id="password" 
-            placeholder="••••••••" 
-            required
-            formControlName="password"
-            class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                   focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
-                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                   dark:focus:ring-lime-400 dark:focus:border-lime-400">
-        </div>
+          <!-- Password field -->
+          <div class="space-y-2">
+            <label for="password" class="block text-sm font-medium text-white">
+              Contraseña
+            </label>
+            <input 
+              id="password" 
+              type="password" 
+              required 
+              formControlName="password"
+              placeholder="Escribe tu contraseña aquí"
+              class="w-full bg-accent border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all">
+          </div>
+        </form>
+      </div>
 
+      <!-- Submit button -->
+      <button 
+        type="submit"
+        (click)="submit()"
+        class="w-full bg-white hover:bg-white/90 text-[#0098A8] font-bold text-base h-12 
+               rounded-lg shadow-lg transition-all duration-200">
+        Crear cuenta
+      </button>
 
-
-        <!-- Botón -->
-        <button type="submit" 
-                class="w-full text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
-                       focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
-                       dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500">
-          Registrarse
-        </button>
-
-        <!-- Login link -->
-        <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-          ¿Ya tienes cuenta? 
-          <a routerLink="/auth/login" class="font-medium text-lime-600 hover:underline dark:text-lime-400">Inicia sesión</a>
-        </p>
-      </form>
+      <!-- Login link -->
+      <p class="text-center text-sm text-white mt-6">
+        ¿Ya tienes una cuenta?
+        <a routerLink="/auth/login" class="font-medium text-[#C8D900] hover:underline ml-1">
+          Inicia sesión aquí
+        </a>
+      </p>
     </div>
   </div>
-</section>
+</div>

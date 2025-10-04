@@ -5,9 +5,9 @@ import { AuthService } from '../../data-access/auth.service';
 
 
 interface SignUpForm {
+  full_name: FormControl<null | string>;
   email: FormControl<null | string>;
   password: FormControl<null | string>;
-
 }
 
 
@@ -27,9 +27,9 @@ export default class AuthSignUpComponent {
 
 
   form = this._formBuilder.group<SignUpForm>({
+    full_name: this._formBuilder.control(null, [Validators.required]),
     email: this._formBuilder.control(null, [Validators.required, Validators.email]),
     password: this._formBuilder.control(null, [Validators.required])
-
   })
 
 

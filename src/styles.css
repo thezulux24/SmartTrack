@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+/* === Tokens Implameq === */
+/* Fuente NeoSansW1G (Medium como base) */
+@font-face{
+  font-family: "NeoSansW1G";
+  src: url("/assets/fonts/NeoSansW1G-Medium.woff2") format("woff2"),
+       url("/assets/fonts/NeoSansW1G-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root{
+  --brand:#0098A8; --muted:#A0A9AD; --white:#FFFFFF; --heading:#10284C; --accent:#C8D900;
+}
+
+/* Utilidades fallback si hiciera falta */
+.text-heading{ color:var(--heading); }
+.text-brand{ color:var(--brand); }
+.bg-accent{ background-color:var(--accent); }
+
+
+
