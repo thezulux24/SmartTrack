@@ -1,304 +1,245 @@
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
-  <!-- Header mejorado para móvil -->
-  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
-    <div class="px-4 py-4">
-      <!-- Top bar con logo y logout -->
-      <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center space-x-3">
-          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" alt="Implameq"
-            class="h-8 brightness-0 invert">
-          <span class="text-lg font-semibold">Sistema Interno</span>
-        </div>
-        <button (click)="logout()"
-          class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
-          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-          Salir
-        </button>
-      </div>
+<div class="min-h-screen relative bg-white">
+  <!-- HEADER con gradiente + imagen + WAVE dentro -->
+  <div class="relative overflow-hidden bg-gradient-to-b from-[#10284C] via-[#0098A8] to-[#0098A8]">
+    <!-- Imagen de fondo -->
+    <img src="05.jpg" alt="Medical background"
+         class="absolute inset-0 w-full h-full object-cover object-top opacity-40 z-0">
 
-      <!-- Título principal -->
-      <div class="text-center">
-        <h1 class="text-2xl font-bold mb-1">Dashboard Operativo</h1>
-        <p class="text-green-100 text-sm">Panel de control para gestión interna</p>
-      </div>
-    </div>
-  </header>
-
-  <!-- Contenido principal -->
-  <main class="px-4 py-6">
-    <!-- KPIs rápidos optimizados para móvil -->
-    <div class="max-w-lg mx-auto grid grid-cols-2 gap-3 mb-6">
-
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
-        <div class="flex items-center space-x-3">
-          <div
-            class="w-10 h-10 bg-gradient-to-br from-lime-400 to-lime-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+    <!-- Contenido del header -->
+    <div class="relative z-10">
+      <header class="px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <!-- Top bar with logo and logout -->
+          <div class="flex justify-between items-center mb-8">
+            <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp"
+                 alt="Implameq" class="h-10 brightness-0 invert">
+            <button (click)="logout()"
+              class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md">
+              Salir
+            </button>
           </div>
-          <div class="min-w-0">
-            <p class="text-xl font-bold text-gray-900 dark:text-white">12</p>
-            <p class="text-xs text-gray-600 dark:text-gray-300">Cirugías Hoy</p>
-          </div>
-        </div>
-      </div>
 
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
-        <div class="flex items-center space-x-3">
-          <div
-            class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" />
-            </svg>
+          <!-- Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#C8D900] mb-2">Dashboard Operativo</h1>
+            <p class="text-white/90 text-sm">Panel de control para gestión interna</p>
           </div>
-          <div class="min-w-0">
-            <p class="text-xl font-bold text-gray-900 dark:text-white">3</p>
-            <p class="text-xs text-gray-600 dark:text-gray-300">Stock Crítico</p>
+
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-2 gap-5 pb-16">
+            <!-- Cirugías Hoy -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">12</div>
+              <div class="text-white/90 text-sm">Cirugías Hoy</div>
+            </div>
+
+            <!-- Stock Crítico -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">03</div>
+              <div class="text-white/90 text-sm">Stock Crítico</div>
+            </div>
+
+            <!-- Soporte pendiente -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">07</div>
+              <div class="text-white/90 text-sm">Soporte pendiente</div>
+            </div>
+
+            <!-- Facturación -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">85%</div>
+              <div class="text-white/90 text-sm">Facturación</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
-        <div class="flex items-center space-x-3">
-          <div
-            class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-xl font-bold text-gray-900 dark:text-white">7</p>
-            <p class="text-xs text-gray-600 dark:text-gray-300">Soporte Pendiente</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
-        <div class="flex items-center space-x-3">
-          <div
-            class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" />
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-xl font-bold text-gray-900 dark:text-white">85%</p>
-            <p class="text-xs text-gray-600 dark:text-gray-300">Facturación</p>
-          </div>
-        </div>
-      </div>
-
+      </header>
     </div>
 
-    <!-- Módulos principales optimizados para móvil -->
-    <div class="max-w-lg mx-auto space-y-4">
+    <!-- WAVE pegada al fondo del header -->
+    <svg class="pointer-events-none absolute bottom-0 left-0 w-full h-20 sm:h-24 md:h-28 lg:h-32 z-10"
+         viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,96 C240,136 480,144 720,112 C960,80 1200,64 1440,104 L1440,160 L0,160 Z" fill="#ffffff"/>
+    </svg>
+  </div>
 
-      <!-- Agenda y Cirugías con enlace -->
-      <a [routerLink]="['/internal/agenda']" class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 
-          p-5 hover:shadow-lg transition-all duration-200 border border-gray-100">
-        <div class="flex items-start space-x-4">
-          <div
-            class="w-14 h-14 bg-gradient-to-br from-lime-400 to-lime-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
+  <!-- Main content with navigation cards -->
+  <div class="bg-white px-4 pt-6 pb-8">
+    <div class="max-w-lg mx-auto space-y-5">
+
+      <!-- Agenda -->
+      <a routerLink="/internal/agenda"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Agenda</h2>
+              <p class="text-sm text-white/70">Gestión de cirugías</p>
+            </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Agenda</h3>
-            <p class="text-sm text-lime-600 dark:text-lime-400 font-medium mb-2">Gestión de cirugías</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Programar cirugías, asignar técnicos y
-              gestionar urgencias</p>
-          </div>
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </a>
+
       <!-- Clientes -->
-      <a [routerLink]="['/internal/clientes']" class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700
-          p-5 hover:shadow-lg transition-all duration-200 border border-gray-100">
-        <div class="flex items-start space-x-4">
-          <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl
-             flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-              </path>
-            </svg>
+      <a routerLink="/internal/clientes"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Clientes</h2>
+              <p class="text-sm text-white/70">Gestión de clientes</p>
+            </div>
           </div>
-
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Clientes</h3>
-            <p class="text-sm text-green-600 dark:text-green-400 font-medium mb-2">Gestión de clientes</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Gestiona la información de tus clientes, contactos y detalles
-            </p>
-          </div>
-
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </a>
 
       <!-- Logística -->
-      <a [routerLink]="['/internal/logistica']" class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700
-          p-5 hover:shadow-lg transition-all duration-200 border border-gray-100">
-        <div class="flex items-start space-x-4">
-          <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl
-             flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-              </path>
-            </svg>
+      <a routerLink="/internal/logistica"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Logística</h2>
+              <p class="text-sm text-white/70">Gestión de kits</p>
+            </div>
           </div>
-
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Logística</h3>
-            <p class="text-sm text-purple-600 dark:text-purple-400 font-medium mb-2">Gestión de kits</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-              Aprobar kits, validar inventario y preparar envíos
-            </p>
-          </div>
-
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </a>
 
-      <!-- Inventario CON ENLACE -->
-      <a [routerLink]="['/internal/inventario']"
-        class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100">
-        <div class="flex items-start space-x-4">
-          <div
-            class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-            </svg>
+      <!-- Inventario -->
+      <a routerLink="/internal/inventario"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Inventario</h2>
+              <p class="text-sm text-white/70">Control de stock</p>
+            </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Inventario</h3>
-            <p class="text-sm text-green-600 dark:text-green-400 font-medium mb-2">Control de stock</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Gestionar inventario, alertas de stock y
-              movimientos</p>
-          </div>
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </a>
 
-      <!-- Soporte -->
-      <div
-        class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100">
-        <div class="flex items-start space-x-4">
-          <div
-            class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364">
-              </path>
-            </svg>
+      <!-- Soporte (deshabilitado) -->
+      <div class="block bg-[#10284C] rounded-2xl p-5 opacity-60">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Soporte</h2>
+              <p class="text-sm text-white/70">Tickets y asistencia</p>
+            </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Soporte</h3>
-            <p class="text-sm text-yellow-600 dark:text-yellow-400 font-medium mb-2">Tickets y asistencia</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Gestionar solicitudes de soporte y
-              asistencia técnica</p>
-          </div>
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </div>
 
-      <!-- Hojas de Gasto CON ENLACE -->
-      <a [routerLink]="['/internal/hojas-gasto']"
-        class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 border border-gray-100">
-        <div class="flex items-start space-x-4">
-          <div
-            class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-              </path>
-            </svg>
+      <!-- Hojas de Gasto -->
+      <a routerLink="/internal/hojas-gasto"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Hojas de Gasto</h2>
+              <p class="text-sm text-white/70">Registro de gastos</p>
+            </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Hojas de Gasto</h3>
-            <p class="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">Registro digital de gastos</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Gestionar gastos quirúrgicos, validación y facturación automática</p>
-          </div>
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </a>
 
       <!-- Trazabilidad -->
-      <a [routerLink]="['/internal/trazabilidad']"
-        class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 border border-gray-100">
-        <div class="flex items-start space-x-4">
-          <div
-            class="w-14 h-14 bg-gradient-to-br from-orange-400 to-amber-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
-              </path>
-            </svg>
+      <a routerLink="/internal/trazabilidad"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Trazabilidad</h2>
+              <p class="text-sm text-white/70">Seguimiento completo</p>
+            </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Trazabilidad</h3>
-            <p class="text-sm text-orange-600 dark:text-orange-400 font-medium mb-2">Seguimiento completo</p>
-            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Historial de cirugías, kits y movimientos en tiempo real</p>
-          </div>
-          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </a>
 
-<a [routerLink]="['/internal/agenda/mi-agenda']"
-  class="block bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700
-         p-5 hover:shadow-lg transition-all duration-200 border border-gray-100">
-  <div class="flex items-start space-x-4">
-    <div class="w-14 h-14 bg-gradient-to-br from-lime-400 to-emerald-600 rounded-xl
-                flex items-center justify-center flex-shrink-0 shadow-lg">
-      <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-      </svg>
+      <!-- Mi Agenda -->
+      <a routerLink="/internal/agenda/mi-agenda"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Mi Agenda</h2>
+              <p class="text-sm text-white/70">Cirugías asignadas</p>
+            </div>
+          </div>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </a>
     </div>
-
-    <div class="flex-1 min-w-0">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Mi Agenda</h3>
-      <p class="text-sm text-lime-600 dark:text-lime-400 font-medium mb-2">Cirugías asignadas a mí</p>
-      <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-        Ver y gestionar mis cirugías
-      </p>
-    </div>
-
-    <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-    </svg>
   </div>
-</a>
-
-
-    </div>
-
-    <!-- Bottom spacing para móvil -->
-    <div class="h-6"></div>
-  </main>
-</section>
+</div>
