@@ -32,6 +32,11 @@ export default [
   },
 
   {
+    path: 'trazabilidad',
+    loadChildren: () => import('../trazabilidad/trazabilidad-routing').then(m => m.TRAZABILIDAD_ROUTES)
+  },
+
+  {
     path: '**', redirectTo: ''
   }
 
