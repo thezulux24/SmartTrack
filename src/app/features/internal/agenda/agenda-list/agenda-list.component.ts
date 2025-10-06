@@ -5,11 +5,12 @@ import { firstValueFrom } from 'rxjs';
 import { CirugiasService } from '../data-access/cirugias.service';
 import { Cirugia } from '../data-access/models';
 import { KitService } from '../../../../shared/services/kit.service';
+import { EstadoDialogComponent } from '../cirugia-detail/estado-dialog.component';
 
 @Component({
   selector: 'app-agenda-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, EstadoDialogComponent],
   templateUrl: './agenda-list.component.html',
   styleUrl: './agenda-list.component.css'
 })
@@ -20,6 +21,8 @@ export class AgendaListComponent implements OnInit {
   error = signal<string | null>(null);
   cirugias = signal<Cirugia[]>([]);
   kitstatus = signal<Record<string, boolean>>({});
+  showEstadoDialog = signal(false);
+  cirugiaSeleccionada = signal<Cirugia | null>(null);
   
   // Signals para filtros
   searchTerm = signal('');
@@ -220,8 +223,8 @@ export class AgendaListComponent implements OnInit {
     }
   }
 
-  // ✅ Método mejorado para cambiar estado
-    cambiarEstado(cirugia: Cirugia, event?: Event) {
+  // ✅ Método mejorado para cambiar estado con diálogo
+  cambiarEstado(cirugia: Cirugia, event?: Event) {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -232,30 +235,25 @@ export class AgendaListComponent implements OnInit {
       return;
     }
 
-    console.log('🔄 Cambiando estado de cirugía:', cirugia.numero_cirugia);
+    console.log('🔄 Abriendo diálogo para cambiar estado de:', cirugia.numero_cirugia);
+    this.cirugiaSeleccionada.set(cirugia);
+    this.showEstadoDialog.set(true);
+  }
 
-    // Por ahora, solo rotamos entre los estados principales
-    let nuevoEstado: Cirugia['estado'];
-    switch (cirugia.estado) {
-      case 'programada':
-        nuevoEstado = 'en_curso';
-        break;
-      case 'en_curso':
-        nuevoEstado = 'completada';
-        break;
-      case 'urgencia':
-        nuevoEstado = 'en_curso';
-        break;
-      default:
-        nuevoEstado = 'programada';
-        break;
-    }
+  onCambioEstadoCirugia(nuevoEstado: string) {
+    const cirugia = this.cirugiaSeleccionada();
+    if (!cirugia) return;
 
-    // Actualizar el estado en la base de datos
+    const estadoValido = nuevoEstado as 'programada' | 'en_curso' | 'completada' | 'cancelada' | 'urgencia';
+    
+    console.log('🔄 Actualizando estado de cirugía:', cirugia.numero_cirugia, 'a', estadoValido);
+    
     this.loading.set(true);
-    this.cirugiasService.updateCirugia(cirugia.id, { estado: nuevoEstado }).subscribe({
+    this.cirugiasService.updateCirugia(cirugia.id, { estado: estadoValido }).subscribe({
       next: (cirugiaActualizada) => {
         console.log('✅ Estado actualizado:', cirugiaActualizada);
+        this.showEstadoDialog.set(false);
+        this.cirugiaSeleccionada.set(null);
         // Recargar la lista para reflejar los cambios
         this.loadData();
       },
@@ -265,6 +263,11 @@ export class AgendaListComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  closeEstadoDialog() {
+    this.showEstadoDialog.set(false);
+    this.cirugiaSeleccionada.set(null);
   }
 
   // ✅ Método para determinar si se puede cambiar estado

@@ -5,11 +5,14 @@ import { switchMap } from 'rxjs/operators';
 
 import { CirugiasService } from '../data-access/cirugias.service';
 import { Cirugia } from '../data-access/models';
+import { EstadoDialogComponent } from './estado-dialog.component';
+import { ConfirmDialogComponent } from '../components/confirm-dialog.component';
+import { SuccessDialogComponent } from '../components/success-dialog.component';
 
 @Component({
   selector: 'app-cirugia-detail',
   standalone: true,
-  imports: [CommonModule], // ✅ Removido RouterLink ya que no se usa
+  imports: [CommonModule, EstadoDialogComponent, ConfirmDialogComponent, SuccessDialogComponent],
   templateUrl: './cirugia-detail.component.html',
   styleUrl: './cirugia-detail.component.css'
 })
@@ -22,6 +25,9 @@ export class CirugiaDetailComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
   cirugia = signal<Cirugia | null>(null);
+  showEstadoDialog = signal(false);
+  showConfirmDeleteDialog = signal(false);
+  showSuccessDeleteDialog = signal(false);
   
   // Estados y prioridades para mostrar
   estadosInfo = {
@@ -124,39 +130,33 @@ export class CirugiaDetailComponent implements OnInit {
       return;
     }
 
-    // ✅ Ciclo simple entre estados con tipado correcto
-    let nuevoEstado: 'programada' | 'en_curso' | 'completada' | 'cancelada' | 'urgencia';
-    switch (cirugia.estado) {
-      case 'programada':
-        nuevoEstado = 'en_curso';
-        break;
-      case 'en_curso':
-        nuevoEstado = 'completada';
-        break;
-      case 'urgencia':
-        nuevoEstado = 'en_curso';
-        break;
-      default:
-        nuevoEstado = 'programada';
-        break;
-    }
+    // Abrir el diálogo de cambio de estado
+    this.showEstadoDialog.set(true);
+  }
 
-    const estadoInfo = this.getEstadoInfo(nuevoEstado);
-    if (confirm(`¿Cambiar estado a "${estadoInfo.label}"?`)) {
-      this.loading.set(true);
-      this.cirugiasService.updateCirugia(cirugia.id, { estado: nuevoEstado }).subscribe({
-        next: (cirugiaActualizada) => {
-          console.log('✅ Estado actualizado:', cirugiaActualizada);
-          this.cirugia.set(cirugiaActualizada);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          console.error('❌ Error updating estado:', err);
-          alert('Error al cambiar estado: ' + (err?.message || err));
-          this.loading.set(false);
-        }
-      });
-    }
+  onEstadoChange(nuevoEstado: string) {
+    const cirugia = this.cirugia();
+    if (!cirugia) return;
+
+    const estadoValido = nuevoEstado as 'programada' | 'en_curso' | 'completada' | 'cancelada' | 'urgencia';
+
+    this.loading.set(true);
+    this.cirugiasService.updateCirugia(cirugia.id, { estado: estadoValido }).subscribe({
+      next: (cirugiaActualizada) => {
+        console.log('✅ Estado actualizado:', cirugiaActualizada);
+        this.cirugia.set(cirugiaActualizada);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('❌ Error updating estado:', err);
+        this.error.set('Error al cambiar estado: ' + (err?.message || err));
+        this.loading.set(false);
+      }
+    });
+  }
+
+  closeEstadoDialog() {
+    this.showEstadoDialog.set(false);
   }
 
   volverAtras() {
@@ -193,6 +193,42 @@ export class CirugiaDetailComponent implements OnInit {
     window.print();
   }
 
+  // Métodos de eliminación
+  confirmarEliminar() {
+    this.showConfirmDeleteDialog.set(true);
+  }
+
+  onConfirmDelete() {
+    const cirugia = this.cirugia();
+    if (!cirugia) return;
+
+    console.log('🗑️ Eliminando cirugía:', cirugia.numero_cirugia);
+    this.loading.set(true);
+    this.showConfirmDeleteDialog.set(false);
+
+    this.cirugiasService.deleteCirugia(cirugia.id).subscribe({
+      next: () => {
+        console.log('✅ Cirugía eliminada exitosamente');
+        this.loading.set(false);
+        this.showSuccessDeleteDialog.set(true);
+      },
+      error: (err) => {
+        console.error('❌ Error eliminando cirugía:', err);
+        this.error.set('Error al eliminar la cirugía: ' + (err?.message || err));
+        this.loading.set(false);
+      }
+    });
+  }
+
+  onCancelDelete() {
+    this.showConfirmDeleteDialog.set(false);
+  }
+
+  onSuccessDeleteClose() {
+    this.showSuccessDeleteDialog.set(false);
+    this.router.navigate(['/internal/agenda']);
+  }
+
   // Métodos helper para obtener información del cliente
   getClienteNombre(): string {
     const cirugia = this.cirugia();
@@ -227,5 +263,9 @@ export class CirugiaDetailComponent implements OnInit {
     if (!cirugia) return null;
     
     return cirugia.cliente?.ciudad || null;
+  }
+
+  getNumeroCirugia(): string {
+    return this.cirugia()?.numero_cirugia || '';
   }
 }

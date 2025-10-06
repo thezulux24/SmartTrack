@@ -299,6 +299,13 @@
               </svg>
               <span>Imprimir</span>
             </button>
+            <button (click)="confirmarEliminar()"
+                    class="w-full bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200 flex items-center justify-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              <span>Eliminar</span>
+            </button>
             <button (click)="volverAtras()"
                     class="w-full bg-[#10284C] hover:bg-[#0a1a30] text-[#C8D900] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200 flex items-center justify-center gap-2">
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,4 +319,31 @@
       </div>
     </main>
   }
+
+  <!-- Estado Dialog -->
+  <app-estado-dialog
+    [isOpen]="showEstadoDialog()"
+    [currentStatus]="cirugia()?.estado || ''"
+    (close)="closeEstadoDialog()"
+    (statusChange)="onEstadoChange($event)">
+  </app-estado-dialog>
+
+  <!-- Confirm Delete Dialog -->
+  <app-confirm-dialog
+    [isOpen]="showConfirmDeleteDialog()"
+    [title]="'¿Eliminar cirugía?'"
+    [message]="'¿Está seguro que desea eliminar la cirugía ' + getNumeroCirugia() + '? Esta acción no se puede deshacer.'"
+    [confirmText]="'Eliminar'"
+    [cancelText]="'Cancelar'"
+    [confirmButtonClass]="'bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C]'"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()">
+  </app-confirm-dialog>
+
+  <!-- Success Delete Dialog -->
+  <app-success-dialog
+    [isOpen]="showSuccessDeleteDialog()"
+    [title]="'Eliminación\nexitosa'"
+    (close)="onSuccessDeleteClose()">
+  </app-success-dialog>
 </section>

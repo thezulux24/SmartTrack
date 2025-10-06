@@ -274,3 +274,11 @@
     </div>
   </div>
 </div>
+
+<!-- Diálogo de cambio de estado -->
+<app-estado-dialog
+  [isOpen]="showEstadoDialog()"
+  [currentStatus]="cirugiaSeleccionada()?.estado || ''"
+  (close)="closeEstadoDialog()"
+  (statusChange)="onCambioEstadoCirugia($event)">
+</app-estado-dialog>

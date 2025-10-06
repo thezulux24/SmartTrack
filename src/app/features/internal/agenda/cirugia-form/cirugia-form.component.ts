@@ -11,11 +11,12 @@ import { TecnicosService } from '../data-access/tecnicos.service';
 import { KitService } from '../../../../shared/services/kit.service';
 import { ClientesService, Cliente } from '../../clientes/data-acces/clientes.service';
 import { Hospital, TipoCirugia, TecnicoAsignado, Cirugia, CirugiaCreate } from '../data-access/models';
+import { SuccessDialogComponent } from '../components/success-dialog.component';
 
 @Component({
   selector: 'app-cirugia-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SuccessDialogComponent],
   templateUrl: './cirugia-form.component.html',
   styleUrl: './cirugia-form.component.css'
 })
@@ -39,6 +40,9 @@ export class CirugiaFormComponent implements OnInit {
   tieneKit = signal<boolean>(false);
   clienteEncontrado = signal<Cliente | null>(null);
   buscandoCliente = signal<boolean>(false);
+  showSuccessDialog = signal(false);
+  successDialogTitle = signal('');
+  successDialogAction = signal<'create' | 'update' | null>(null);
   
   // Data signals
   hospitales = signal<Hospital[]>([]);
@@ -229,6 +233,10 @@ export class CirugiaFormComponent implements OnInit {
     if (cirugia.cliente) {
       this.clienteEncontrado.set(cirugia.cliente);
       this.llenarCamposCliente(cirugia.cliente);
+      // También llenar documento_numero que no está en llenarCamposCliente
+      this.cirugiaForm.patchValue({
+        documento_numero: cirugia.cliente.documento_numero
+      });
     }
   }
 
@@ -386,9 +394,12 @@ export class CirugiaFormComponent implements OnInit {
     this.cirugiasService.createCirugia(data).subscribe({
       next: (cirugia) => {
         console.log('✅ Cirugía creada exitosamente:', cirugia);
-        this.success.set('Cirugía creada exitosamente');
         this.cirugiaCreada.set(cirugia);
         this.loading.set(false);
+        // Mostrar diálogo de éxito
+        this.successDialogTitle.set('La cirugía se ha programado\nexitosamente');
+        this.successDialogAction.set('create');
+        this.showSuccessDialog.set(true);
       },
       error: (err) => {
         console.error('❌ Error creating cirugia:', err);
@@ -405,10 +416,12 @@ export class CirugiaFormComponent implements OnInit {
     this.cirugiasService.updateCirugia(this.cirugiaId, data).subscribe({
       next: (cirugia) => {
         console.log('✅ Cirugía actualizada exitosamente:', cirugia);
-        this.success.set('Cirugía actualizada exitosamente');
-        setTimeout(() => {
-          this.router.navigate(['/internal/agenda']);
-        }, 1500);
+        this.cirugiaEditada.set(cirugia); // Guardar para poder navegar a detalles
+        this.loading.set(false);
+        // Mostrar diálogo de éxito
+        this.successDialogTitle.set('La cirugía se ha actualizado\nexitosamente');
+        this.successDialogAction.set('update');
+        this.showSuccessDialog.set(true);
       },
       error: (err) => {
         console.error('❌ Error updating cirugia:', err);
@@ -471,6 +484,35 @@ export class CirugiaFormComponent implements OnInit {
 
   onVolverAgenda() {
     this.router.navigate(['/internal/agenda']);
+  }
+
+  onSuccessDialogClose() {
+    this.showSuccessDialog.set(false);
+    // Volver a la agenda
+    this.router.navigate(['/internal/agenda']);
+  }
+
+  onVerDetalles() {
+    this.showSuccessDialog.set(false);
+    const cirugia = this.cirugiaCreada() || this.cirugiaEditada();
+    if (cirugia) {
+      console.log('🔍 Navegando a detalles de cirugía:', cirugia.id);
+      this.router.navigate(['/internal/agenda/detalle', cirugia.id]);
+    }
+  }
+
+  onAgendarOtraCirugia() {
+    this.showSuccessDialog.set(false);
+    // Resetear el formulario para crear una nueva cirugía
+    this.cirugiaCreada.set(null);
+    this.cirugiaEditada.set(null);
+    this.cirugiaForm.reset({
+      documento_tipo: 'cedula',
+      estado: 'programada',
+      prioridad: 'normal'
+    });
+    this.clienteEncontrado.set(null);
+    console.log('📝 Formulario reseteado para nueva cirugía');
   }
 
   // ✅ Métodos de debug para el template

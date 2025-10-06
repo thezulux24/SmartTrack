@@ -571,4 +571,14 @@
     }
   }
 </div>
-  
+
+<!-- Diálogo de éxito -->
+<app-success-dialog
+  [isOpen]="showSuccessDialog()"
+  [title]="successDialogTitle()"
+  [showDetailsButton]="true"
+  [showAgendarButton]="successDialogAction() === 'create'"
+  (close)="onSuccessDialogClose()"
+  (verDetalles)="onVerDetalles()"
+  (agendarOtra)="onAgendarOtraCirugia()">
+</app-success-dialog>
