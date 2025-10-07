@@ -6,11 +6,12 @@ import { switchMap } from 'rxjs/operators';
 
 import { ProductosService } from '../data-access/productos.service';
 import { Producto } from '../data-access/models/producto.model';
+import { ProductoSuccessDialogComponent } from '../components/producto-success-dialog.component';
 
 @Component({
   selector: 'app-producto-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ProductoSuccessDialogComponent],
   templateUrl: './producto-form.component.html',
   styleUrl: './producto-form.component.css'
 })
@@ -25,6 +26,11 @@ export class ProductoFormComponent implements OnInit {
   error = signal<string | null>(null);
   success = signal<string | null>(null);
   isEditing = signal(false);
+  
+  // Dialog signals
+  showSuccessDialog = signal(false);
+  successDialogTitle = signal('');
+  productoCreado = signal<Producto | null>(null);
 
   // Form
   productoForm: FormGroup = this.fb.group({
@@ -123,16 +129,20 @@ export class ProductoFormComponent implements OnInit {
     operation.subscribe({
       next: (producto) => {
         console.log('✅ Producto guardado:', producto);
-        const message = this.isEditing() 
-          ? 'Producto actualizado exitosamente' 
-          : 'Producto creado exitosamente';
-        this.success.set(message);
         this.loading.set(false);
         
-        // Redirigir después de un momento
-        setTimeout(() => {
-          this.router.navigate(['/internal/inventario']);
-        }, 2000);
+        if (this.isEditing()) {
+          // Para edición, mostrar mensaje simple
+          this.success.set('Producto actualizado exitosamente');
+          setTimeout(() => {
+            this.router.navigate(['/internal/inventario']);
+          }, 2000);
+        } else {
+          // Para creación, mostrar dialog
+          this.productoCreado.set(producto);
+          this.successDialogTitle.set('Producto\ncreado\nexitosamente');
+          this.showSuccessDialog.set(true);
+        }
       },
       error: (err) => {
         console.error('❌ Error guardando producto:', err);
@@ -153,6 +163,31 @@ export class ProductoFormComponent implements OnInit {
 
   onCancel() {
     this.router.navigate(['/internal/inventario']);
+  }
+
+  // Métodos del dialog
+  onSuccessDialogClose() {
+    this.showSuccessDialog.set(false);
+    this.router.navigate(['/internal/inventario']);
+  }
+
+  onCrearOtro() {
+    this.showSuccessDialog.set(false);
+    this.productoCreado.set(null);
+    this.productoForm.reset({
+      codigo: '',
+      nombre: '',
+      descripcion: '',
+      categoria: '',
+      precio: 0,
+      stock_minimo: 1,
+      unidad_medida: 'unidad',
+      proveedor: '',
+      ubicacion_principal: 'bodega_central',
+      notas: ''
+    });
+    this.success.set(null);
+    this.error.set(null);
   }
 
   // Utilidades de validación

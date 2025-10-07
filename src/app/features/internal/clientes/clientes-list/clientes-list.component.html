@@ -1,208 +1,213 @@
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
-  <!-- Header -->
-  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
-    <div class="px-4 py-4">
-      <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center space-x-3">
-          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
-               alt="Implameq" class="h-8 brightness-0 invert">
-          <span class="text-lg font-semibold">Gestión de Clientes</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button [routerLink]="['/internal']" 
-                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
-            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Volver
-          </button>
-        </div>
-      </div>
-      
-      <div class="text-center">
-        <h1 class="text-2xl font-bold mb-1">Clientes</h1>
-        <p class="text-green-100 text-sm">Gestiona la información de tus clientes</p>
-      </div>
-    </div>
-  </header>
+<div class="min-h-screen bg-white">
 
   <!-- Loading state -->
-  <div *ngIf="loading()" class="px-4 py-6">
-    <div class="max-w-lg mx-auto">
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
-        <div class="animate-pulse space-y-4">
-          <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
-          <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-          <div class="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
-        </div>
-        <p class="text-sm text-gray-500 mt-4">Cargando clientes...</p>
+  <div *ngIf="loading()" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="animate-pulse space-y-4">
+        <div class="h-4 bg-gray-200 rounded w-64 mx-auto"></div>
+        <div class="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
       </div>
+      <p class="text-sm text-gray-500 mt-4">Cargando clientes...</p>
     </div>
   </div>
 
   <!-- Error state -->
-  <div *ngIf="!loading() && error()" class="px-4 py-6">
-    <div class="max-w-lg mx-auto">
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
-        <div class="text-red-600 dark:text-red-400">
-          <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-            </path>
-          </svg>
-          <p class="text-sm">{{ error() }}</p>
-        </div>
-        <button type="button" (click)="loadClientes()"
-                class="mt-4 w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none 
-                       focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-          Reintentar
-        </button>
+  <div *ngIf="!loading() && error()" class="flex items-center justify-center min-h-screen px-4">
+    <div class="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+      <div class="text-red-600">
+        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+          </path>
+        </svg>
+        <p class="text-lg">{{ error() }}</p>
       </div>
+      <button type="button" (click)="loadClientes()"
+              class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium">
+        Reintentar
+      </button>
     </div>
   </div>
 
-  <!-- Contenido principal -->
-  <main *ngIf="!loading() && !error()" class="px-4 py-6">
-    
-    <!-- Botón nuevo cliente -->
-    <div class="max-w-lg mx-auto mb-6">
-      <button [routerLink]="['/internal/clientes/nuevo']"
-              class="w-full bg-gradient-to-r from-lime-400 to-green-500 hover:from-lime-500 hover:to-green-600 
-                     text-white px-6 py-4 rounded-xl font-medium shadow-lg transition-all duration-200 
-                     flex items-center justify-center space-x-3">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-        <span class="text-lg">Nuevo Cliente</span>
-      </button>
-    </div>
+  <!-- Main content -->
+  <div *ngIf="!loading() && !error()">
+    <div class="relative">
+      <!-- Diagonal navy background -->
+      <div class="absolute top-0 left-0 w-full bg-[#10284C]" 
+           style="height: 520px; clip-path: polygon(0 0, 100% 0, 100% 60%, 0 90%);"></div>
 
-    <!-- Filtros -->
-    <div class="max-w-lg mx-auto mb-6">
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-4">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filtros</h3>
-        <div class="space-y-4">
-          <!-- Búsqueda -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
-            <input type="text" 
-                   [value]="searchTerm()"
-                   (input)="onSearchChange($event)"
-                   placeholder="Nombre, documento, email..."
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 
-                          focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-          </div>
-
-          <!-- Estado -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estado</label>
-            <select [value]="selectedEstado()"
-                    (change)="onEstadoChange($event)"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 
-                           focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-              <option value="">Todos los estados</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-              <option value="suspendido">Suspendido</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Lista de clientes optimizada para móvil -->
-    <div class="max-w-lg mx-auto space-y-4">
-      <div *ngFor="let cliente of filteredClientes()" 
-           class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 
-                  hover:shadow-lg transition-all duration-200 border border-gray-100">
-        
-        <!-- Header del cliente -->
-        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div class="flex justify-between items-start gap-3">
-            <div class="flex-1">
-              <div class="flex items-center space-x-2 mb-2">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                  {{ cliente.nombre }} {{ cliente.apellido }}
-                </h3>
-                <span [class]="getEstadoBadgeClass(cliente.estado)" 
-                      class="px-2 py-1 rounded-full text-xs font-medium">
-                  {{ getEstadoLabel(cliente.estado) }}
-                </span>
-              </div>
-              <p class="text-gray-600 dark:text-gray-300 font-medium">{{ cliente.documento_numero }}</p>
+      <!-- Content -->
+      <div class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <!-- Top bar -->
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+                   alt="Implameq" 
+                   class="h-8 brightness-0 invert">
             </div>
-            <div class="text-right">
-              <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ formatFecha(cliente.created_at) }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contenido del cliente -->
-        <div class="p-4 space-y-3">
-          <!-- Información principal -->
-          <div class="space-y-2">
-            <div *ngIf="cliente.email">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Email</p>
-              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ cliente.email }}</p>
-            </div>
-            <div *ngIf="cliente.telefono">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Teléfono</p>
-              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ cliente.telefono }}</p>
-            </div>
-            <div *ngIf="cliente.ciudad">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Ciudad</p>
-              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ cliente.ciudad }}</p>
-            </div>
-            <div *ngIf="cliente.fecha_nacimiento">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Fecha de Nacimiento</p>
-              <p class="text-gray-900 dark:text-white font-medium text-sm">{{ formatFecha(cliente.fecha_nacimiento) }}</p>
-            </div>
-          </div>
-
-          <!-- Observaciones si existen -->
-          <div *ngIf="cliente.observaciones" class="border-t border-gray-200 dark:border-gray-700 pt-3">
-            <p class="text-xs text-gray-500 dark:text-gray-400">Observaciones</p>
-            <p class="text-gray-700 dark:text-gray-300 text-sm">{{ cliente.observaciones }}</p>
-          </div>
-
-          <!-- Acciones optimizadas para móvil -->
-          <div class="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-            <div class="grid grid-cols-2 gap-2">
-              <button [routerLink]="['/internal/clientes/editar', cliente.id]"
-                      class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 
-                             rounded-lg text-sm font-medium transition duration-200">
-                Editar
-              </button>
-              <button (click)="deleteCliente(cliente)"
-                      class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm 
-                             font-medium transition duration-200">
-                Eliminar
+            <div>
+              <button [routerLink]="['/internal']"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
               </button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Sin resultados -->
-    <div *ngIf="filteredClientes().length === 0" class="max-w-lg mx-auto">
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-8 text-center">
-        <div class="text-gray-400 dark:text-gray-500">
-          <div class="text-4xl mb-4">👥</div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No se encontraron clientes</h3>
-          <p class="text-gray-500 dark:text-gray-400 mb-4">Intenta ajustar los filtros de búsqueda</p>
+          <!-- Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#C8D900] mb-2">Clientes</h1>
+            <p class="text-white/90 text-sm">Gestiona la información de tus clientes</p>
+          </div>
+
+          <!-- Nueva Cliente Button -->
           <button [routerLink]="['/internal/clientes/nuevo']"
-                  class="bg-gradient-to-r from-lime-400 to-green-500 hover:from-lime-500 hover:to-green-600 
-                         text-white px-6 py-2.5 rounded-lg font-medium shadow-lg transition-all duration-200">
+                  class="w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold py-4 rounded-2xl shadow-lg transition-colors mb-6">
+            + Nuevo Cliente
+          </button>
+
+          <!-- Filtros Section -->
+          <div class="bg-[#0098A8] rounded-2xl p-5 shadow-lg">
+            <h3 class="text-[#10284C] font-bold text-lg mb-4">Filtros</h3>
+            <div class="space-y-4">
+              <!-- Search -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Buscar</label>
+                <div class="relative">
+                  <input type="text"
+                         [value]="searchTerm()"
+                         (input)="onSearchChange($event)"
+                         placeholder="Nombre, documento, email..."
+                         class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Estado -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Estado</label>
+                <select [value]="selectedEstado()"
+                        (change)="onEstadoChange($event)"
+                        class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <option value="">Todos los estados</option>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                  <option value="suspendido">Suspendido</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- White background section -->
+    <div class="px-4 pb-8">
+      <div class="max-w-lg mx-auto">
+        <!-- Client Cards -->
+        <div class="space-y-4">
+          <div *ngFor="let cliente of filteredClientes()" 
+               class="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+            <!-- Card Header -->
+            <div class="p-4 border-b border-gray-200">
+              <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center space-x-2 flex-wrap gap-2">
+                  <h3 class="text-lg font-bold text-[#10284C]">
+                    {{ cliente.nombre }} {{ cliente.apellido }}
+                  </h3>
+                  <span [class]="getEstadoBadgeClass(cliente.estado)"
+                        class="px-3 py-1 rounded-full text-xs font-medium">
+                    {{ getEstadoLabel(cliente.estado) }}
+                  </span>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm text-gray-600">{{ formatFecha(cliente.created_at) }}</p>
+                </div>
+              </div>
+              <p class="text-sm font-medium text-[#10284C]">{{ cliente.documento_numero }}</p>
+            </div>
+
+            <!-- Card Content -->
+            <div class="p-4 space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div *ngIf="cliente.email">
+                  <p class="text-xs text-gray-500 mb-1">Email</p>
+                  <p class="text-sm font-medium text-[#10284C]">{{ cliente.email }}</p>
+                </div>
+                <div *ngIf="cliente.telefono">
+                  <p class="text-xs text-gray-500 mb-1">Teléfono</p>
+                  <p class="text-sm font-medium text-[#10284C]">{{ cliente.telefono }}</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div *ngIf="cliente.ciudad">
+                  <p class="text-xs text-gray-500 mb-1">Ciudad</p>
+                  <p class="text-sm font-medium text-[#10284C]">{{ cliente.ciudad }}</p>
+                </div>
+                <div *ngIf="cliente.fecha_nacimiento">
+                  <p class="text-xs text-gray-500 mb-1">Fecha de Nacimiento</p>
+                  <p class="text-sm font-medium text-[#10284C]">{{ formatFecha(cliente.fecha_nacimiento) }}</p>
+                </div>
+              </div>
+
+              <div *ngIf="cliente.observaciones" class="border-t border-gray-200 pt-3">
+                <p class="text-xs text-gray-500 mb-1">Observaciones</p>
+                <p class="text-sm text-gray-700">{{ cliente.observaciones }}</p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="space-y-2 pt-3">
+                <div class="grid grid-cols-2 gap-2">
+                  <button [routerLink]="['/internal/clientes/editar', cliente.id]"
+                          class="bg-[#10284C] hover:bg-[#10284C]/90 text-white font-medium py-2.5 rounded-xl transition-colors">
+                    Editar
+                  </button>
+                  <button (click)="deleteCliente(cliente)"
+                          class="bg-[#CBDD00] hover:bg-[#B8C900] text-[#10284C] font-medium py-2.5 rounded-xl transition-colors">
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No results -->
+        <div *ngIf="filteredClientes().length === 0" 
+             class="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center shadow-md">
+          <div class="text-4xl mb-4">👥</div>
+          <h3 class="text-lg font-bold text-[#10284C] mb-2">No se encontraron clientes</h3>
+          <p class="text-gray-600 mb-4">Intenta ajustar los filtros de búsqueda</p>
+          <button [routerLink]="['/internal/clientes/nuevo']"
+                  class="bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold px-6 py-3 rounded-xl transition-colors">
             Crear Primer Cliente
           </button>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- Bottom spacing -->
-    <div class="h-6"></div>
-  </main>
-</section>
+<!-- Confirm Delete Dialog -->
+<app-cliente-confirm-dialog
+  [isOpen]="showConfirmDialog()"
+  [clientName]="getClienteNombreCompleto()"
+  (confirm)="onConfirmDelete()"
+  (cancel)="onCancelDelete()">
+</app-cliente-confirm-dialog>
+
+<!-- Success Delete Dialog -->
+<app-cliente-success-dialog
+  [isOpen]="showSuccessDialog()"
+  [title]="'Cliente eliminado\nexitosamente'"
+  [showCrearOtroButton]="false"
+  (close)="onSuccessDialogClose()">
+</app-cliente-success-dialog>

@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ClientesService, Cliente } from '../data-acces/clientes.service';
+import { ClienteSuccessDialogComponent } from '../components/cliente-success-dialog.component';
 
 @Component({
   selector: 'app-cliente-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, ClienteSuccessDialogComponent],
   templateUrl: './cliente-form.component.html',
   styleUrls: ['./cliente-form.component.css']
 })
@@ -22,6 +23,11 @@ export class ClienteFormComponent implements OnInit {
   clienteId = signal<string | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
+  
+  // Dialog signals
+  showSuccessDialog = signal(false);
+  successDialogTitle = signal('');
+  isCreateAction = signal(false);
 
   documentoTipos = [
     { value: 'cedula', label: 'Cédula' },
@@ -104,7 +110,15 @@ export class ClienteFormComponent implements OnInit {
 
     operation.subscribe({
       next: () => {
-        this.router.navigate(['/internal/clientes']);
+        this.loading.set(false);
+        if (this.isEditing()) {
+          this.successDialogTitle.set('Los datos del cliente se\nactualizaron exitosamente');
+          this.isCreateAction.set(false);
+        } else {
+          this.successDialogTitle.set('Nuevo cliente creado\nexitosamente');
+          this.isCreateAction.set(true);
+        }
+        this.showSuccessDialog.set(true);
       },
       error: (err) => {
         this.error.set(this.isEditing() ? 'Error al actualizar el cliente' : 'Error al crear el cliente');
@@ -112,6 +126,21 @@ export class ClienteFormComponent implements OnInit {
         console.error('Error:', err);
       }
     });
+  }
+
+  onSuccessDialogClose() {
+    this.showSuccessDialog.set(false);
+    this.router.navigate(['/internal/clientes']);
+  }
+
+  onCrearOtroCliente() {
+    this.showSuccessDialog.set(false);
+    this.form.reset({
+      documento_tipo: 'cedula',
+      pais: 'Colombia',
+      estado: 'activo'
+    });
+    this.error.set(null);
   }
 
   markFormGroupTouched() {

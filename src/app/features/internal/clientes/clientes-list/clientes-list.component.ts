@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ClientesService, Cliente } from '../data-acces/clientes.service';
+import { ClienteConfirmDialogComponent } from '../components/cliente-confirm-dialog.component';
+import { ClienteSuccessDialogComponent } from '../components/cliente-success-dialog.component';
 
 @Component({
   selector: 'app-clientes-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ClienteConfirmDialogComponent, ClienteSuccessDialogComponent],
   templateUrl: './clientes-list.component.html',
   styleUrls: ['./clientes-list.component.css']
 })
@@ -20,6 +22,11 @@ export class ClientesListComponent implements OnInit {
   error = signal<string | null>(null);
   searchTerm = signal('');
   selectedEstado = signal('');
+  
+  // Dialog signals
+  showConfirmDialog = signal(false);
+  showSuccessDialog = signal(false);
+  clienteToDelete = signal<Cliente | null>(null);
 
   ngOnInit() {
     this.loadClientes();
@@ -78,31 +85,55 @@ export class ClientesListComponent implements OnInit {
   }
 
   deleteCliente(cliente: Cliente) {
-    if (!cliente.id) return;
+    this.clienteToDelete.set(cliente);
+    this.showConfirmDialog.set(true);
+  }
 
-    if (confirm(`¿Estás seguro de eliminar al cliente ${cliente.nombre} ${cliente.apellido}?`)) {
-      this.clientesService.deleteCliente(cliente.id).subscribe({
-        next: () => {
-          this.loadClientes();
-        },
-        error: (err) => {
-          this.error.set('Error al eliminar el cliente');
-          console.error('Error:', err);
-        }
-      });
-    }
+  onConfirmDelete() {
+    const cliente = this.clienteToDelete();
+    if (!cliente || !cliente.id) return;
+
+    this.showConfirmDialog.set(false);
+
+    this.clientesService.deleteCliente(cliente.id).subscribe({
+      next: () => {
+        this.showSuccessDialog.set(true);
+        this.loadClientes();
+      },
+      error: (err) => {
+        this.error.set('Error al eliminar el cliente');
+        console.error('Error:', err);
+        this.clienteToDelete.set(null);
+      }
+    });
+  }
+
+  onCancelDelete() {
+    this.showConfirmDialog.set(false);
+    this.clienteToDelete.set(null);
+  }
+
+  onSuccessDialogClose() {
+    this.showSuccessDialog.set(false);
+    this.clienteToDelete.set(null);
+  }
+
+  getClienteNombreCompleto(): string {
+    const cliente = this.clienteToDelete();
+    if (!cliente) return '';
+    return `${cliente.nombre} ${cliente.apellido}`;
   }
 
   getEstadoBadgeClass(estado: string | undefined): string {
     switch (estado) {
       case 'activo':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-500 text-white font-medium';
       case 'inactivo':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+        return 'bg-gray-400 text-white font-medium';
       case 'suspendido':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+        return 'bg-fuchsia-600 text-white font-medium';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+        return 'bg-gray-400 text-white font-medium';
     }
   }
 

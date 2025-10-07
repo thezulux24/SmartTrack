@@ -278,4 +278,18 @@ export default class InventarioListComponent implements OnInit {
     
     return ubicacionesMap[ubicacion] || ubicacion;
   }
+
+  // ✅ Función para colorear la pill de categoría
+  categoriaPill(cat?: string): string {
+    const key = (cat || '').toLowerCase();
+    const map: Record<string, string> = {
+      'trauma': 'bg-pink-300 text-[#10284C]',
+      'consumibles': 'bg-fuchsia-300 text-[#10284C]',
+      'fijación externa': 'bg-rose-300 text-[#10284C]',
+      'fijacion_externa': 'bg-rose-300 text-[#10284C]',
+      'osteosintesis': 'bg-purple-300 text-[#10284C]',
+      'columna': 'bg-indigo-300 text-[#10284C]'
+    };
+    return map[key] || 'bg-[#0098A8] text-white';
+  }
 }

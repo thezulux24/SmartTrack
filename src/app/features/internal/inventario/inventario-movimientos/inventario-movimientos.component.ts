@@ -227,9 +227,72 @@ export class InventarioMovimientosComponent implements OnInit {
   }
 
   exportarMovimientos() {
-    // TODO: Implementar exportación a Excel/CSV
     console.log('📊 Exportando movimientos...');
-    alert('Funcionalidad de exportación próximamente');
+    
+    const movimientos = this.filteredMovimientos();
+    if (movimientos.length === 0) {
+      alert('No hay movimientos para exportar');
+      return;
+    }
+
+    // Preparar datos para exportación
+    const csvData = this.prepararDatosCSV(movimientos);
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `movimientos_inventario_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  private prepararDatosCSV(movimientos: MovimientoInventario[]): string {
+    // Encabezados
+    const headers = [
+      'Fecha',
+      'Tipo',
+      'Producto',
+      'Código',
+      'Categoría',
+      'Cantidad',
+      'Ubicación Origen',
+      'Ubicación Destino',
+      'Usuario',
+      'Motivo',
+      'Observaciones',
+      'Lote',
+      'Fecha Vencimiento',
+      'Referencia'
+    ];
+
+    // Convertir movimientos a filas CSV
+    const rows = movimientos.map(m => [
+      this.formatFecha(m.created_at),
+      this.getTipoInfo(m.tipo).label,
+      m.producto?.nombre || '',
+      m.producto?.codigo || '',
+      m.producto?.categoria || '',
+      m.cantidad.toString(),
+      this.formatUbicacion(m.ubicacion_origen),
+      this.formatUbicacion(m.ubicacion_destino),
+      m.usuario?.full_name || '',
+      m.motivo || '',
+      m.observaciones || '',
+      m.lote || '',
+      m.fecha_vencimiento ? this.formatFechaCorta(m.fecha_vencimiento) : '',
+      m.referencia || ''
+    ]);
+
+    // Combinar encabezados y filas
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    return csvContent;
   }
 
   volverAtras() {
