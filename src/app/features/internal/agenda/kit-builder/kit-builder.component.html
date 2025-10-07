@@ -1,29 +1,106 @@
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
-  <!-- Header mejorado para móvil -->
-  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
+<!-- Contenedor principal con fondo navy -->
+<div class="min-h-screen bg-[#10284C] relative overflow-hidden">
+  <!-- Fondo con formas SVG modernas y bacanas -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gradientes avanzados -->
+        <linearGradient id="gradFlow1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0098A8;stop-opacity:0.15" />
+          <stop offset="50%" style="stop-color:#C8D900;stop-opacity:0.08" />
+          <stop offset="100%" style="stop-color:#0098A8;stop-opacity:0.12" />
+        </linearGradient>
+        <radialGradient id="gradRadial1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#C8D900;stop-opacity:0.2" />
+          <stop offset="100%" style="stop-color:#0098A8;stop-opacity:0" />
+        </radialGradient>
+      </defs>
+      
+      <!-- Ondas fluidas en la parte superior -->
+      <path d="M 0 100 Q 150 80 300 100 T 600 100 T 900 100 T 1200 100 L 1200 0 L 0 0 Z" 
+            fill="#0098A8" opacity="0.06" />
+      <path d="M 0 140 Q 200 120 400 140 T 800 140 T 1200 140 L 1200 0 L 0 0 Z" 
+            fill="#C8D900" opacity="0.04" />
+      
+      <!-- Espirales conectadas -->
+      <path d="M 100 300 Q 150 250 200 300 Q 250 350 300 300 Q 350 250 400 300" 
+            stroke="#0098A8" stroke-width="3" fill="none" opacity="0.12" />
+      <path d="M 800 200 Q 850 150 900 200 Q 950 250 1000 200 Q 1050 150 1100 200" 
+            stroke="#C8D900" stroke-width="3" fill="none" opacity="0.1" />
+      
+      <!-- Hexágonos conectados formando patrón -->
+      <g opacity="0.08">
+        <polygon points="150,400 175,415 175,445 150,460 125,445 125,415" fill="none" stroke="#0098A8" stroke-width="2" />
+        <polygon points="200,400 225,415 225,445 200,460 175,445 175,415" fill="none" stroke="#C8D900" stroke-width="2" />
+        <polygon points="175,445 200,460 200,490 175,505 150,490 150,460" fill="none" stroke="#0098A8" stroke-width="2" />
+      </g>
+      
+      <!-- Anillos concéntricos -->
+      <g opacity="0.1">
+        <circle cx="85%" cy="25%" r="60" fill="none" stroke="#0098A8" stroke-width="2" />
+        <circle cx="85%" cy="25%" r="80" fill="none" stroke="#C8D900" stroke-width="1.5" />
+        <circle cx="85%" cy="25%" r="100" fill="none" stroke="#0098A8" stroke-width="1" />
+      </g>
+      
+      <!-- Círculos flotantes grandes -->
+      <circle cx="15%" cy="70%" r="150" fill="url(#gradRadial1)" />
+      <circle cx="90%" cy="80%" r="120" fill="#C8D900" opacity="0.05" />
+      
+      <!-- Curvas bezier creativas -->
+      <path d="M 0 500 C 200 450, 400 550, 600 500 S 1000 450, 1200 500" 
+            stroke="#0098A8" stroke-width="4" fill="none" opacity="0.08" />
+      <path d="M 0 600 C 250 550, 450 650, 700 600 S 1050 550, 1200 600" 
+            stroke="#C8D900" stroke-width="3" fill="none" opacity="0.06" />
+      
+      <!-- Triángulos modernos distribuidos -->
+      <polygon points="300,600 350,700 250,700" fill="#0098A8" opacity="0.08" />
+      <polygon points="900,500 950,600 850,600" fill="#C8D900" opacity="0.07" />
+      <polygon points="500,150 540,230 460,230" fill="#0098A8" opacity="0.06" />
+      
+      <!-- Red de puntos conectados -->
+      <g opacity="0.1">
+        <line x1="600" y1="300" x2="650" y2="320" stroke="#0098A8" stroke-width="1" />
+        <line x1="650" y1="320" x2="700" y2="300" stroke="#0098A8" stroke-width="1" />
+        <line x1="700" y1="300" x2="650" y2="270" stroke="#C8D900" stroke-width="1" />
+        <line x1="650" y1="270" x2="600" y2="300" stroke="#C8D900" stroke-width="1" />
+        <circle cx="600" cy="300" r="4" fill="#0098A8" />
+        <circle cx="650" cy="320" r="4" fill="#C8D900" />
+        <circle cx="700" cy="300" r="4" fill="#0098A8" />
+        <circle cx="650" cy="270" r="4" fill="#C8D900" />
+      </g>
+      
+      <!-- Arcos entrelazados en la parte inferior -->
+      <path d="M 0 800 Q 300 750 600 800 T 1200 800" 
+            stroke="#0098A8" stroke-width="5" fill="none" opacity="0.08" />
+      <path d="M 0 850 Q 350 800 700 850 T 1200 850" 
+            stroke="#C8D900" stroke-width="4" fill="none" opacity="0.06" />
+      
+      <!-- Estrellas modernas de 8 puntas -->
+      <polygon points="50,200 60,220 80,225 60,230 50,250 40,230 20,225 40,220" fill="#C8D900" opacity="0.12" />
+      <polygon points="1100,400 1115,425 1145,430 1115,435 1100,460 1085,435 1055,430 1085,425" fill="#0098A8" opacity="0.1" />
+      
+      <!-- Forma de onda compleja -->
+      <path d="M 0,700 L 100,680 L 200,720 L 300,690 L 400,730 L 500,700 L 600,740 L 700,710 L 800,750 L 900,720 L 1000,760 L 1100,730 L 1200,770" 
+            stroke="#0098A8" stroke-width="2" fill="none" opacity="0.09" />
+    </svg>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 bg-gradient-to-br from-[#10284C]/95 to-[#10284C]/60 backdrop-blur-md border-b border-white/10 shadow-2xl">
     <div class="px-4 py-4">
-      <!-- Top bar con logo y navegación -->
-      <div class="flex justify-between items-center mb-3">
+      <!-- Top bar con logo -->
+      <div class="flex justify-center items-center mb-3">
         <div class="flex items-center space-x-3">
           <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
                alt="Implameq" class="h-8 brightness-0 invert">
-          <span class="text-lg font-semibold">Armar Kit Quirúrgico</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button (click)="volver()" 
-                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
-            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Volver
-          </button>
+          <span class="text-lg font-semibold text-white">Armar Kit Quirúrgico</span>
         </div>
       </div>
       
       <!-- Título principal -->
       <div class="text-center">
-        <h1 class="text-2xl font-bold mb-1">{{ modoEdicion ? 'Editar Kit Quirúrgico' : 'Crear Kit Quirúrgico' }}</h1>
-        <p class="text-green-100 text-sm" *ngIf="cirugia()">
+        <h1 class="text-2xl font-bold mb-1 text-white">{{ modoEdicion ? 'Editar Kit Quirúrgico' : 'Crear Kit Quirúrgico' }}</h1>
+        <p class="text-[#C8D900] text-sm" *ngIf="cirugia()">
           {{ cirugia()?.numero_cirugia }} - {{ getClienteNombre() }}
         </p>
       </div>
@@ -32,15 +109,13 @@
 
   <!-- Loading state -->
   @if (loading()) {
-    <div class="px-4 py-6">
+    <div class="relative z-10 px-4 py-6">
       <div class="max-w-lg mx-auto">
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
-          <div class="animate-pulse space-y-4">
-            <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-            <div class="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 text-center">
+          <div class="flex justify-center mb-4">
+            <div class="w-12 h-12 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <p class="text-sm text-gray-500 mt-4">Cargando información de la cirugía...</p>
+          <p class="text-sm text-white/90 mt-4">Cargando información de la cirugía...</p>
         </div>
       </div>
     </div>
@@ -48,14 +123,14 @@
 
   <!-- Error state -->
   @if (error()) {
-    <div class="px-4 py-4">
+    <div class="relative z-10 px-4 py-4">
       <div class="max-w-lg mx-auto">
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-md">
+        <div class="bg-red-500/20 backdrop-blur-md border border-red-400/30 rounded-2xl shadow-xl px-4 py-3">
           <div class="flex items-center space-x-3">
-            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-5 h-5 text-red-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
             </svg>
-            <p class="text-sm">{{ error() }}</p>
+            <p class="text-sm text-red-200">{{ error() }}</p>
           </div>
         </div>
       </div>
@@ -64,14 +139,25 @@
 
   <!-- Contenido principal -->
   @if (!loading() && !error()) {
-    <main class="px-4 py-6">
+    <main class="relative z-10 px-4 py-6">
+      <!-- Botón Volver arriba -->
+      <div class="max-w-lg mx-auto mb-4">
+        <button (click)="volver()" type="button"
+                class="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg backdrop-blur-sm border border-white/20 active:scale-95 flex items-center justify-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Volver</span>
+        </button>
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="max-w-lg mx-auto space-y-6">
         
         <!-- Información de la Cirugía -->
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
               </svg>
             </div>
@@ -79,50 +165,50 @@
           </h2>
           
           <div class="space-y-3 text-sm">
-            <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-              <span class="font-medium text-gray-600 dark:text-gray-400">Cliente:</span>
-              <span class="text-gray-900 dark:text-white">{{ getClienteNombre() }}</span>
+            <div class="flex justify-between border-b border-white/10 pb-2">
+              <span class="font-medium text-white/70">Cliente:</span>
+              <span class="text-white font-semibold">{{ getClienteNombre() }}</span>
             </div>
-            <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-              <span class="font-medium text-gray-600 dark:text-gray-400">Médico:</span>
-              <span class="text-gray-900 dark:text-white">{{ cirugia()?.medico_cirujano }}</span>
+            <div class="flex justify-between border-b border-white/10 pb-2">
+              <span class="font-medium text-white/70">Médico:</span>
+              <span class="text-white font-semibold">{{ cirugia()?.medico_cirujano }}</span>
             </div>
-            <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
-              <span class="font-medium text-gray-600 dark:text-gray-400">Fecha:</span>
-              <span class="text-gray-900 dark:text-white">{{ formatearFecha(cirugia()?.fecha_programada) }}</span>
+            <div class="flex justify-between border-b border-white/10 pb-2">
+              <span class="font-medium text-white/70">Fecha:</span>
+              <span class="text-white font-semibold">{{ formatearFecha(cirugia()?.fecha_programada) }}</span>
             </div>
             <div class="flex justify-between">
-              <span class="font-medium text-gray-600 dark:text-gray-400">Hospital:</span>
-              <span class="text-gray-900 dark:text-white">{{ cirugia()?.hospital?.nombre }}</span>
+              <span class="font-medium text-white/70">Hospital:</span>
+              <span class="text-white font-semibold">{{ cirugia()?.hospital?.nombre }}</span>
             </div>
           </div>
         </div>
 
         <!-- Productos Sugeridos -->
         @if (productosSugeridos().length > 0) {
-          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+              <div class="w-8 h-8 bg-[#0098A8] rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
               </div>
               <span>Productos Sugeridos</span>
             </h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <p class="text-sm text-white/70 mb-4">
               Basado en el tipo de cirugía: {{ cirugia()?.tipo_cirugia?.nombre }}
             </p>
             
             <div class="space-y-3">
               @for (producto of productosSugeridos(); track producto.id) {
-                <div class="flex justify-between items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-200">
+                <div class="flex justify-between items-center p-3 border border-white/10 rounded-xl hover:bg-white/5 transition duration-200 backdrop-blur-sm">
                   <div class="flex-1">
-                    <p class="font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ producto.codigo }} - Stock: {{ producto.stock_disponible }}</p>
+                    <p class="font-medium text-white">{{ producto.nombre }}</p>
+                    <p class="text-sm text-white/60">{{ producto.codigo }} - Stock: {{ producto.stock_disponible }}</p>
                   </div>
                   <button type="button" 
                           (click)="agregarProducto(producto)"
-                          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md">
+                          class="bg-[#0098A8] hover:bg-[#0098A8]/80 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md active:scale-95">
                     Agregar
                   </button>
                 </div>
@@ -132,10 +218,10 @@
         }
 
         <!-- Filtros de Búsqueda -->
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
               </svg>
             </div>
@@ -145,23 +231,23 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <!-- Búsqueda -->
             <div>
-              <label for="busqueda" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Buscar</label>
+              <label for="busqueda" class="block text-sm font-medium text-white mb-2">Buscar</label>
               <input type="text" 
                      id="busqueda"
                      [(ngModel)]="busquedaProducto"
                      (input)="buscarProductos()"
                      placeholder="Buscar por nombre o código..."
-                     class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                     class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#C8D900] focus:border-transparent transition duration-200"
                      [ngModelOptions]="{standalone: true}">
             </div>
 
             <!-- Categoría -->
             <div>
-              <label for="categoria" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
+              <label for="categoria" class="block text-sm font-medium text-white mb-2">Categoría</label>
               <select id="categoria"
                       [(ngModel)]="categoriaSeleccionada"
                       (change)="buscarProductos()"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                      class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 text-white rounded-xl focus:ring-2 focus:ring-[#C8D900] focus:border-transparent transition duration-200"
                       [ngModelOptions]="{standalone: true}">
                 <option value="">Todas las categorías</option>
                 <option *ngFor="let categoria of categorias()" [value]="categoria">
@@ -172,11 +258,11 @@
 
             <!-- Stock disponible -->
             <div>
-              <label for="stockFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Disponibilidad</label>
+              <label for="stockFilter" class="block text-sm font-medium text-white mb-2">Disponibilidad</label>
               <select id="stockFilter"
                       [(ngModel)]="filtroStock"
                       (change)="buscarProductos()"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                      class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 text-white rounded-xl focus:ring-2 focus:ring-[#C8D900] focus:border-transparent transition duration-200"
                       [ngModelOptions]="{standalone: true}">
                 <option value="">Todos los productos</option>
                 <option value="disponible">Solo con stock</option>
@@ -187,11 +273,11 @@
 
             <!-- Marca -->
             <div>
-              <label for="marca" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Marca</label>
+              <label for="marca" class="block text-sm font-medium text-white mb-2">Marca</label>
               <select id="marca"
                       [(ngModel)]="marcaSeleccionada"
                       (change)="buscarProductos()"
-                      class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition duration-200"
+                      class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 text-white rounded-xl focus:ring-2 focus:ring-[#C8D900] focus:border-transparent transition duration-200"
                       [ngModelOptions]="{standalone: true}">
                 <option value="">Todas las marcas</option>
                 <option *ngFor="let marca of marcas()" [value]="marca">
@@ -202,16 +288,16 @@
           </div>
 
           <!-- Resumen de resultados -->
-          <div class="text-center pt-2 border-t border-gray-200 dark:border-gray-600">
-            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-              📦 {{ productosEncontrados().length }} productos encontrados
+          <div class="text-center pt-2 border-t border-white/10">
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#C8D900] text-[#10284C]">
+              {{ productosEncontrados().length }} productos encontrados
             </div>
           </div>
         </div>
 
         <!-- Productos Disponibles -->
         @if (productosEncontrados().length > 0) {
-          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
               <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,17 +309,17 @@
             
             <div class="space-y-4 max-h-96 overflow-y-auto">
               @for (producto of productosEncontrados(); track producto.id) {
-                <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                <div class="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition duration-200">
                   <div class="flex justify-between items-start mb-3">
                     <div class="flex-1">
-                      <h4 class="font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</h4>
-                      <p class="text-sm text-gray-600 dark:text-gray-400">{{ producto.codigo }}</p>
+                      <h4 class="font-medium text-white">{{ producto.nombre }}</h4>
+                      <p class="text-sm text-white/60">{{ producto.codigo }}</p>
                       <div class="flex items-center space-x-2 mt-2">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#0098A8] text-white">
                           {{ producto.categoria | titlecase }}
                         </span>
                         @if (producto.marca) {
-                          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#C8D900] text-[#10284C]">
                             {{ producto.marca }}
                           </span>
                         }
@@ -246,11 +332,11 @@
                           <div class="text-sm font-bold" [ngClass]="getStockColorClass(producto)">
                             {{ producto.stock_total || producto.stock_disponible || 0 }}
                           </div>
-                          <div class="text-xs text-gray-500 dark:text-gray-400">unidades</div>
+                          <div class="text-xs text-white/50">unidades</div>
                         </div>
                       </div>
                       @if (producto.precio) {
-                        <div class="text-sm font-semibold text-gray-900 dark:text-white mt-1">
+                        <div class="text-sm font-semibold text-white mt-1">
                           ${{ producto.precio | number:'1.0-0' }}
                         </div>
                       }
@@ -258,7 +344,7 @@
                   </div>
 
                   @if (producto.descripcion) {
-                    <div class="text-xs text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-2 rounded mb-3">
+                    <div class="text-xs text-white/70 bg-[#10284C]/30 p-2 rounded mb-3">
                       {{ producto.descripcion }}
                     </div>
                   }
@@ -266,7 +352,7 @@
                   <button type="button" 
                           (click)="agregarProducto(producto)"
                           [disabled]="isProductoAgregado(producto.id)"
-                          class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 disabled:cursor-not-allowed">
+                          class="w-full bg-[#0098A8] hover:bg-[#0098A8]/80 disabled:bg-white/10 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 disabled:cursor-not-allowed active:scale-95">
                     @if (isProductoAgregado(producto.id)) {
                       <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -286,10 +372,10 @@
         }
 
         <!-- Productos Seleccionados -->
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
               </svg>
             </div>
@@ -298,24 +384,24 @@
           
           @if (productosFormArray().length === 0) {
             <div class="text-center py-8">
-              <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-12 h-12 text-white/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
               </svg>
-              <p class="text-gray-500 dark:text-gray-400">No hay productos agregados al kit</p>
-              <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Busca y agrega productos para armar el kit</p>
+              <p class="text-white/60">No hay productos agregados al kit</p>
+              <p class="text-sm text-white/40 mt-1">Busca y agrega productos para armar el kit</p>
             </div>
           } @else {
             <div formArrayName="productos" class="space-y-4">
               @for (productoControl of productosFormArray().controls; track $index) {
-                <div [formGroupName]="$index" class="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
+                <div [formGroupName]="$index" class="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition duration-200">
                   <div class="flex justify-between items-start mb-3">
                     <div class="flex-1">
-                      <p class="font-medium text-gray-900 dark:text-white">{{ getProductoNombre($index) }}</p>
-                      <p class="text-sm text-gray-600 dark:text-gray-400">{{ getProductoCodigo($index) }}</p>
+                      <p class="font-medium text-white">{{ getProductoNombre($index) }}</p>
+                      <p class="text-sm text-white/60">{{ getProductoCodigo($index) }}</p>
                     </div>
                     <button type="button" 
                             (click)="removerProducto($index)"
-                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition duration-200">
+                            class="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/20 transition duration-200 active:scale-95">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                       </svg>
@@ -324,18 +410,18 @@
                   
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cantidad *</label>
+                      <label class="block text-sm font-medium text-white mb-2">Cantidad *</label>
                       <input type="number" 
                              formControlName="cantidad_solicitada"
                              min="1"
-                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white transition duration-200">
+                             class="w-full px-3 py-2 bg-[#10284C]/50 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#C8D900] focus:border-transparent transition duration-200">
                     </div>
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Observaciones</label>
+                      <label class="block text-sm font-medium text-white mb-2">Observaciones</label>
                       <input type="text" 
                              formControlName="observaciones"
                              placeholder="Notas adicionales..."
-                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white transition duration-200">
+                             class="w-full px-3 py-2 bg-[#10284C]/50 border border-white/20 text-white placeholder-white/50 rounded-lg focus:ring-2 focus:ring-[#C8D900] focus:border-transparent transition duration-200">
                     </div>
                   </div>
                 </div>
@@ -345,9 +431,9 @@
         </div>
 
         <!-- Observaciones Generales -->
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-gray-400 to-gray-600 rounded-lg flex items-center justify-center flex-shrink-0">
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6">
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
               <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
               </svg>
@@ -357,19 +443,19 @@
           <textarea formControlName="observaciones_generales" 
                     rows="3"
                     placeholder="Instrucciones especiales, notas para logística..."
-                    class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none transition duration-200"></textarea>
+                    class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#C8D900] focus:border-transparent resize-none transition duration-200"></textarea>
         </div>
 
         <!-- Botones -->
         <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
           <button type="button" 
                   (click)="volver()" 
-                  class="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-6 py-3 rounded-xl font-medium transition-all duration-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 shadow-md">
+                  class="flex-1 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg backdrop-blur-sm active:scale-95">
             Cancelar
           </button>
           <button type="submit" 
                   [disabled]="!form.valid || creandoKit() || productosFormArray().length === 0"
-                  class="flex-1 bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                  class="flex-1 bg-[#C8D900] hover:bg-[#C8D900]/90 text-[#10284C] px-6 py-3 rounded-xl font-bold transition-all duration-200 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95">
             @if (creandoKit()) {
               <svg class="animate-spin w-5 h-5 inline mr-2" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -397,4 +483,12 @@
       </form>
     </main>
   }
-</section>
+</div>
+
+<!-- Success Dialog -->
+<app-kit-success-dialog
+  [isOpen]="showSuccessDialog()"
+  [title]="modoEdicion ? 'Kit actualizado\nexitosamente' : 'Kit creado\nexitosamente'"
+  [kitName]="cirugia()?.numero_cirugia || ''"
+  (close)="onSuccessDialogClose()">
+</app-kit-success-dialog>

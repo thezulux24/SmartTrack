@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { HojaGastoService } from '../data-access/hoja-gasto.service';
 import { CirugiasService } from '../../agenda/data-access/cirugias.service';
+import { HojaGastoSuccessDialogComponent } from '../components/hoja-gasto-success-dialog.component';
 import { 
   HojaGasto, 
   HojaGastoItem, 
@@ -44,7 +45,7 @@ interface CirugiaOption {
 @Component({
   selector: 'app-hoja-gasto-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HojaGastoSuccessDialogComponent],
   templateUrl: './hoja-gasto-form.component.html',
   styleUrl: './hoja-gasto-form.component.css'
 })
@@ -59,6 +60,8 @@ export class HojaGastoFormComponent implements OnInit {
   loading = signal(false);
   saving = signal(false);
   error = signal<string | null>(null);
+  showSuccessDialog = signal(false);
+  successHojaNumero = signal('');
   hojaGasto = signal<HojaGasto | null>(null);
   cirugias = signal<CirugiaOption[]>([]);
   kitItems = signal<Array<{ id: string; nombre: string; categoria: CategoriaProducto; precio: number; cantidad_requerida: number }>>([]);
@@ -310,7 +313,10 @@ export class HojaGastoFormComponent implements OnInit {
           next: () => {
             console.log('✅ Hoja actualizada correctamente');
             this.saving.set(false);
-            this.router.navigate(['/internal/hojas-gasto']);
+            // Guardar información para el diálogo
+            this.successHojaNumero.set(this.hojaGasto()?.numero_hoja || 'Hoja de Gasto');
+            // Mostrar diálogo de éxito
+            this.showSuccessDialog.set(true);
           },
           error: (error: any) => {
             console.error('❌ Error actualizando hoja de gasto:', error);
@@ -341,8 +347,12 @@ export class HojaGastoFormComponent implements OnInit {
         this.hojaGastoService.createHojaGasto(createRequest).subscribe({
           next: (response) => {
             console.log('✅ Hoja creada:', response);
-            this.router.navigate(['/internal/hojas-gasto']);
             this.saving.set(false);
+            // Guardar el número de la cirugía para mostrarlo en el diálogo
+            const cirugia = this.cirugias().find(c => c.id === formValue.cirugiaId);
+            this.successHojaNumero.set(cirugia?.numero_cirugia || 'Hoja de Gasto');
+            // Mostrar diálogo de éxito
+            this.showSuccessDialog.set(true);
           },
           error: (error: any) => {
             console.error('❌ Error creando hoja de gasto:', error);
@@ -389,6 +399,26 @@ export class HojaGastoFormComponent implements OnInit {
 
   volver() {
     this.router.navigate(['/internal/hojas-gasto']);
+  }
+
+  onSuccessDialogClose() {
+    this.showSuccessDialog.set(false);
+    this.router.navigate(['/internal/hojas-gasto']);
+  }
+
+  onCrearOtraHoja() {
+    this.showSuccessDialog.set(false);
+    // Resetear el formulario
+    this.form.reset();
+    this.form.patchValue({
+      cirugiaId: '',
+      observaciones: ''
+    });
+    // Limpiar items
+    while (this.itemsFormArray.length !== 0) {
+      this.itemsFormArray.removeAt(0);
+    }
+    this.kitItems.set([]);
   }
 
   // Métodos de utilidad para templates

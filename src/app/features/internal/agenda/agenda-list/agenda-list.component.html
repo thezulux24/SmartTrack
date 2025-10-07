@@ -243,9 +243,9 @@
         <!-- Surgery Cards -->
         <div class="space-y-4">
           <div *ngFor="let cirugia of filteredCirugias()" 
-               class="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+               class="bg-white rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]">
             <!-- Card Header -->
-            <div class="p-4 border-b border-gray-200">
+            <div class="p-4 border-b-2 border-[#0098A8]/30">
               <div class="flex justify-between items-start mb-3">
                 <div class="flex items-center space-x-2 flex-wrap gap-2">
                   <h3 class="text-lg font-bold text-[#10284C]">{{ cirugia.numero_cirugia }}</h3>
@@ -291,7 +291,7 @@
                 <p class="text-sm font-medium text-[#10284C]">{{ cirugia.tecnico_asignado.full_name }}</p>
               </div>
 
-              <div *ngIf="cirugia.notas" class="border-t border-gray-200 pt-3">
+              <div *ngIf="cirugia.notas" class="border-t-2 border-[#0098A8]/30 pt-3">
                 <p class="text-xs text-gray-500 mb-1">Notas</p>
                 <p class="text-sm text-gray-700">{{ cirugia.notas }}</p>
               </div>
@@ -335,7 +335,7 @@
 
         <!-- No results -->
         <div *ngIf="filteredCirugias().length === 0" 
-             class="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center shadow-md">
+             class="bg-white rounded-2xl border-2 border-[#0098A8] p-8 text-center shadow-lg">
           <div class="text-4xl mb-4">📅</div>
           <h3 class="text-lg font-bold text-[#10284C] mb-2">No se encontraron cirugías</h3>
           <p class="text-gray-600 mb-4">Intenta ajustar los filtros de búsqueda</p>

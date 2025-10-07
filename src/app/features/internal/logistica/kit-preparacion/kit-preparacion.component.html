@@ -1,47 +1,67 @@
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
-  <!-- Header mejorado -->
-  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
-    <div class="px-4 py-4">
-      <!-- Top bar con logo y navegación -->
-      <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center space-x-3">
-          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
-               alt="Implameq" class="h-8 brightness-0 invert">
-          <span class="text-lg font-semibold">Preparación de Kit</span>
-        </div>
-        <a routerLink="/internal/logistica/kits-pendientes" 
-           class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
-          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-          </svg>
-          Volver
-        </a>
-      </div>
-      
-      <!-- Título principal -->
-      <div class="text-center">
-        <h1 class="text-2xl font-bold mb-1">Preparación de Kit</h1>
-        <p class="text-green-100 text-sm">Componente en desarrollo</p>
-      </div>
+<div class="min-h-screen relative overflow-hidden">
+  <!-- Background con SVG de formas geométricas -->
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-[#10284C]">
+      <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <!-- Círculos decorativos -->
+        <circle cx="10%" cy="15%" r="120" fill="#0098A8" opacity="0.1"/>
+        <circle cx="85%" cy="25%" r="180" fill="#C8D900" opacity="0.08"/>
+        <circle cx="50%" cy="80%" r="150" fill="#0098A8" opacity="0.12"/>
+        
+        <!-- Formas geométricas -->
+        <rect x="60%" y="5%" width="200" height="200" fill="#0098A8" opacity="0.06" transform="rotate(45 70 15)"/>
+        <rect x="15%" y="65%" width="160" height="160" fill="#C8D900" opacity="0.08" transform="rotate(30 20 70)"/>
+        
+        <!-- Líneas decorativas -->
+        <line x1="0%" y1="30%" x2="100%" y2="35%" stroke="#0098A8" stroke-width="2" opacity="0.1"/>
+        <line x1="0%" y1="60%" x2="100%" y2="55%" stroke="#C8D900" stroke-width="2" opacity="0.08"/>
+        
+        <!-- Polígonos -->
+        <polygon points="90,10 95,25 85,25" fill="#0098A8" opacity="0.1" transform="scale(8)"/>
+        <polygon points="5,85 12,95 2,98" fill="#C8D900" opacity="0.09" transform="scale(10)"/>
+      </svg>
     </div>
-  </header>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#10284C]/50 via-[#10284C]/80 to-[#10284C]/95"></div>
+  </div>
 
   <!-- Contenido principal -->
-  <main class="px-4 py-6">
-    <div class="max-w-7xl mx-auto">
-      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-6">
-        <div class="flex items-center justify-center h-64">
+  <main class="relative z-10 px-4 py-6">
+    <div class="max-w-4xl mx-auto space-y-6">
+      
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+             alt="Implameq" 
+             class="h-10 w-auto brightness-0 invert">
+        <a routerLink="/internal/logistica/kits-pendientes"
+           class="px-4 py-2 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-colors font-medium flex items-center gap-2 active:scale-95">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span class="hidden sm:inline">Volver</span>
+        </a>
+      </div>
+
+      <!-- Título -->
+      <div class="text-center">
+        <h1 class="text-3xl sm:text-4xl font-bold text-[#C8D900] mb-2">Preparación de Kit</h1>
+        <p class="text-white/80 text-sm">Componente en desarrollo</p>
+      </div>
+
+      <!-- Contenido -->
+      <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-12 shadow-xl">
+        <div class="flex items-center justify-center">
           <div class="text-center">
-            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-24 h-24 mx-auto text-[#C8D900]/50 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
               </path>
             </svg>
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Preparación de Kit en Desarrollo</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Esta funcionalidad estará disponible próximamente</p>
+            <h3 class="text-2xl font-semibold text-white mb-3">Preparación de Kit en Desarrollo</h3>
+            <p class="text-white/70 mb-6 text-lg">Esta funcionalidad estará disponible próximamente</p>
             
             <a routerLink="/internal/logistica/kits-pendientes" 
-               class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md">
+               class="inline-flex items-center gap-2 px-8 py-3 bg-[#C8D900] text-[#10284C] rounded-xl hover:bg-[#d4e820] transition-all shadow-xl font-bold active:scale-95">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
@@ -50,6 +70,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Bottom spacing -->
+      <div class="h-6"></div>
     </div>
   </main>
-</section>
+</div>

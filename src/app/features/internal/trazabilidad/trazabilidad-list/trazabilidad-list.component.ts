@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -20,6 +20,7 @@ interface Cirugia {
   selector: 'app-trazabilidad-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  schemas: [NO_ERRORS_SCHEMA],
   templateUrl: './trazabilidad-list.component.html',
   styleUrl: './trazabilidad-list.component.css'
 })
@@ -107,6 +108,10 @@ export class TrazabilidadListComponent implements OnInit {
     this.eventos.set([]);
   }
 
+  volverAlMenu(): void {
+    this.router.navigate(['/internal']);
+  }
+
   // Utilidades
   formatearFecha(fecha: string): string {
     if (!fecha) return 'N/A';
@@ -159,20 +164,20 @@ export class TrazabilidadListComponent implements OnInit {
 
   obtenerColorEstado(estado: string): string {
     const colores: { [key: string]: string } = {
-      'programada': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      'en_proceso': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      'finalizada': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      'cancelada': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      'solicitado': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      'preparando': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      'listo_envio': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      'en_transito': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      'entregado': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      'en_uso': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-      'devuelto': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
-      'finalizado': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      'programada': 'bg-[#0098A8] text-white',
+      'en_proceso': 'bg-[#C8D900] text-[#10284C]',
+      'finalizada': 'bg-[#C8D900] text-[#10284C]',
+      'cancelada': 'bg-red-500 text-white',
+      'solicitado': 'bg-[#C8D900] text-[#10284C]',
+      'preparando': 'bg-[#0098A8] text-white',
+      'listo_envio': 'bg-[#C8D900] text-[#10284C]',
+      'en_transito': 'bg-[#0098A8] text-white',
+      'entregado': 'bg-[#C8D900] text-[#10284C]',
+      'en_uso': 'bg-[#0098A8] text-white',
+      'devuelto': 'bg-white/20 text-white',
+      'finalizado': 'bg-[#C8D900] text-[#10284C]'
     };
-    return colores[estado] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    return colores[estado] || 'bg-white/20 text-white';
   }
 
   obtenerNombreCliente(cirugia: Cirugia): string {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormArray, Validators, FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,11 +6,13 @@ import { firstValueFrom } from 'rxjs';
 import { KitService } from '../../../../shared/services/kit.service';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
 import { CreateKitRequest } from '../../../../shared/models/kit.model';
+import { KitSuccessDialogComponent } from '../components/kit-success-dialog.component';
 
 @Component({
   selector: 'app-kit-builder',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, KitSuccessDialogComponent],
+  schemas: [NO_ERRORS_SCHEMA],
   templateUrl: './kit-builder.component.html',
   styleUrl: './kit-builder.component.css'
 })
@@ -25,6 +27,7 @@ export class KitBuilderComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
   creandoKit = signal(false);
+  showSuccessDialog = signal(false);
   cirugia = signal<any>(null);
   productosSugeridos = signal<any[]>([]);
   productosEncontrados = signal<any[]>([]);
@@ -268,6 +271,8 @@ export class KitBuilderComponent implements OnInit {
       if (this.modoEdicion) {
         // Modo edición - actualizar kit existente
         await this.actualizarKit(formValue);
+        // Mostrar diálogo de éxito
+        this.showSuccessDialog.set(true);
       } else {
         // Modo creación - crear nuevo kit
         const request: CreateKitRequest = {
@@ -277,10 +282,9 @@ export class KitBuilderComponent implements OnInit {
         };
 
         await firstValueFrom(this.kitService.crearKit(request));
+        // Mostrar diálogo de éxito
+        this.showSuccessDialog.set(true);
       }
-      
-      // Navegar de vuelta a la agenda
-      this.router.navigate(['/internal/agenda']);
       
     } catch (error: any) {
       console.error('Error procesando kit:', error);
@@ -291,6 +295,11 @@ export class KitBuilderComponent implements OnInit {
   }
 
   volver() {
+    this.router.navigate(['/internal/agenda']);
+  }
+
+  onSuccessDialogClose() {
+    this.showSuccessDialog.set(false);
     this.router.navigate(['/internal/agenda']);
   }
 
