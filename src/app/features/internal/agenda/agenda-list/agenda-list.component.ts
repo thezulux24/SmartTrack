@@ -29,6 +29,74 @@ export class AgendaListComponent implements OnInit {
   selectedEstado = signal('');
   selectedFecha = signal('');
   
+  // Signals para vista de calendario
+  viewMode = signal<'list' | 'calendar'>('list');
+  currentMonth = signal(new Date());
+  weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+  // Computed para el label del mes actual
+  currentMonthLabel = computed(() => {
+    const date = this.currentMonth();
+    return date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  });
+
+  // Computed para generar días del calendario
+  calendarDays = computed(() => {
+    const currentDate = this.currentMonth();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Primer y último día del mes
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Días para completar la primera semana
+    const startPadding = firstDay.getDay();
+    const endPadding = 6 - lastDay.getDay();
+    
+    const days: Array<{
+      date: Date;
+      isCurrentMonth: boolean;
+      isToday: boolean;
+      events: Cirugia[];
+    }> = [];
+    
+    // Días del mes anterior
+    for (let i = startPadding - 1; i >= 0; i--) {
+      const date = new Date(year, month, -i);
+      days.push({
+        date,
+        isCurrentMonth: false,
+        isToday: this.isToday(date),
+        events: this.getEventsForDate(date)
+      });
+    }
+    
+    // Días del mes actual
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const date = new Date(year, month, day);
+      days.push({
+        date,
+        isCurrentMonth: true,
+        isToday: this.isToday(date),
+        events: this.getEventsForDate(date)
+      });
+    }
+    
+    // Días del mes siguiente
+    for (let i = 1; i <= endPadding; i++) {
+      const date = new Date(year, month + 1, i);
+      days.push({
+        date,
+        isCurrentMonth: false,
+        isToday: this.isToday(date),
+        events: this.getEventsForDate(date)
+      });
+    }
+    
+    return days;
+  });
+  
   // Computed para cirugías filtradas
   filteredCirugias = computed(() => {
     let result = this.cirugias();
@@ -396,5 +464,46 @@ export class AgendaListComponent implements OnInit {
   // Método heredado para compatibilidad
   onCrearKit(cirugiaId: string) {
     this.onManejarKit(cirugiaId);
+  }
+
+  // Métodos para el calendario
+  setViewMode(mode: 'list' | 'calendar') {
+    this.viewMode.set(mode);
+  }
+
+  previousMonth() {
+    const current = this.currentMonth();
+    this.currentMonth.set(new Date(current.getFullYear(), current.getMonth() - 1, 1));
+  }
+
+  nextMonth() {
+    const current = this.currentMonth();
+    this.currentMonth.set(new Date(current.getFullYear(), current.getMonth() + 1, 1));
+  }
+
+  isToday(date: Date): boolean {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  }
+
+  getEventsForDate(date: Date): Cirugia[] {
+    const dateStr = date.toISOString().split('T')[0];
+    return this.filteredCirugias().filter(cirugia => {
+      const cirugiaDate = new Date(cirugia.fecha_programada).toISOString().split('T')[0];
+      return cirugiaDate === dateStr;
+    });
+  }
+
+  getUrgenciaClass(cirugia: Cirugia): string {
+    const isUrgent = cirugia.estado === 'urgencia' || cirugia.prioridad === 'urgencia';
+    return isUrgent 
+      ? 'bg-red-500/30 text-white border-red-400/50 hover:bg-red-500/50'
+      : 'bg-[#0098A8]/40 text-white border-[#0098A8]/60 hover:bg-[#0098A8]/60';
+  }
+
+  navigateToCirugia(cirugia: Cirugia) {
+    this.router.navigate(['/internal/agenda/detalle', cirugia.id]);
   }
 }

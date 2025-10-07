@@ -1,301 +1,354 @@
-<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
-  <!-- Header específico para técnicos - mismo estilo que el original -->
-  <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white shadow-lg">
-    <div class="px-4 py-4">
-      <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center space-x-3">
-          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
-               alt="Implameq" class="h-8 brightness-0 invert">
-          <span class="text-lg font-semibold">Mi Agenda de Cirugías</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button (click)="refreshData()"
-                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-            </svg>
-          </button>
-          <button [routerLink]="['/internal/agenda']" 
-                  class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
-            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Agenda General
-          </button>
-        </div>
-      </div>
-      
-      <div class="text-center">
-        <h1 class="text-2xl font-bold mb-1">{{ getCurrentPeriodTitle() }}</h1>
-        <p class="text-green-100 text-sm">Mis cirugías asignadas</p>
-      </div>
-    </div>
-  </header>
+<div class="min-h-screen relative overflow-hidden">
+  <!-- Background Image -->
+  <div class="absolute inset-0 z-0">
+    <img src="01.jpg" alt="Surgical background" class="absolute inset-0 w-full h-full object-cover">
+    <div class="absolute inset-0 bg-[#10284C]/80"></div>
+  </div>
 
   <!-- Loading state -->
   @if (loading()) {
-    <div class="px-4 py-6">
-      <div class="max-w-lg mx-auto">
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
-          <div class="animate-pulse space-y-4">
-            <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
-            <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
-            <div class="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
-          </div>
-          <p class="text-sm text-gray-500 mt-4">Cargando mis cirugías...</p>
+    <div class="relative z-10 flex items-center justify-center min-h-screen">
+      <div class="text-center">
+        <div class="animate-pulse space-y-4">
+          <div class="h-4 bg-gray-200 rounded w-64 mx-auto"></div>
+          <div class="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
         </div>
+        <p class="text-sm text-white/70 mt-4">Cargando mis cirugías...</p>
       </div>
     </div>
   }
 
   <!-- Error state -->
   @if (!loading() && error()) {
-    <div class="px-4 py-6">
-      <div class="max-w-lg mx-auto">
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
-          <div class="text-red-600 dark:text-red-400">
-            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-              </path>
-            </svg>
-            <p class="text-sm">{{ error() }}</p>
-          </div>
-          <button type="button" (click)="refreshData()"
-                  class="mt-4 w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none 
-                         focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-            Reintentar
-          </button>
+    <div class="relative z-10 flex items-center justify-center min-h-screen px-4">
+      <div class="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+        <div class="text-red-600">
+          <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+            </path>
+          </svg>
+          <p class="text-lg">{{ error() }}</p>
         </div>
+        <button type="button" (click)="refreshData()"
+                class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium">
+          Reintentar
+        </button>
       </div>
     </div>
   }
 
   <!-- Contenido principal -->
   @if (!loading() && !error()) {
-    <main class="px-4 py-6">
-      <!-- Controles de vista - igual que el original -->
-      <div class="max-w-lg mx-auto mb-6">
-        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
-          <!-- Navegación temporal -->
-          <div class="flex items-center justify-between mb-4">
-            <button (click)="previousPeriod()" 
-                    class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+    <main class="relative z-10 px-4 py-6">
+      <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Top bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+               alt="Implameq" 
+               class="h-10 w-auto brightness-0 invert">
+          <div class="flex items-center gap-3">
+            <button [routerLink]="['/internal']"
+                    class="px-4 py-2 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-colors font-medium flex items-center gap-2 active:scale-95">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
+              <span class="hidden sm:inline">Dashboard</span>
             </button>
-            
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ getCurrentPeriodTitle() }}
-            </h2>
-            
-            <button (click)="nextPeriod()" 
-                    class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+            <button [routerLink]="['/internal/agenda']"
+                    class="px-4 py-2 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-colors font-medium flex items-center gap-2 active:scale-95">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-            </button>
-          </div>
-
-          <!-- Botones de vista -->
-          <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-            <button (click)="setView('month')" 
-                    [class]="currentView() === 'month' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'"
-                    class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors">
-              Mes
-            </button>
-            <button (click)="setView('week')" 
-                    [class]="currentView() === 'week' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'"
-                    class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors">
-              Semana
-            </button>
-            <button (click)="setView('day')" 
-                    [class]="currentView() === 'day' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'"
-                    class="flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors">
-              Día
+              <span class="hidden sm:inline">Agenda General</span>
             </button>
           </div>
         </div>
-      </div>
+
+        <!-- Title -->
+        <div class="text-center">
+          <h1 class="text-3xl sm:text-4xl font-bold text-[#C8D900] mb-2">Mi Agenda</h1>
+          <p class="text-white/80 text-sm">Mis cirugías programadas</p>
+        </div>
+
+        <!-- Controles de navegación y vista -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <!-- Navegación temporal -->
+            <div class="flex items-center gap-4 justify-center sm:justify-start">
+              <button (click)="previousPeriod()" 
+                      class="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              </button>
+              <h2 class="text-2xl font-bold text-[#C8D900] min-w-[200px] text-center">
+                {{ getCurrentPeriodTitle() }}
+              </h2>
+              <button (click)="nextPeriod()" 
+                      class="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Botones de vista -->
+            <div class="flex bg-[#0098A8]/30 backdrop-blur-sm rounded-xl p-1 border border-white/20">
+              <button (click)="setView('month')" 
+                      [class]="currentView() === 'month' ? 'bg-[#C8D900] text-[#10284C] shadow-lg' : 'text-white/70 hover:text-white'"
+                      class="flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all">
+                Mes
+              </button>
+              <button (click)="setView('week')" 
+                      [class]="currentView() === 'week' ? 'bg-[#C8D900] text-[#10284C] shadow-lg' : 'text-white/70 hover:text-white'"
+                      class="flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all">
+                Semana
+              </button>
+              <button (click)="setView('day')" 
+                      [class]="currentView() === 'day' ? 'bg-[#C8D900] text-[#10284C] shadow-lg' : 'text-white/70 hover:text-white'"
+                      class="flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all">
+                Día
+              </button>
+            </div>
+          </div>
+        </div>
 
       <!-- Alertas del técnico -->
       @if (alerts().length > 0) {
-        <div class="max-w-lg mx-auto mb-6">
-          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Mis Alertas</h3>
-            <div class="space-y-3">
-              @for (alert of alerts(); track alert.titulo) {
-                <div [class]="alert.tipo === 'urgente' ? 'bg-red-50 border-red-200 dark:bg-red-900/20' : 
-                               alert.tipo === 'advertencia' ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20' : 
-                               'bg-blue-50 border-blue-200 dark:bg-blue-900/20'"
-                     class="p-3 rounded-lg border">
-                  <div class="flex items-start space-x-3">
-                    <div [class]="alert.tipo === 'urgente' ? 'text-red-500' : 
-                                   alert.tipo === 'advertencia' ? 'text-yellow-500' : 
-                                   'text-blue-500'">
-                      @if (alert.tipo === 'urgente') {
-                        <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                        </svg>
-                      } @else if (alert.tipo === 'advertencia') {
-                        <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                        </svg>
-                      } @else {
-                        <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                        </svg>
-                      }
-                    </div>
-                    <div class="flex-1">
-                      <p [class]="alert.tipo === 'urgente' ? 'text-red-800 dark:text-red-300' : 
-                                   alert.tipo === 'advertencia' ? 'text-yellow-800 dark:text-yellow-300' : 
-                                   'text-blue-800 dark:text-blue-300'"
-                         class="text-sm font-medium">
-                        {{ alert.titulo }}
-                      </p>
-                      <p [class]="alert.tipo === 'urgente' ? 'text-red-700 dark:text-red-400' : 
-                                   alert.tipo === 'advertencia' ? 'text-yellow-700 dark:text-yellow-400' : 
-                                   'text-blue-700 dark:text-blue-400'"
-                         class="text-xs mt-1">
-                        {{ alert.mensaje }}
-                      </p>
-                    </div>
-                    <span [class]="alert.tipo === 'urgente' ? 'text-red-600 dark:text-red-400' : 
-                                   alert.tipo === 'advertencia' ? 'text-yellow-600 dark:text-yellow-400' : 
-                                   'text-blue-600 dark:text-blue-400'"
-                          class="text-xs font-medium">
-                      {{ alert.tiempo }}
-                    </span>
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+          <h3 class="text-xl font-bold text-white mb-4">Mis Alertas</h3>
+          <div class="space-y-3">
+            @for (alert of alerts(); track alert.titulo) {
+              <div [class]="alert.tipo === 'urgente' ? 'bg-red-500/20 border-red-400/50' : 
+                             alert.tipo === 'advertencia' ? 'bg-yellow-500/20 border-yellow-400/50' : 
+                             'bg-blue-500/20 border-blue-400/50'"
+                   class="p-4 rounded-xl border backdrop-blur-sm">
+                <div class="flex items-start space-x-3">
+                  <div [class]="alert.tipo === 'urgente' ? 'text-red-300' : 
+                                 alert.tipo === 'advertencia' ? 'text-yellow-300' : 
+                                 'text-blue-300'">
+                    @if (alert.tipo === 'urgente') {
+                      <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                      </svg>
+                    } @else if (alert.tipo === 'advertencia') {
+                      <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                    } @else {
+                      <svg class="w-5 h-5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                      </svg>
+                    }
                   </div>
+                  <div class="flex-1">
+                    <p [class]="alert.tipo === 'urgente' ? 'text-white font-semibold' : 
+                                 alert.tipo === 'advertencia' ? 'text-white font-semibold' : 
+                                 'text-white font-semibold'"
+                       class="text-sm">
+                      {{ alert.titulo }}
+                    </p>
+                    <p class="text-white/80 text-xs mt-1">
+                      {{ alert.mensaje }}
+                    </p>
+                  </div>
+                  <span class="text-white/70 text-xs font-medium">
+                    {{ alert.tiempo }}
+                  </span>
                 </div>
-              }
-            </div>
+              </div>
+            }
           </div>
         </div>
       }
 
-      <!-- Vista mensual - exactamente igual al original -->
+      <!-- Vista mensual -->
       @if (currentView() === 'month') {
-        <div class="max-w-lg mx-auto">
-          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 overflow-hidden">
-            <!-- Encabezados de días -->
-            <div class="grid grid-cols-7 bg-gray-50 dark:bg-gray-700">
-              @for (day of weekDays; track day) {
-                <div class="p-2 text-center">
-                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ day }}</span>
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl overflow-hidden">
+          <!-- Encabezados de días -->
+          <div class="grid grid-cols-7 bg-[#0098A8]/40">
+            @for (day of weekDays; track day) {
+              <div class="p-2 text-center">
+                <span class="text-xs font-semibold text-white">{{ day }}</span>
+              </div>
+            }
+          </div>
+          
+          <!-- Días del calendario -->
+          <div class="grid grid-cols-7">
+            @for (calendarDay of calendarDays(); track calendarDay.date.getTime()) {
+              <div [class]="calendarDay.isCurrentMonth ? 'bg-[#0098A8]/10' : 'bg-[#10284C]/50'"
+                   class="min-h-[80px] p-1 border-b border-r border-white/10">
+                <div [class]="calendarDay.isToday ? 'bg-[#C8D900] text-[#10284C] font-bold' : 
+                             calendarDay.isCurrentMonth ? 'text-white' : 'text-white/40'"
+                     class="text-xs mb-1 w-6 h-6 flex items-center justify-center rounded">
+                  {{ calendarDay.date.getDate() }}
                 </div>
-              }
+                
+                <!-- Mis cirugías del día -->
+                <div class="space-y-1">
+                  @for (event of calendarDay.events; track event.id) {
+                    <button (click)="selectEvent(event)"
+                            [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-red-500/30 text-white border-red-400/50 hover:bg-red-500/50' : 'bg-[#0098A8]/40 text-white border-[#0098A8]/60 hover:bg-[#0098A8]/60'"
+                            class="w-full text-left px-2 py-1 rounded text-xs border truncate transition-colors">
+                      <div class="font-medium truncate">{{ getClienteNombre(event) }}</div>
+                      <div class="truncate">{{ formatHora(event.hora_inicio) }}</div>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Vista semanal -->
+      @if (currentView() === 'week') {
+        <!-- Vista de escritorio (grid horizontal) -->
+        <div class="hidden sm:block bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl p-4 border border-white/20 overflow-x-auto">
+          <!-- Encabezados de días de la semana -->
+          <div class="grid grid-cols-8 gap-1 mb-3 min-w-[600px]">
+            <div class="text-center text-white/80 text-xs font-medium py-2">
+              Hora
             </div>
-            
-            <!-- Días del calendario -->
-            <div class="grid grid-cols-7">
-              @for (calendarDay of calendarDays(); track calendarDay.date.getTime()) {
-                <div [class]="calendarDay.isCurrentMonth ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'"
-                     class="min-h-[80px] p-1 border-b border-r border-gray-200 dark:border-gray-600">
-                  <div [class]="calendarDay.isToday ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 
-                               calendarDay.isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'"
-                       class="text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded">
-                    {{ calendarDay.date.getDate() }}
-                  </div>
-                  
-                  <!-- Mis cirugías del día -->
-                  <div class="space-y-1">
-                    @for (event of calendarDay.events; track event.id) {
+            @for (day of getWeekDays(); track day.getTime(); let i = $index) {
+              <div class="text-center text-white/80 text-xs font-medium py-2">
+                <div [class]="isToday(day) ? 'text-[#C8D900]' : 'text-white'">
+                  {{ weekDays[i] }}
+                </div>
+                <div [class]="isToday(day) ? 'text-[#C8D900]' : 'text-white/60'"
+                     class="text-[10px]">
+                  {{ day.getDate() }}
+                </div>
+              </div>
+            }
+          </div>
+          
+          <!-- Grid de horarios por día -->
+          <div class="space-y-1 min-w-[600px]">
+            @for (hour of hours; track hour) {
+              <div class="grid grid-cols-8 gap-1">
+                <!-- Columna de hora -->
+                <div class="text-xs text-white/60 py-2 text-center">
+                  {{ formatHour(hour) }}
+                </div>
+                
+                <!-- Columnas de días -->
+                @for (day of getWeekDays(); track day.getTime(); let dayIndex = $index) {
+                  <div class="bg-[#0D5F6A]/50 rounded p-1 min-h-[60px]">
+                    @for (event of getEventsForDayHour(dayIndex, hour); track event.id) {
                       <button (click)="selectEvent(event)"
-                              [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-red-100 text-red-700 border-red-200' : 'bg-blue-100 text-blue-700 border-blue-200'"
-                              class="w-full text-left px-2 py-1 rounded text-xs border truncate hover:shadow-sm transition-shadow">
-                        <div class="font-medium truncate">{{ getClienteNombre(event) }}</div>
-                        <div class="truncate">{{ formatHora(event.hora_inicio) }}</div>
+                              [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-[#E91E63]' : 
+                                       event.estado === 'en_curso' ? 'bg-[#FF9800]' : 
+                                       event.estado === 'completada' ? 'bg-[#4CAF50]' : 
+                                       'bg-[#2196F3]'"
+                              class="w-full text-white text-[9px] px-1 py-1 rounded font-medium hover:opacity-80 transition-opacity mb-1">
+                        <div class="truncate">{{ getClienteNombre(event) }}</div>
+                        <div class="text-[8px] text-white/80">{{ formatHora(event.hora_inicio) }}</div>
                       </button>
                     }
                   </div>
-                </div>
-              }
-            </div>
+                }
+              </div>
+            }
           </div>
         </div>
-      }
 
-      <!-- Vista semanal - exactamente igual al original -->
-      @if (currentView() === 'week') {
-        <div class="max-w-lg mx-auto">
-          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 overflow-hidden">
-            <!-- Encabezado de la semana -->
-            <div class="grid grid-cols-8 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-              <div class="p-2"></div>
-              @for (day of getWeekDays(); track day.getTime()) {
-                <div class="p-2 text-center border-l border-gray-200 dark:border-gray-600">
-                  <div [class]="isToday(day) ? 'text-green-600 dark:text-green-400 font-bold' : 'text-gray-700 dark:text-gray-300'"
-                       class="text-xs font-medium">
-                    {{ day.toLocaleDateString('es-ES', { weekday: 'short' }) }}
-                  </div>
-                  <div [class]="isToday(day) ? 'text-green-600 dark:text-green-400 font-bold' : 'text-gray-900 dark:text-white'"
-                       class="text-sm font-semibold">
-                    {{ day.getDate() }}
-                  </div>
+        <!-- Vista móvil (lista de días) -->
+        <div class="sm:hidden space-y-3">
+          @for (day of getWeekDays(); track day.getTime(); let dayIndex = $index) {
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl p-3 border border-white/20">
+              <!-- Encabezado del día -->
+              <div class="flex items-center justify-between mb-3 pb-2 border-b border-white/20">
+                <div>
+                  <h4 [class]="isToday(day) ? 'text-[#C8D900]' : 'text-white'"
+                      class="text-sm font-bold">
+                    {{ weekDays[dayIndex] }} {{ day.getDate() }}
+                  </h4>
+                  <p class="text-white/60 text-xs">
+                    {{ day.toLocaleDateString('es-ES', { month: 'short' }) }}
+                  </p>
                 </div>
-              }
-            </div>
-            
-            <!-- Horarios -->
-            <div class="overflow-y-auto max-h-96">
-              @for (hour of hours; track hour) {
-                <div class="grid grid-cols-8 border-b border-gray-100 dark:border-gray-700">
-                  <div class="p-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
-                    {{ formatHour(hour) }}
-                  </div>
-                  
-                  @for (dayIndex of [0,1,2,3,4,5,6]; track dayIndex) {
-                    <div class="p-1 min-h-[50px] border-l border-gray-100 dark:border-gray-700">
-                      @for (event of getEventsForDayHour(dayIndex, hour); track event.id) {
-                        <button (click)="selectEvent(event)"
-                                [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200' : 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200'"
-                                class="w-full text-left px-2 py-1 rounded text-xs border mb-1 transition-colors">
-                          <div class="font-medium truncate">{{ getClienteNombre(event) }}</div>
-                          <div class="truncate">{{ getTipoCirugiaNombre(event) }}</div>
-                        </button>
-                      }
-                    </div>
+                @if (isToday(day)) {
+                  <span class="bg-[#C8D900] text-[#10284C] text-xs px-2 py-1 rounded-full font-medium">
+                    Hoy
+                  </span>
+                }
+              </div>
+
+              <!-- Eventos del día -->
+              <div class="space-y-2">
+                @for (hour of hours; track hour) {
+                  @for (event of getEventsForDayHour(dayIndex, hour); track event.id) {
+                    <button (click)="selectEvent(event)"
+                            [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-[#E91E63]/20 border-l-[#E91E63]' : 
+                                     event.estado === 'en_curso' ? 'bg-[#FF9800]/20 border-l-[#FF9800]' : 
+                                     event.estado === 'completada' ? 'bg-[#4CAF50]/20 border-l-[#4CAF50]' : 
+                                     'bg-[#2196F3]/20 border-l-[#2196F3]'"
+                            class="w-full text-left p-3 rounded-lg border-l-4 backdrop-blur-sm active:bg-white/10 transition-colors">
+                      <div class="flex justify-between items-start mb-2">
+                        <h5 class="text-white font-semibold text-sm">{{ getClienteNombre(event) }}</h5>
+                        <span [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-[#E91E63]/30 text-[#E91E63]' : 
+                                       event.estado === 'en_curso' ? 'bg-[#FF9800]/30 text-[#FF9800]' : 
+                                       event.estado === 'completada' ? 'bg-[#4CAF50]/30 text-[#4CAF50]' : 
+                                       'bg-[#2196F3]/30 text-[#2196F3]'"
+                              class="px-2 py-1 rounded-full text-[10px] font-medium">
+                          {{ getStatusLabel(event.estado) }}
+                        </span>
+                      </div>
+                      <div class="flex items-center space-x-2 text-xs text-white/80">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>{{ formatHora(event.hora_inicio) }}</span>
+                      </div>
+                    </button>
                   }
-                </div>
-              }
+                }
+                @empty {
+                  <p class="text-white/40 text-sm text-center py-4 italic">
+                    Sin cirugías programadas
+                  </p>
+                }
+              </div>
             </div>
-          </div>
+          }
         </div>
       }
 
-      <!-- Vista diaria - exactamente igual al original -->
+      <!-- Vista diaria -->
       @if (currentView() === 'day') {
-        <div class="max-w-lg mx-auto space-y-4">
-          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+        <div class="space-y-4">
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+            <h3 class="text-2xl font-bold text-[#C8D900] mb-4">
               {{ getCurrentDayDate() }}
             </h3>
             
             <!-- Mis cirugías del día -->
-            <div class="space-y-2">
+            <div class="space-y-3">
               @for (hour of hours; track hour) {
-                <div class="flex items-start space-x-3 pb-3 border-b border-gray-100 dark:border-gray-700 last:border-b-0">
-                  <div class="text-sm font-medium text-gray-500 dark:text-gray-400 w-16">
+                <div class="flex items-start space-x-4 pb-3 border-b border-white/10 last:border-b-0">
+                  <div class="text-sm font-semibold text-white/80 w-20">
                     {{ formatHour(hour) }}
                   </div>
                   
                   <div class="flex-1 space-y-2">
                     @for (event of getEventsForHour(hour); track event.id) {
                       <button (click)="selectEvent(event)"
-                              [class]="getTipoUrgencia(event) === 'urgente' ? 'border-l-red-500 bg-red-50 dark:bg-red-900/20' : 'border-l-blue-500 bg-blue-50 dark:bg-blue-900/20'"
-                              class="w-full text-left p-3 rounded-lg border-l-4 hover:shadow-md transition-shadow">
-                        <div class="flex justify-between items-start mb-2">
-                          <h4 class="font-semibold text-gray-900 dark:text-white">{{ getClienteNombre(event) }}</h4>
-                          <span [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'"
-                                class="px-2 py-1 rounded-full text-xs font-medium">
+                              [class]="getTipoUrgencia(event) === 'urgente' ? 'border-l-red-500 bg-red-500/20' : 'border-l-[#C8D900] bg-[#0098A8]/30'"
+                              class="w-full text-left p-4 rounded-xl border-l-4 hover:bg-white/10 transition-all backdrop-blur-sm">
+                        <div class="flex justify-between items-start mb-3">
+                          <h4 class="font-bold text-white text-lg">{{ getClienteNombre(event) }}</h4>
+                          <span [class]="getTipoUrgencia(event) === 'urgente' ? 'bg-red-500/40 text-white' : 'bg-[#C8D900]/30 text-[#C8D900]'"
+                                class="px-3 py-1 rounded-full text-xs font-semibold border border-white/20">
                             {{ getStatusLabel(event.estado) }}
                           </span>
                         </div>
                         
-                        <div class="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                        <div class="space-y-2 text-sm text-white/90">
                           <div class="flex items-center space-x-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -333,7 +386,7 @@
                         </div>
                       </button>
                     } @empty {
-                      <div class="text-sm text-gray-400 dark:text-gray-500 italic">
+                      <div class="text-sm text-white/60 italic pl-4">
                         Sin cirugías asignadas
                       </div>
                     }
@@ -347,159 +400,157 @@
 
       <!-- Sin cirugías asignadas -->
       @if (cirugias().length === 0) {
-        <div class="max-w-lg mx-auto">
-          <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-8 text-center">
-            <div class="text-gray-400 dark:text-gray-500">
-              <div class="text-4xl mb-4">👨‍⚕️</div>
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No tienes cirugías asignadas</h3>
-              <p class="text-gray-500 dark:text-gray-400 mb-4">Cuando se te asignen cirugías, aparecerán aquí</p>
-              <button [routerLink]="['/internal/agenda']"
-                      class="bg-gradient-to-r from-lime-400 to-green-500 hover:from-lime-500 hover:to-green-600 
-                             text-white px-6 py-2.5 rounded-lg font-medium shadow-lg transition-all duration-200">
-                Ver Agenda General
-              </button>
-            </div>
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-12 text-center">
+          <div class="text-white/80">
+            <div class="text-6xl mb-6">👨‍⚕️</div>
+            <h3 class="text-2xl font-bold text-white mb-3">No tienes cirugías asignadas</h3>
+            <p class="text-white/70 text-lg mb-6">Cuando se te asignen cirugías, aparecerán aquí</p>
+            <button [routerLink]="['/internal/agenda']"
+                    class="bg-[#C8D900] hover:bg-[#d4e820] text-[#10284C] px-8 py-3 rounded-xl font-bold shadow-xl transition-all duration-200 active:scale-95">
+              Ver Agenda General
+            </button>
           </div>
         </div>
       }
 
       <!-- Bottom spacing -->
       <div class="h-6"></div>
+      </div>
     </main>
   }
 
-  <!-- Modal de detalle - exactamente igual al original -->
+  <!-- Modal de detalle -->
   @if (showModal() && selectedEventDetails()) {
-    <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center p-4"
+    <div class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
          (click)="closeModal()">
-      <div class="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl"
+      <div class="bg-gradient-to-br from-[#10284C] via-[#1a4d5c] to-[#0098A8] rounded-t-2xl sm:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-[#0098A8]"
            (click)="$event.stopPropagation()">
         
         <!-- Header del modal -->
-        <div class="sticky top-0 bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-2xl sm:rounded-t-2xl">
+        <div class="sticky top-0 bg-[#10284C]/95 backdrop-blur-md px-6 py-4 border-b border-white/20 rounded-t-2xl sm:rounded-t-2xl">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 class="text-xl font-bold text-[#C8D900]">
               Mi Cirugía Asignada
             </h3>
             <button (click)="closeModal()" 
-                    class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="p-2 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
         </div>
 
-        <!-- Contenido del modal - igual que el original -->
+        <!-- Contenido del modal -->
         <div class="p-6 space-y-6">
           <!-- Info principal -->
           <div class="text-center">
-            <div [class]="getTipoUrgencia(selectedEventDetails()!) === 'urgente' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'"
-                 class="inline-flex px-3 py-1 rounded-full text-xs font-medium mb-3">
+            <div [class]="getTipoUrgencia(selectedEventDetails()!) === 'urgente' ? 'bg-red-500/30 text-white border-red-400/50' : 'bg-[#C8D900]/30 text-[#C8D900] border-[#C8D900]/50'"
+                 class="inline-flex px-4 py-2 rounded-full text-sm font-bold mb-4 border-2">
               {{ getStatusLabel(selectedEventDetails()!.estado) }}
             </div>
-            <h4 class="text-xl font-bold text-gray-900 dark:text-white">
+            <h4 class="text-2xl font-bold text-white mb-2">
               {{ getClienteNombre(selectedEventDetails()!) }}
             </h4>
-            <p class="text-gray-600 dark:text-gray-400 mt-1">
+            <p class="text-white/80 text-lg">
               {{ getTipoCirugiaNombre(selectedEventDetails()!) }}
             </p>
           </div>
 
-          <!-- Detalles organizados en tarjetas - igual que el original -->
+          <!-- Detalles organizados en tarjetas -->
           <div class="space-y-4">
             <!-- Fecha y Hora -->
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div class="flex items-center space-x-3 mb-3">
-                <div class="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
-                  <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-[#C8D900] p-2 rounded-lg">
+                  <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                 </div>
-                <h5 class="font-semibold text-gray-900 dark:text-white">Programación</h5>
+                <h5 class="font-bold text-white text-lg">Programación</h5>
               </div>
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Fecha:</span>
-                  <span class="font-medium">{{ selectedEventDetails()!.fecha_programada | date:'dd/MM/yyyy' }}</span>
+                  <span class="text-white/70">Fecha:</span>
+                  <span class="font-semibold text-white">{{ selectedEventDetails()!.fecha_programada | date:'dd/MM/yyyy' }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Hora inicio:</span>
-                  <span class="font-medium">{{ formatHora(selectedEventDetails()!.hora_inicio) }}</span>
+                  <span class="text-white/70">Hora inicio:</span>
+                  <span class="font-semibold text-white">{{ formatHora(selectedEventDetails()!.hora_inicio) }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Hora fin (est.):</span>
-                  <span class="font-medium">{{ getHoraFin(selectedEventDetails()!) }}</span>
+                  <span class="text-white/70">Hora fin (est.):</span>
+                  <span class="font-semibold text-white">{{ getHoraFin(selectedEventDetails()!) }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Duración:</span>
-                  <span class="font-medium">{{ getDuracionEstimada(selectedEventDetails()!) }}</span>
+                  <span class="text-white/70">Duración:</span>
+                  <span class="font-semibold text-white">{{ getDuracionEstimada(selectedEventDetails()!) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Equipo Médico -->
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div class="flex items-center space-x-3 mb-3">
-                <div class="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg">
-                  <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-[#C8D900] p-2 rounded-lg">
+                  <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                   </svg>
                 </div>
-                <h5 class="font-semibold text-gray-900 dark:text-white">Equipo Médico</h5>
+                <h5 class="font-bold text-white text-lg">Equipo Médico</h5>
               </div>
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Cirujano:</span>
-                  <span class="font-medium">Dr. {{ selectedEventDetails()!.medico_cirujano }}</span>
+                  <span class="text-white/70">Cirujano:</span>
+                  <span class="font-semibold text-white">Dr. {{ selectedEventDetails()!.medico_cirujano }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Técnico:</span>
-                  <span class="font-medium">{{ getTecnicoNombre(selectedEventDetails()!) }}</span>
+                  <span class="text-white/70">Técnico:</span>
+                  <span class="font-semibold text-white">{{ getTecnicoNombre(selectedEventDetails()!) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Ubicación -->
-            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div class="flex items-center space-x-3 mb-3">
-                <div class="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg">
-                  <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-[#C8D900] p-2 rounded-lg">
+                  <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                   </svg>
                 </div>
-                <h5 class="font-semibold text-gray-900 dark:text-white">Ubicación</h5>
+                <h5 class="font-bold text-white text-lg">Ubicación</h5>
               </div>
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Hospital:</span>
-                  <span class="font-medium">{{ getHospitalNombre(selectedEventDetails()!) }}</span>
+                  <span class="text-white/70">Hospital:</span>
+                  <span class="font-semibold text-white">{{ getHospitalNombre(selectedEventDetails()!) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Información del Paciente -->
             @if (getClienteDocumento(selectedEventDetails()!) || getClienteTelefono(selectedEventDetails()!)) {
-              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div class="flex items-center space-x-3 mb-3">
-                  <div class="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg">
-                    <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="bg-[#C8D900] p-2 rounded-lg">
+                    <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
                   </div>
-                  <h5 class="font-semibold text-gray-900 dark:text-white">Cliente</h5>
+                  <h5 class="font-bold text-white text-lg">Cliente</h5>
                 </div>
                 <div class="space-y-2 text-sm">
                   @if (getClienteDocumento(selectedEventDetails()!)) {
                     <div class="flex justify-between">
-                      <span class="text-gray-600 dark:text-gray-400">Documento:</span>
-                      <span class="font-medium">{{ getClienteDocumento(selectedEventDetails()!) }}</span>
+                      <span class="text-white/70">Documento:</span>
+                      <span class="font-semibold text-white">{{ getClienteDocumento(selectedEventDetails()!) }}</span>
                     </div>
                   }
                   @if (getClienteTelefono(selectedEventDetails()!)) {
                     <div class="flex justify-between">
-                      <span class="text-gray-600 dark:text-gray-400">Teléfono:</span>
-                      <span class="font-medium">{{ getClienteTelefono(selectedEventDetails()!) }}</span>
+                      <span class="text-white/70">Teléfono:</span>
+                      <span class="font-semibold text-white">{{ getClienteTelefono(selectedEventDetails()!) }}</span>
                     </div>
                   }
                 </div>
@@ -508,16 +559,16 @@
 
             <!-- Notas -->
             @if (selectedEventDetails()!.notas) {
-              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div class="flex items-center space-x-3 mb-3">
-                  <div class="bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded-lg">
-                    <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="bg-[#C8D900] p-2 rounded-lg">
+                    <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                   </div>
-                  <h5 class="font-semibold text-gray-900 dark:text-white">Notas</h5>
+                  <h5 class="font-bold text-white text-lg">Notas</h5>
                 </div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
+                <p class="text-sm text-white/80">
                   {{ selectedEventDetails()!.notas }}
                 </p>
               </div>
@@ -526,16 +577,14 @@
         </div>
 
         <!-- Botones de acción -->
-        <div class="sticky bottom-0 bg-white dark:bg-gray-800 px-6 py-4 border-t border-gray-200 dark:border-gray-700 rounded-b-2xl sm:rounded-b-2xl">
-          <div class="flex space-x-3">
+        <div class="sticky bottom-0 bg-[#10284C]/95 backdrop-blur-md px-6 py-4 border-t border-white/20 rounded-b-2xl sm:rounded-b-2xl">
+          <div class="flex gap-3">
             <button (click)="navigateToEvent(selectedEventDetails()!)"
-                    class="flex-1 bg-gradient-to-r from-lime-400 to-green-500 hover:from-lime-500 hover:to-green-600 
-                           text-white px-4 py-2.5 rounded-lg font-medium shadow-lg transition-all duration-200 text-center">
+                    class="flex-1 bg-[#C8D900] hover:bg-[#d4e820] text-[#10284C] px-6 py-3 rounded-xl font-bold shadow-xl transition-all duration-200 text-center active:scale-95">
               Ver Detalles
             </button>
             <button (click)="closeModal()"
-                    class="px-4 py-2.5 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 
-                           hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors">
+                    class="px-6 py-3 text-white bg-white/10 hover:bg-white/20 rounded-xl font-bold transition-colors border border-white/20">
               Cerrar
             </button>
           </div>
@@ -543,4 +592,4 @@
       </div>
     </div>
   }
-</section>
+</div>
