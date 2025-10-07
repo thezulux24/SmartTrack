@@ -4,9 +4,9 @@
     <!-- Logo y título -->
     <div class="flex flex-col items-center mb-6">
       <div class="flex items-center gap-4 mb-4">
-        <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+        <img src="https://www.implameq.com/wp-content/uploads/2020/08/logo-implameq.svg" 
              alt="Implameq Logo" 
-             class="h-12">
+             class="h-12 w-auto">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Inventario</h1>
           <p class="text-sm text-gray-600 dark:text-gray-300">Gestión de productos y stock</p>
@@ -208,119 +208,130 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- Modal con estilo Implameq -->
   <div *ngIf="showModal()" 
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center">
-          {{ modalType() === 'entrada' ? '➕ Entrada' : '➖ Salida' }} de Inventario
-        </h3>
-        
-        <!-- Info del producto -->
-        <div class="text-center border-b pb-4 mb-4">
-          <div class="font-medium text-gray-900 dark:text-white">{{ selectedProducto()?.nombre }}</div>
-          <div class="text-sm text-gray-500 dark:text-gray-400">{{ selectedProducto()?.codigo }}</div>
-        </div>
+       class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+       (click)="closeModal()">
+    <div class="w-full max-w-md" (click)="$event.stopPropagation()">
+      <!-- Background with gradient and surgical image -->
+      <div class="relative min-h-[600px] bg-gradient-to-b from-[#10284C] via-[#10284C] to-[#0098A8] rounded-lg overflow-hidden">
+        <!-- Surgical background image with overlay -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-10"
+             style="background-image: url('/02.jpg')"></div>
 
-        <form (ngSubmit)="submitMovimiento()" #form="ngForm" class="space-y-4">
-          <!-- Cantidad -->
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cantidad *</label>
-            <input type="number" 
-                   [(ngModel)]="cantidad"
-                   name="cantidad"
-                   min="1"
-                   [max]="modalType() === 'salida' ? (selectedInventario()?.cantidad ?? null) : 999"
-                   required
-                   class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                          focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
-                          dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                          dark:focus:ring-lime-400 dark:focus:border-lime-400">
-            <div *ngIf="modalType() === 'salida' && selectedInventario()" 
-                 class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Disponible: {{ selectedInventario()?.cantidad }}
+        <!-- Content -->
+        <div class="relative z-10 p-6">
+          <!-- Header -->
+          <div class="flex items-center mb-8">
+            <div class="flex items-center gap-2">
+              <img 
+                src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+                alt="Implameq" 
+                class="h-8 brightness-0 invert" />
             </div>
           </div>
 
-          <!-- Ubicación (solo para entradas) -->
-          <div *ngIf="modalType() === 'entrada'">
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ubicación *</label>
-            <select [(ngModel)]="ubicacion" 
-                    name="ubicacion"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                           focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
-                           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                           dark:focus:ring-lime-400 dark:focus:border-lime-400">
-              
-              <!-- ✅ Opciones organizadas -->
-              <optgroup label="🏢 Sedes Principales">
-                <option value="sede_principal_norte">Sede Principal Norte</option>
-                <option value="sede_principal_sur">Sede Principal Sur</option>
-              </optgroup>
-
-              <optgroup label="🏬 Sedes Secundarias">
-                <option value="sede_secundaria_este">Sede Secundaria Este</option>
-                <option value="sede_secundaria_oeste">Sede Secundaria Oeste</option>
-              </optgroup>
-
-              <optgroup label="📦 Bodegas">
-                <option value="bodega_central">Bodega Central</option>
-                <option value="bodega_norte">Bodega Norte</option>
-                <option value="bodega_sur">Bodega Sur</option>
-              </optgroup>
-
-              <optgroup label="🏥 Quirófanos">
-                <option value="quirofano_sede_norte_1">Quirófano Norte 1</option>
-                <option value="quirofano_sede_norte_2">Quirófano Norte 2</option>
-                <option value="quirofano_sede_sur_1">Quirófano Sur 1</option>
-                <option value="quirofano_sede_sur_2">Quirófano Sur 2</option>
-              </optgroup>
-
-              <optgroup label="🚨 Emergencias">
-                <option value="emergencia_norte">Emergencia Norte</option>
-                <option value="emergencia_sur">Emergencia Sur</option>
-              </optgroup>
-
-              <optgroup label="⚡ Áreas Especiales">
-                <option value="esterilizacion_central">Esterilización Central</option>
-              </optgroup>
-            </select>
+          <!-- Title and product info -->
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-[#CBDD00] mb-2">
+              {{ modalType() === 'entrada' ? 'Entrada de Inventario' : 'Salida de Inventario' }}
+            </h2>
+            <p class="text-white text-sm mb-1">{{ selectedProducto()?.nombre }}</p>
+            <p class="text-white/70 text-xs">{{ selectedProducto()?.codigo }}</p>
           </div>
 
-          <!-- Motivo -->
-          <div>
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Motivo (opcional)</label>
-            <input type="text" 
+          <!-- Form card -->
+          <div class="bg-[#10284C]/80 backdrop-blur-sm rounded-lg p-6 space-y-4">
+            <form (ngSubmit)="submitMovimiento()" #form="ngForm" class="space-y-4">
+              <!-- Cantidad -->
+              <div>
+                <label class="block text-white text-sm font-medium mb-2">Cantidad*</label>
+                <input type="number" 
+                       [(ngModel)]="cantidad"
+                       name="cantidad"
+                       min="1"
+                       [max]="modalType() === 'salida' ? (selectedInventario()?.cantidad ?? 999) : 999"
+                       required
+                       class="w-full px-4 py-3 bg-[#0098A8]/40 border-0 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#CBDD00]">
+                <div *ngIf="modalType() === 'salida' && selectedInventario()" 
+                     class="text-white/60 text-xs mt-1">
+                  Disponible: {{ selectedInventario()?.cantidad }}
+                </div>
+              </div>
+
+              <!-- Ubicación (para entradas y salidas) -->
+              <div>
+                <label class="block text-white text-sm font-medium mb-2">
+                  {{ modalType() === 'entrada' ? 'Ubicación de destino*' : 'Ubicación de origen*' }}
+                </label>
+                <select [(ngModel)]="ubicacion" 
+                        name="ubicacion"
+                        required
+                        class="w-full px-4 py-3 bg-[#0098A8]/40 border-0 rounded text-white focus:outline-none focus:ring-2 focus:ring-[#CBDD00]">
+                  <option value="" class="bg-[#10284C]">Selecciona una ubicación</option>
+                  
+                  <optgroup label="🏢 Sedes Principales" class="bg-[#10284C]">
+                    <option value="sede_principal_norte" class="bg-[#10284C]">Sede Principal Norte</option>
+                    <option value="sede_principal_sur" class="bg-[#10284C]">Sede Principal Sur</option>
+                  </optgroup>
+
+                  <optgroup label="🏬 Sedes Secundarias" class="bg-[#10284C]">
+                    <option value="sede_secundaria_este" class="bg-[#10284C]">Sede Secundaria Este</option>
+                    <option value="sede_secundaria_oeste" class="bg-[#10284C]">Sede Secundaria Oeste</option>
+                  </optgroup>
+
+                  <optgroup label="📦 Bodegas" class="bg-[#10284C]">
+                    <option value="bodega_central" class="bg-[#10284C]">Bodega Central</option>
+                    <option value="bodega_norte" class="bg-[#10284C]">Bodega Norte</option>
+                    <option value="bodega_sur" class="bg-[#10284C]">Bodega Sur</option>
+                  </optgroup>
+
+                  <optgroup label="🏥 Quirófanos" class="bg-[#10284C]">
+                    <option value="quirofano_sede_norte_1" class="bg-[#10284C]">Quirófano Norte 1</option>
+                    <option value="quirofano_sede_norte_2" class="bg-[#10284C]">Quirófano Norte 2</option>
+                    <option value="quirofano_sede_sur_1" class="bg-[#10284C]">Quirófano Sur 1</option>
+                    <option value="quirofano_sede_sur_2" class="bg-[#10284C]">Quirófano Sur 2</option>
+                  </optgroup>
+
+                  <optgroup label="🚨 Emergencias" class="bg-[#10284C]">
+                    <option value="emergencia_norte" class="bg-[#10284C]">Emergencia Norte</option>
+                    <option value="emergencia_sur" class="bg-[#10284C]">Emergencia Sur</option>
+                  </optgroup>
+
+                  <optgroup label="⚡ Áreas Especiales" class="bg-[#10284C]">
+                    <option value="esterilizacion_central" class="bg-[#10284C]">Esterilización Central</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <!-- Motivo -->
+              <div>
+                <label class="block text-white text-sm font-medium mb-2">Motivo (opcional)</label>
+                <textarea 
                    [(ngModel)]="motivo"
                    name="motivo"
+                   rows="3"
                    placeholder="Descripción del movimiento..."
-                   class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg 
-                          focus:ring-lime-400 focus:border-lime-400 block w-full p-2.5 
-                          dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-                          dark:focus:ring-lime-400 dark:focus:border-lime-400">
-          </div>
+                   class="w-full px-4 py-3 bg-[#0098A8]/40 border-0 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#CBDD00] resize-none"></textarea>
+              </div>
 
-          <!-- Botones -->
-          <div class="space-y-3 pt-4">
-            <button type="submit" 
-                    [disabled]="!form.valid || loading()"
-                    class="w-full text-gray-900 bg-lime-400 hover:bg-lime-500 focus:ring-4 focus:outline-none 
-                           focus:ring-lime-300 font-bold rounded-lg text-sm px-5 py-2.5 text-center 
-                           dark:bg-lime-400 dark:hover:bg-lime-500 dark:focus:ring-lime-500
-                           disabled:opacity-50 disabled:cursor-not-allowed">
-              {{ modalType() === 'entrada' ? 'Registrar Entrada' : 'Registrar Salida' }}
-            </button>
-            
-            <button type="button" 
-                    (click)="closeModal()"
-                    class="w-full text-white bg-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none 
-                           focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
-                           dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
-              Cancelar
-            </button>
+              <!-- Action buttons -->
+              <div class="space-y-3 pt-2">
+                <button type="submit" 
+                        [disabled]="!form.valid || loading()"
+                        class="w-full bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C] font-bold py-3 text-base rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  {{ modalType() === 'entrada' ? 'Registrar Entrada' : 'Registrar Salida' }}
+                </button>
+                
+                <button type="button" 
+                        (click)="closeModal()"
+                        class="w-full bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C] font-bold py-3 text-base rounded-lg transition-colors">
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>

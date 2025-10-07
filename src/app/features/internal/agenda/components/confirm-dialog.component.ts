@@ -26,9 +26,9 @@ import { CommonModule } from '@angular/common';
             <div class="flex items-center p-6">
               <div class="flex items-center gap-2">
                 <img 
-                  src="https://www.implameq.com/wp-content/uploads/2020/08/logo-implameq.svg" 
+                  src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
                   alt="Implameq" 
-                  class="h-10 w-auto brightness-0 invert" />
+                  class="h-8 brightness-0 invert" />
               </div>
             </div>
 
