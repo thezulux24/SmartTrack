@@ -13,7 +13,8 @@ module.exports = {
         accent: "var(--accent)",   // lima
       },
   fontFamily: {
-    neo: ["NeoSansW1G", "Exo 2", "Inter", "ui-sans-serif", "system-ui"]
+    neo: ["Neo Sans", "ui-sans-serif", "system-ui"],
+    sans: ["Neo Sans", "ui-sans-serif", "system-ui"]
   },
       borderRadius: {
         '2xl': '14px' // redondeado como en el mock
