@@ -64,6 +64,23 @@ CREATE TABLE public.clientes (
   CONSTRAINT clientes_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id),
   CONSTRAINT clientes_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES auth.users(id)
 );
+CREATE TABLE public.envios (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  kit_id uuid NOT NULL,
+  mensajero_id uuid NOT NULL,
+  direccion_destino text NOT NULL,
+  contacto_destino character varying,
+  telefono_destino character varying,
+  fecha_programada date NOT NULL,
+  hora_salida timestamp with time zone,
+  hora_llegada timestamp with time zone,
+  estado character varying NOT NULL DEFAULT 'programado'::character varying CHECK (estado::text = ANY (ARRAY['programado'::character varying, 'en_transito'::character varying, 'entregado'::character varying]::text[])),
+  observaciones text,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT envios_pkey PRIMARY KEY (id),
+  CONSTRAINT envios_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
+  CONSTRAINT envios_mensajero_id_fkey FOREIGN KEY (mensajero_id) REFERENCES public.mensajeros(id)
+);
 CREATE TABLE public.hoja_gasto_items (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   hoja_gasto_id uuid NOT NULL,
@@ -192,6 +209,15 @@ CREATE TABLE public.kits_cirugia (
   CONSTRAINT kits_cirugia_comercial_id_fkey FOREIGN KEY (comercial_id) REFERENCES public.profiles(id),
   CONSTRAINT kits_cirugia_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id),
   CONSTRAINT kits_cirugia_logistica_id_fkey FOREIGN KEY (logistica_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.mensajeros (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  nombre character varying NOT NULL,
+  telefono character varying NOT NULL,
+  placa character varying,
+  estado character varying NOT NULL DEFAULT 'disponible'::character varying CHECK (estado::text = ANY (ARRAY['disponible'::character varying, 'ocupado'::character varying]::text[])),
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT mensajeros_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.movimientos_inventario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

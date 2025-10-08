@@ -1,0 +1,1811 @@
+ 
+ 
+ 
+ 
+1 | Página 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+INFORME DE AVANCE 
+ 
+App SmartTrack: Gestión de Inventarios y Soporte Quirúrgico 
+ 
+IMPLAMEQ S.A.S. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Centro Javeriano de Innovación y Emprendimiento – Campus Nova 
+Pontificia Universidad Javeriana Cali 
+2025 
+ 
+ 
+CONFIDENCIAL 
+El presente documento, así como toda la información en él contenida, es de 
+carácter estrictamente confidencial y está destinado únicamente al conocimiento 
+del destinatario. Queda prohibido su uso o divulgación por parte de terceros no 
+autorizados. 
+Se prohíbe de manera expresa su retención, reproducción, utilización, 
+aprovechamiento o difusión para cualquier fin, salvo que exista autorización 
+previa, expresa y por escrito del destinatario. 
+2 | P á g i n a 
+Contenido 
+1. 
+2. 
+3. 
+4. 
+5. 
+6. 
+DESARROLLO DEL PROYECTO 
+OBJETIVOS 
+AVANCES 
+Análisis del contexto 
+Análisis de casos de uso 
+Levantamiento de información de la organización. 
+Entrevistas e identificación de los Jobs por usuario. 
+Análisis de patrones y factores clave por área 
+Definición de jobs por área para funcionalidad de la aplicación 
+Insights en Requerimientos Funcionales 
+Construcción de la Hoja de Ruta de Desarrollo 
+RETOS Y DESAFÍOS 
+MODIFICACIONES REALIZADAS 
+REFERENCIAS 
+4 
+5 
+6 
+6 
+7 
+11 
+12 
+35 
+38 
+40 
+43 
+44 
+45 
+46 
+3 | P á g i n a 
+1. DESARROLLO DEL PROYECTO 
+1.1. Nombre de la MiPyme:  
+IMPLAMEQ S.A.S. 
+1.2. Reto de Innovación 
+Desarrollar y validar un prototipo funcional de la aplicación digital SmartTrack, 
+orientada a la gestión integral de inventarios quirúrgicos, programación de 
+cirugías y coordinación de soporte técnico en tiempo real, con integración 
+logística-comercial y trazabilidad end-to-end, optimizando los procesos actuales 
+y mejorando la experiencia del cliente. 
+1.3. Problema técnico existente 
+Actualmente, Implameq gestiona sus operaciones mediante una combinación 
+de herramientas manuales y digitales (ERP, Google Forms, Excel y WhatsApp) 
+que generan dispersión de la información, reprocesos, falta de visibilidad en 
+tiempo real y demoras en la trazabilidad de inventarios y soporte quirúrgico. No 
+existe una plataforma centralizada que integre la programación de cirugías, el 
+control de inventario quirúrgico, el seguimiento postoperatorio y la coordinación 
+entre áreas (comercial, logística, técnica y facturación), lo que limita la eficiencia 
+operativa y la capacidad de respuesta ante urgencias. 
+1.4. Solución técnica planteada 
+Diseñar un prototipo funcional de la aplicación SmartTrack, que permita: 
+• Centralizar la información operativa en un solo sistema digital. 
+• Realizar control de inventario quirúrgico en tiempo real con registro de 
+entradas y salidas desde cualquier punto del proceso. 
+• Programar y gestionar cirugías (incluyendo urgencias) con alertas 
+automáticas. 
+• Integrar trazabilidad completa del material desde el pedido hasta la 
+facturación, con indicadores de tiempo y cumplimiento. 
+• Incorporar dashboards interactivos y KPIs para análisis y toma de decisiones. 
+• Automatizar validaciones documentales y generar alertas proactivas para 
+minimizar errores y retrasos. 
+1.5. Responsable técnico y equipo de la PUJ y la MiPyme. 
+• Por parte de la PUJ:  
+4 | P á g i n a 
+Nombre 
+Rol 
+Gabrielle Devia Vásquez 
+Líder de Innovación 
+Mario Sánchez 
+Monitor de Innovación 
+Harold Castro 
+Tech Manager 
+• Por parte de Implameq: 
+o Angélica Ortíz – Coordinadora de Soporte Técnico Quirúrgico (líder 
+frente de soporte). 
+o David Navarro – Líder de Logística. 
+o Dennys Mosquera – Gerente Comercial. 
+o Jhon A. Osorio – Responsable del Proceso Tecnológico. 
+o Equipo de validación: personal de soporte técnico, logística y 
+comercial.  
+2. OBJETIVOS 
+Objetivo general: 
+Diseñar, desarrollar y validar un prototipo funcional de una aplicación digital 
+llamada SmartTrack, que permita gestionar inventarios, programar cirugías y 
+coordinar soporte técnico en entornos clínico-quirúrgicos, con el fin de evaluar 
+su viabilidad técnica y comercial mediante pruebas en un entorno piloto  
+Objetivos específicos 
+• Definir los requisitos funcionales y técnicos del sistema, incluyendo la 
+estructura de usuarios, procesos clave y componentes del prototipo. 
+• Diseñar una hoja de ruta detallada para el desarrollo de la aplicación, 
+incluyendo flujos de procesos, arquitectura del sistema y fases de validación 
+• Realizar pruebas piloto en un entorno controlado, obteniendo 
+retroalimentación de usuarios clave (Técnicos, cirujanos, personal logístico) 
+para validar el concepto 
+• Documentar los aprendizajes y resultados del proceso, generando 
+entregables que respalden la toma de decisiones sobre su escalamiento y 
+comercialización 
+5 | P á g i n a 
+Cumplimiento de los objetivos 
+OBJETIVO GENERAL 
+Diseñar, desarrollar y validar un prototipo funcional de una 
+aplicación digital llamada SmartTrack, que permita gestionar 
+inventarios, programar cirugías y coordinar soporte técnico en 
+entornos clínico-quirúrgicos, con el fin de evaluar su viabilidad 
+técnica y comercial mediante pruebas en un entorno piloto 
+% 
+CUMPLIMIENTO  
+45% 
+FASES 
+Diagnóstico y recolección de la información 
+% CUMPLIMIENTO  
+89% 
+Diseño de hoja de ruta y arquitectura del 
+sistema 
+30% 
+Construcción segundo entregable 
+Validación en entorno piloto 
+100% 
+Recolección y Cierre 
+0% 
+Presentación y cierre 
+0% 
+0% 
+3. AVANCES  
+Análisis del contexto 
+El mercado global de la logística sanitaria está experimentando una trayectoria de 
+crecimiento significativa, proyectándose alcanzar aproximadamente 184 mil 
+millones de dólares para 2034. 1 Esta expansión está impulsada principalmente por 
+la creciente demanda de productos biológicos sensibles a la temperatura, la 
+medicina personalizada y la necesidad generalizada de una mayor eficiencia 
+operativa dentro de las complejas cadenas de suministro.1 Las principales 
+innovaciones que impulsan este crecimiento incluyen la adopción de Inteligencia 
+Artificial (IA) para la optimización de rutas, la tecnología blockchain para mejorar la 
+transparencia y trazabilidad de la cadena de suministro, soluciones avanzadas de 
+cadena de frío y tecnologías sofisticadas de seguimiento en tiempo real. 1 
+En Colombia, existe un impulso activo hacia la transformación digital en el sector de 
+la salud. Diversas startups e instituciones establecidas están implementando 
+tecnologías de vanguardia como la IA, la Identificación por Radiofrecuencia (RFID) 
+y otras soluciones digitales para abordar eficazmente problemas estructurales de 
+6 | P á g i n a 
+larga data dentro del sistema de salud.3 Los avances específicos observados a nivel 
+nacional incluyen el despliegue exitoso de RFID para la gestión de inventarios y 
+activos, la integración de soluciones impulsadas por IA para mejorar la eficiencia 
+quirúrgica y la implementación de plataformas digitales para una mejor identificación 
+de pacientes y una trazabilidad integral. 2 
+Las posibles soluciones tecnológicas más relevantes y su potencial impacto para 
+Implameq abarcan: 
+• Tecnología RFID. 
+• Soluciones ERP/WMS Integradas. 
+• Software de Programación Quirúrgica con IA. 
+• Plataformas de Trazabilidad en Tiempo Real. 
+Análisis de casos de uso  
+La transformación digital en el sector de la salud se apoya en varias categorías 
+tecnológicas interconectadas que están redefiniendo la eficiencia operativa, la 
+seguridad del paciente y la toma de decisiones. 
+Las soluciones de RFID y seguimiento en tiempo real utilizan ondas de radio para 
+transmitir datos desde objetos etiquetados a un lector, permitiendo la identificación 
+automática y el seguimiento en tiempo real de los activos.2 A diferencia de los 
+sistemas de códigos de barras tradicionales, la RFID no requiere línea de visión 
+directa, lo que permite una gestión eficiente y en tiempo real de inventarios y 
+activos.2 Un sistema RFID típico consta de etiquetas, antenas y lectores que 
+trabajan en conjunto para enviar datos capturados a un sistema central.2 Sus 
+aplicaciones abarcan la gestión integral de activos, el control preciso de inventarios, 
+el monitoreo en tiempo real de flotas y cargas, el control de acceso mejorado y la 
+trazabilidad de productos desde el origen hasta el destino.2 En el sector sanitario, la 
+RFID se emplea para la gestión de medicamentos de alto costo, la actualización en 
+tiempo real de los niveles de inventario, la mejora de la eficiencia operativa, la 
+reducción de errores en la administración de medicamentos y la trazabilidad robusta 
+de dispositivos y equipos médicos a lo largo de su ciclo de vida.2 Para Implameq, 
+estas capacidades abordan directamente la necesidad de optimizar la verificación 
+de inventario de equipos y mejorar la visualización de dispositivos para una toma de 
+decisiones más eficiente. 
+Los sistemas de Planificación de Recursos Empresariales (ERP) y Sistemas de 
+Gestión de Almacenes (WMS) son soluciones de software integrales diseñadas para 
+unificar funciones empresariales clave, como registros de pacientes, facturación, 
+gestión de inventario, recursos humanos y operaciones de la cadena de suministro, 
+7 | P á g i n a 
+en una plataforma cohesiva. Esta integración mejora la precisión de los datos, 
+agiliza los flujos de trabajo y reduce los costos operativos.6 Una característica 
+fundamental de los sistemas ERP es su base de datos centralizada, que actúa como 
+una "única fuente de verdad" para todos los datos empresariales, facilitando el 
+acceso en tiempo real a información crítica y permitiendo una toma de decisiones 
+informada y oportuna.6 Los Sistemas de Gestión de Almacenes (WMS), ya sean 
+componentes especializados o soluciones independientes, simplifican la gestión de 
+inventario, el cumplimiento de pedidos y el seguimiento dentro del entorno del 
+almacén, proporcionando visibilidad completa del movimiento de mercancías desde 
+la llegada hasta la entrega final.4  
+La Inteligencia Artificial (IA) y la automatización en la cadena de suministro y 
+operaciones están transformando profundamente diversos aspectos de la atención 
+médica, incluyendo diagnósticos, monitoreo remoto de pacientes, análisis 
+predictivos y optimización de rutas logísticas.1 La automatización en el sector de la 
+salud implica el uso de tecnología para reducir significativamente la intervención 
+humana en una amplia gama de procesos, desde tareas administrativas y gestión 
+de la cadena de suministro hasta documentación clínica y monitoreo de pacientes, 
+lo que agiliza los flujos de trabajo.7 El mercado global de la IA en las cadenas de 
+suministro de atención médica está proyectado para un crecimiento sustancial, con 
+una Tasa de Crecimiento Anual Compuesta (CAGR) del 41.7% hasta 2030, lo que 
+destaca su creciente adopción e impacto. 8 Los sistemas automatizados de gestión 
+de inventario han demostrado una notable eficacia, reduciendo las roturas de stock 
+hasta en un 73% y disminuyendo los costos de mantenimiento de inventario en un 
+promedio del 25-30% en las instalaciones implementadas.8 Además, las soluciones 
+robóticas para el cumplimiento de pedidos, como los Vehículos de Guiado 
+Automático (AGV) y los sistemas de picking automatizado, pueden reducir los 
+costos laborales entre un 20% y un 30% y procesar pedidos de 3 a 4 veces más 
+rápido que los métodos manuales.8  
+Finalmente, las plataformas de salud digital y soluciones integradas abarcan 
+registros electrónicos de salud (EHR), servicios de telesalud y capacidades 
+avanzadas de análisis de datos. Su implementación ha demostrado reducir 
+significativamente los costos operativos y mejorar notablemente la participación del 
+paciente.10 Estas soluciones permiten el monitoreo en tiempo real de la salud del 
+paciente, facilitan planes de tratamiento personalizados y pueden cambiar 
+fundamentalmente la prestación de atención médica de un modelo reactivo a uno 
+proactivo9 La integración fluida entre varios sistemas de atención médica (por 
+ejemplo, EMR, ERP, dispositivos médicos especializados) es un factor crítico para 
+8 | P á g i n a 
+lograr un flujo de datos sin interrupciones, reducir errores y mejorar la coordinación 
+general de la atención.3  
+Avances tecnológicos en Colombia  
+Colombia está experimentando una notable transformación en el sector de la salud, 
+con una creciente adopción de tecnologías digitales para abordar los desafíos 
+operativos y mejorar la atención al paciente. 
+Tecnologías de Gestión de Inventario de Dispositivos Médicos 
+La RFID y la automatización están emergiendo como pilares fundamentales para la 
+gestión de inventarios en Colombia. La tecnología RFID, por ejemplo, está siendo 
+implementada para transformar la gestión de activos, inventarios y medicamentos 
+de alto costo, ofreciendo precisión, eficiencia y trazabilidad en tiempo real.2 A 
+diferencia de los sistemas de códigos de barras, la RFID permite la captura de datos 
+sin necesidad de contacto visual directo, lo que facilita una gestión eficiente y en 
+tiempo real de diversos activos.2 Esto incluye el control de inventarios, la 
+optimización de la cadena de suministro y la reducción de errores humanos.2 
+Empresas como POL Colombia ofrecen soluciones RFID que permiten un control 
+de inventario en tiempo real, evitando la escasez y optimizando el suministro.2 
+Telectrónica, por su parte, ha demostrado cómo su solución RFID mejora el control 
+de activos y las auditorías de inventario al permitir el escaneo masivo de 
+dispositivos. Una auditoría que antes tomaba una hora, ahora se puede completar 
+en 1 a 5 minutos, dependiendo de la superficie.11 
+Los casos de éxito en Colombia validan el impacto de estas tecnologías. Una 
+destacada institución de salud en Colombia logró ahorrar el 88% del tiempo en la 
+migración de registros de procesos clínicos y administrativos con la ayuda de 
+STELA, una solución de Automatización Robótica de Procesos (RPA), además de 
+reducir los errores en un 97%.12 La Fundación Cardiovascular de Colombia ha 
+optimizado la trazabilidad y mejorado la atención al paciente mediante la 
+implementación de tecnología de Zebra que permite identificar a cada paciente al 
+ingreso, lo que ha llevado a una mejora del 98% en la precisión de la atención.13 El 
+Sanatorio Finochietto, en un caso de éxito regional, reportó que la implementación 
+del sistema RFID no solo mejoró los tiempos de trabajo y agilizó los procesos, sino 
+que también mejoró la parte sanitaria y posicionó a la institución de manera diferente 
+en el mercado.11 
+Trazabilidad en Tiempo Real y Logística Médica 
+Las plataformas y avances en trazabilidad en tiempo real son cruciales para la 
+seguridad del paciente y la eficiencia operativa. La informatización del proceso 
+9 | P á g i n a 
+sanitario ha traído consigo avances en seguridad y calidad, especialmente en la 
+trazabilidad de materiales estériles en el ámbito quirúrgico.5 Esto implica el 
+seguimiento del instrumental desde que entra en el área quirúrgica, incluyendo 
+información sobre su procedencia, manipulación, transporte y embalaje, hasta su 
+llegada al centro. Los pasos incluyen el escaneo de cajas y cestos de instrumental 
+al llegar de la Unidad Central de Esterilización (UCE) y al salir hacia ella, enlazando 
+el instrumental utilizado con el número de historia del paciente.5 
+Los casos de éxito demuestran la aplicación práctica de estas soluciones. La 
+Fundación Cardiovascular de Colombia ha optimizado la trazabilidad y mejorado la 
+atención al paciente mediante la implementación de tecnología que permite 
+identificar a cada paciente al momento del ingreso, asegurando la atención correcta 
+y una mejora del 98% en la precisión de la atención a usuarios.13 Esto no solo 
+impacta la seguridad del paciente, sino que también contribuye a la eficiencia 
+operativa al reducir errores de medicación.14 
+Empresas Innovadoras y Startups en Salud Digital 
+El panorama general en Colombia muestra un ecosistema vibrante de startups que 
+están liderando la revolución digital en salud, no solo implementando IA, sino 
+también abordando problemas estructurales del sistema.15 Estas iniciativas 
+demuestran cómo la tecnología puede aplicarse para solucionar problemas locales, 
+generando un impacto global.15 Ejemplos notables incluyen Samay (diagnóstico 
+pulmonar inteligente), Arkangel AI (prevención con IA), OxLER (innovación en 
+tratamiento del cáncer), Selia (salud mental en línea) y Salud Tools (eficiencia en la 
+consulta médica).15 
+En cuanto a soluciones de logística médica, aunque no se detallan startups 
+colombianas específicas centradas exclusivamente en este nicho, muchas de las 
+empresas de salud digital mencionadas ofrecen plataformas de software que 
+indirectamente impactan la logística. Saludtools, por ejemplo, es una plataforma 
+virtual que ofrece soluciones de historial clínico en la nube, telemedicina, atención 
+presencial, informes, facturación y pagos, lo que contribuye a la eficiencia operativa 
+general.16 Medka ofrece información en tiempo real a pacientes con cualquier tipo 
+de enfermedad utilizando relojes inteligentes y modelos de aprendizaje automático 
+para predecir deterioros de salud graves, lo que puede tener implicaciones para la 
+gestión logística de suministros médicos urgentes.16 La adopción de estas 
+soluciones por parte de instituciones como el Hospital General de Medellín y el 
+Instituto Nacional de Cancerología indica una creciente integración de la tecnología 
+en la gestión de la salud en Colombia.16 
+10 | P á g i n a 
+Levantamiento de información de la organización. 
+En el sector salud, la criticidad en la atención de los procesos logísticos puede 
+significar la diferencia entre la vida y la muerte de un paciente. En este sentido, las 
+organizaciones que suministran insumos esenciales para los procedimientos 
+médicos adquieren una relevancia aún mayor. Dentro de este contexto, Implameq, 
+como parte de la cadena de suministro, debe anticiparse a las necesidades de las 
+entidades de salud, garantizando la comercialización y distribución de implantes 
+médico-quirúrgicos a través de una línea de suministro eficiente y digital, que genere 
+confianza y se destaque por su relación calidad-precio. 
+Durante el desarrollo del proyecto, se busca validar una solución digital integrada 
+que permita optimizar los procesos y elevar la calidad del servicio. Actualmente, la 
+organización utiliza una herramienta mixta (combinando tecnología y procesos 
+manuales) para la gestión de inventarios quirúrgicos. 
+En el proceso actual intervienen: Asesor Comercial, Auxiliar Logístico, Emisario, 
+Cliente, Instrumentador Quirúrgico y Área de Facturación. 
+El flujo inicia cuando el Asesor Comercial envía el pedido de venta al Auxiliar 
+Logístico, quien genera la requisición. Una vez comparada la RQI contra el estándar 
+y sin observaciones, se emite la remisión al Emisario. Este entrega el pedido al 
+cliente y registra la operación en la planilla de recorrido mediante un código QR. 
+Posteriormente, cuando la entidad de salud realiza la cirugía, el Instrumentador 
+Quirúrgico verifica el consumo y elabora la hoja de gastos, remitiéndola al Auxiliar 
+Logístico de Implameq, quien coordina la recogida del material. El Emisario, 
+nuevamente, genera una planilla de recorrido con QR y valida la remisión de la hoja 
+de gastos emitida por el Instrumentador Quirúrgico. 
+Si el Auxiliar Logístico aprueba la hoja de gastos, procede a recibir el material y 
+validar el documento. En caso contrario, el Instrumentador Quirúrgico corrige la hoja 
+y la remite nuevamente para su validación. Una vez validada, el Auxiliar Logístico 
+realiza el lavado del material y transfiere la información a la planilla TRP para el área 
+de Facturación. 
+En Facturación, se verifica la integridad documental, se cierra el pedido de venta y 
+se realiza la devolución de la documentación correspondiente. 
+Análisis visita sede Implameq 
+La visita a las instalaciones de Implameq permitió mapear, de primera mano, el 
+funcionamiento actual de sus procesos críticos de programación, soporte quirúrgico 
+y logística. El ejercicio tuvo como objetivo principal levantar insumos para el diseño 
+11 | P á g i n a 
+de una aplicación que, alineada con las necesidades reales de los usuarios, pueda 
+optimizar la gestión operativa y la generación de información estratégica. 
+Hoy, la operación se apoya en una combinación de Excel, formularios de Google, 
+canales de WhatsApp y procesos presenciales que, aunque funcionales, presentan 
+altos niveles de manualidad, dispersión y dependencia de la autogestión del 
+personal. Esto se traduce en una visibilidad limitada, con proyecciones que rara vez 
+superan las 24 horas, e imposibilidad de anticipar necesidades de recursos con la 
+anticipación que demandan los picos de actividad quirúrgica. 
+El seguimiento en tiempo real es prácticamente inexistente: la ubicación, tiempos 
+de inicio y finalización de cirugías, así como la confirmación de tareas críticas, 
+dependen de reportes enviados por chat y verificados manualmente. A esto se suma 
+que los reportes e indicadores de desempeño —como puntualidad, tiempos de 
+ejecución, cancelaciones y urgencias— se elaboran copiando y pegando datos 
+desde múltiples fuentes, consumiendo horas-hombre que podrían destinarse a 
+tareas de mayor valor. 
+En el plano tecnológico, aunque la empresa cuenta con un ERP y un CRM, ambos 
+están subutilizados. Los módulos no están plenamente integrados y la información 
+fluye de forma fragmentada, obligando a duplicar registros y reduciendo la 
+trazabilidad. Las áreas de Comercial, Soporte Técnico y Logística comparten una 
+misma necesidad: contar con una plataforma que centralice datos, automatice 
+actualizaciones y reduzca la fricción operativa. 
+Desde el punto de vista de oportunidad, la digitalización de la hoja de gasto es un 
+punto de partida clave. Esto permitiría registrar consumos en quirófano, generar 
+automáticamente la devolución de inventario y eliminar pasos intermedios de 
+digitación. Funcionalidades como reportes automáticos, control de tiempos por tipo 
+de cirugía, trazabilidad mediante códigos QR y paneles de seguimiento en tiempo 
+real emergen como habilitadores claros de eficiencia y control. 
+No obstante, la transición hacia un modelo completamente digital enfrentará retos 
+culturales. Algunos clientes aún exigen soportes físicos con firmas, sellos y huellas, 
+por lo que el diseño inicial deberá contemplar un esquema híbrido, combinando 
+registro digital con cumplimiento de estos requerimientos externos. La gestión del 
+cambio —mediante pilotos controlados, capacitación y comunicación clara de 
+beneficios— será determinante para lograr adopción y escalabilidad. 
+Entrevistas e identificación de los Jobs por usuario. 
+Con el propósito de orientar el desarrollo de la nueva aplicación y garantizar que su 
+diseño responda a necesidades reales de los usuarios internos, se realizaron 
+entrevistas semiestructuradas con representantes clave de las áreas Comercial, 
+12 | P á g i n a 
+Soporte Técnico y Logística. El objetivo central fue identificar los “jobs to be done”, 
+para así traducirlos en funcionalidades y flujos de valor dentro de la solución 
+tecnológica. 
+Las sesiones, llevadas a cabo entre el 18 de julio y el 5 de agosto de 2025, 
+incluyeron perfiles estratégicos, operativos y de coordinación, abarcando desde la 
+gestión comercial y el soporte quirúrgico en campo hasta la logística interna. Esta 
+diversidad de perspectivas permitió capturar un panorama integral de las 
+interacciones, fricciones y oportunidades que la aplicación podría resolver o 
+potenciar. 
+El presente capítulo analiza los hallazgos, organizándolos de manera que faciliten 
+la priorización de requerimientos y la definición de un roadmap funcional alineado 
+con los objetivos de negocio y la experiencia de usuario. 
+No. Entrevistado 
+Área 
+Fecha 
+1 
+Comercial 
+Agosto 5/2025 
+Hora 
+2:05 p.m. 
+2 
+Comercial 
+Julio 21/2025 
+3 
+Comercial 
+4:00 p.m. 
+Julio 22/2025 
+2:00 p.m. 
+4 
+Soporte Técnico 
+Agosto 1/2025 
+2:30 p.m. 
+5 
+Soporte Técnico 
+Julio 24/2025 
+8:39 a.m. 
+6 
+Soporte Técnico 
+Julio 22/2025 
+7 
+Soporte Técnico 
+Julio 22/2025 
+12:00 p.m. 
+5:00 p.m. 
+8 
+Soporte Técnico 
+Julio 18/2025 
+5:00 p.m. 
+9 
+Soporte Técnico 
+Julio 18/2025 
+4:30 p.m. 
+10 
+Logística 
+Julio 25/2025 
+11 
+Logística 
+Julio 25/2025 
+8:28 a.m. 
+9:45 a.m. 
+12 
+Logística 
+Julio 25/2025 
+8:53 a.m. 
+13 
+Logística 
+Julio 25/2025 
+9:12 a.m. 
+Tabla 1. Matriz de Participantes y Sesiones de Recolección de Datos. 
+13 | P á g i n a 
+Análisis de entrevista por usuario 
+Comercial 
+Entrevistado No. 1 
+Entre sus responsabilidades se incluyen el seguimiento a las ventas por 
+regional y línea de negocio, la ejecución de estrategias comerciales, la atención y 
+resolución de incidencias con clientes y la coordinación con áreas clave como 
+logística, facturación y soporte técnico. 
+Durante la entrevista, planteó la necesidad de contar con una aplicación que 
+centralice información crítica en tiempo real. Entre sus prioridades se encuentra el 
+seguimiento diario de ventas y facturación, desglosado por cliente y línea de 
+producto, así como la visualización del estado de solicitudes mediante un formato 
+claro y visual. También destacó la importancia de una trazabilidad operativa que 
+registre el tiempo que un técnico permanece en cirugía, los retrasos y los tiempos 
+muertos entre procedimientos. Este módulo debería complementarse con acceso 
+inmediato al estado del material en logística y lavado, acompañado de alertas de 
+posibles demoras. 
+Asimismo, consideró esencial un sistema de seguimiento a cotizaciones que 
+registre las enviadas, aprobadas y rechazadas, incluyendo el motivo de rechazo, y 
+que genere alertas automáticas para facilitar un seguimiento proactivo con los 
+clientes. 
+En cuanto a la interfaz, propuso un dashboard inicial personalizado que sirva 
+como punto de partida para la gestión diaria. Este incluiría un indicador “¿Cómo voy 
+hoy?” para mostrar en tiempo real el avance en ventas y recaudo, motivadores y 
+eslóganes comerciales para incentivar al equipo, y alertas sobre clientes inactivos 
+o con bajo consumo reciente, favoreciendo la priorización de acciones comerciales. 
+Para la programación y gestión de urgencias, la aplicación debería permitir la 
+visualización de agendas a 2-3 días y semanal, así como el registro y conteo de 
+cirugías de urgencia por línea de producto. Estos datos serían clave para el análisis 
+de impacto y la elaboración de presupuestos de compra, mejorando la toma de 
+decisiones y asegurando la disponibilidad de recursos en casos críticos. 
+La integración logística-comercial fue señalada como un eje central. El flujo 
+debería automatizar el proceso desde la solicitud, pasando por la validación de 
+inventario, hasta el traslado interregional, con comunicación en tiempo real para 
+reportar y resolver incidencias de materiales faltantes. 
+Finalmente, propuso que la plataforma incorpore alertas y comunicación 
+transversal para fortalecer la alineación y la motivación organizacional. Esto incluiría 
+14 | P á g i n a 
+mensajes motivacionales, reportes de progreso a los objetivos mensuales en 
+porcentaje y herramientas para conectar distintas áreas con el fin de mantener el 
+foco en las metas de ventas, fomentando una cultura de colaboración y 
+transparencia. 
+Hallazgos clave: 
+• Necesidad de centralización de información en tiempo real: ventas y 
+facturación diarias por cliente y línea de producto, con visualización clara de 
+solicitudes. 
+• Trazabilidad operativa: registro de tiempos en cirugía, retrasos y tiempos 
+muertos, más acceso al estado de material en logística y lavado con alertas 
+de demoras. 
+• Seguimiento a cotizaciones: control de enviadas, aprobadas y rechazadas 
+con motivo, y alertas para seguimiento proactivo. 
+• Dashboard inicial personalizado: indicador “¿Cómo voy hoy?”, motivadores 
+comerciales y alertas sobre clientes inactivos o de bajo consumo. 
+• Gestión de agendas y urgencias: visualización a 2–3 días y semanal, conteo 
+de cirugías urgentes por línea de producto para análisis y presupuestos. 
+• Integración logística-comercial: automatización desde solicitud hasta traslado 
+interregional, con comunicación en tiempo real para incidencias. 
+• Alertas y comunicación transversal: mensajes motivacionales, reportes de 
+avance mensual y herramientas para alinear y motivar equipos. 
+Entrevistado No. 2 
+Desarrolla su labor en un entorno de alta exigencia que combina funciones 
+comerciales, logísticas y de soporte técnico. Su jornada se caracteriza por una alta 
+disponibilidad, con frecuencia extendida más allá del horario laboral, y por una 
+dinámica de trabajo intensiva y reactiva. El día a día involucra desde la planeación 
+quirúrgica con especialistas y la fidelización de clientes, hasta la gestión de 
+urgencias, la coordinación logística y la resolución de incidencias, todo en un 
+contexto que requiere una rápida capacidad de respuesta y una gestión emocional 
+constante. 
+Entre sus responsabilidades se encuentran la venta directa de productos 
+médicos especializados, como insumos para trauma y columna, la atención a 
+médicos, jefes de compra y gerentes de clínicas, así como el seguimiento a quejas 
+y reclamos. También, asume un papel clave en la verificación de facturación post
+cirugía, la gestión de recaudos con clientes y entidades de salud, la coordinación 
+con las áreas de logística, administración para evitar retrasos da atención y manejo 
+de urgencias por facturación de casos de SOAT. A nivel operativo, se encarga de 
+confirmar la disponibilidad de material quirúrgico, coordinar despachos desde el 
+15 | P á g i n a 
+almacén, validar sustituciones de insumos con especialistas y dar seguimiento a 
+devoluciones y hojas de gasto. 
+Uno de los principales retos que enfrenta es la falta de trazabilidad en la 
+facturación, lo que impide a las asesoras visualizar en tiempo real el estado de cada 
+caso. Esta limitación, junto con retrasos por reprocesos, como sellos faltantes o 
+discrepancias en hojas de gasto, y una carga administrativa elevada, impacta 
+directamente en la eficiencia y en el cumplimiento de metas. La desactivación de 
+módulos clave en el CRM, como el acelerador de ventas o la facturación por 
+producto, ha reducido la capacidad de control y seguimiento, mientras que la 
+comunicación con el área de cartera se realiza de forma manual, limitando la 
+visibilidad de información crítica. 
+En su visión, una aplicación integrada podría resolver gran parte de estas 
+ineficiencias. Esta herramienta debería permitir la visualización en tiempo real del 
+estado de la facturación, con listados detallados por cliente, paciente y línea de 
+producto, así como indicadores de desempeño que muestren el avance hacia las 
+metas de ventas y recaudo. La inclusión de alertas automáticas para clientes con 
+cartera vencida, materiales pendientes de recoger o cirugías no facturadas ayudaría 
+a priorizar acciones y prevenir pérdidas de oportunidad. Asimismo, un historial de 
+trazabilidad con registro de hojas de gasto, movimientos logísticos y visitas a 
+clientes fortalecería el control operativo. 
+Otras funcionalidades de alto valor serían un módulo de gestión de 
+cotizaciones para verificar el estado de las propuestas enviadas y dar seguimiento 
+a aprobaciones, una agenda integrada que cruce cirugías programadas, visitas y 
+reuniones, y la visualización del inventario en tiempo real por sede y línea de 
+producto, con alertas de stock bajo y control de rotación. Un panel de confirmación 
+de sets quirúrgicos evitaría cancelaciones por falta de insumos, mientras que un 
+flujo logístico más intuitivo reduciría reprocesos y errores. Además, la conexión 
+directa entre logística y comercial permitiría monitorear el estado de cada cirugía y 
+la trazabilidad de materiales, fomentando la coordinación y reduciendo los retrasos. 
+En este contexto, identifica que centralizar la comunicación interna y los 
+registros operativos en una única plataforma podría disminuir el uso fragmentado 
+de canales como WhatsApp, llamadas y correos, mejorando la coordinación diaria 
+y reduciendo el caos operativo. La implementación de un sistema con estas 
+capacidades no solo optimizaría la gestión del tiempo y los recursos, sino que 
+también contribuiría a una experiencia de cliente más fluida y confiable, alineando 
+las metas individuales con los objetivos globales de la empresa. 
+Hallazgos clave:  
+16 | P á g i n a 
+• Entorno de alta exigencia y multitarea: combina labores comerciales, 
+logísticas y de soporte técnico, con disponibilidad extendida y gestión 
+emocional constante. 
+• Falta de trazabilidad en facturación: imposibilidad de visualizar en tiempo real 
+el estado de casos, con retrasos por reprocesos y alta carga administrativa. 
+• Limitaciones del CRM: desactivación de módulos clave (acelerador de 
+ventas, facturación por producto) y comunicación manual con cartera que 
+restringe visibilidad. 
+• Necesidad de aplicación integrada: visualización en tiempo real de 
+facturación, indicadores de desempeño, alertas para cartera vencida, 
+materiales pendientes y cirugías no facturadas. 
+• Control operativo y seguimiento: historial de hojas de gasto, movimientos 
+logísticos, visitas y módulo de cotizaciones para seguimiento de propuestas. 
+• Agenda e inventario integrados: cruce de cirugías, visitas y reuniones; stock 
+en tiempo real con alertas y control de sets quirúrgicos para evitar 
+cancelaciones. 
+• Mejora del flujo logístico: conexión directa logística-comercial para 
+monitorear cirugías y materiales, reduciendo reprocesos. 
+• Centralización de la comunicación interna: sustitución de canales 
+fragmentados por una plataforma única para optimizar coordinación y reducir 
+caos operativo. 
+Entrevistado No. 3 
+Se desempeña como asesora comercial, desarrolla su labor en un entorno 
+de alta exigencia que combina funciones comerciales, logísticas y administrativas. 
+Su rutina diaria inicia con la revisión de una agenda personal que combina formatos 
+físicos y digitales, seguida por visitas a un promedio de tres a cuatro médicos y un 
+número similar de administrativos. Las jornadas pueden verse alteradas por cirugías 
+extensas, no siempre programables, que ocupan toda una mañana o tarde. Entre 
+sus actividades también se incluye la gestión de cotizaciones, licitaciones, 
+seguimiento a cartera, resolución de reclamos y coordinación de planeamientos 
+quirúrgicos con médicos, garantizando la disponibilidad de materiales necesarios 
+para cada procedimiento. 
+Actualmente, su trabajo se apoya en una combinación de herramientas 
+fragmentadas: un CRM con funcionalidad limitada y fallos de acceso, formularios de 
+Google para solicitudes de cirugía, correo electrónico y WhatsApp para la 
+comunicación con soporte, logística y clientes, así como registros manuales para 
+remisiones, gastos, inventarios y soporte técnico. Este ecosistema disperso genera 
+un alto grado de trabajo manual y dependencia de procesos físicos, como el traslado 
+de documentos para validar gastos. La falta de integración entre áreas clave, 
+17 | P á g i n a 
+comercial, logística, soporte y facturación, dificulta la toma de decisiones en tiempo 
+real y provoca bloqueos en la operación. 
+Entre las principales dificultades que enfrenta se encuentran la ausencia de 
+inventario actualizado con alertas de agotamiento y fechas de importación, la 
+imposibilidad de rastrear equipos o verificar su disponibilidad, y la carencia de 
+herramientas para consultar en tiempo real el estado financiero de los clientes, como 
+cupo y deuda. A nivel organizativo, la comunicación con logística es excesiva y 
+descentralizada, con escasa trazabilidad sobre qué soporte técnico está de turno. 
+Los errores en envíos o demoras logísticas afectan directamente la calidad del 
+servicio y repercuten en la relación con los clientes. 
+Su labor está marcada por un fuerte compromiso humano, especialmente en 
+la línea reconstructiva o fijación externa, que tiene un impacto directo en la 
+preservación de extremidades. Disfruta del contacto cercano con médicos y 
+personal clínico, asumiendo una alta responsabilidad para evitar errores que 
+puedan perjudicar a pacientes o a la empresa. Sin embargo, este nivel de exposición 
+también conlleva un desgaste emocional considerable: se siente como la “cara 
+visible” ante fallos internos, percibe una falta de incentivos colectivos fuera del área 
+comercial y ha experimentado episodios de ansiedad derivados de retrasos o 
+errores ajenos, particularmente en contextos quirúrgicos críticos. 
+En su perspectiva, un sistema digital integrado, amigable y con información 
+en tiempo real podría optimizar significativamente su labor. Este debería incluir 
+inventarios actualizados con alertas automáticas, visualización instantánea del 
+estado financiero de los clientes, automatización de remisiones y reportes, registro 
+y validación inmediata de gastos, así como herramientas de trazabilidad para el 
+soporte técnico y la asignación de equipos. Funcionalidades adicionales como listas 
+de precios personalizadas, historial de solicitudes de materiales, bitácoras de 
+comunicación interna y paneles de notificaciones ayudarían a reducir errores y 
+mejorar la coordinación. Un tablero de indicadores con métricas regionales visibles 
+podría fomentar la motivación colectiva, mientras que un registro de información 
+personalizada sobre médicos y clientes fortalecería las relaciones comerciales. 
+Estas posibilidades apuntan a un flujo de trabajo más eficiente, con una menor carga 
+operativa y una respuesta más ágil ante situaciones críticas. 
+Hallazgos clave: 
+• Entorno de alta exigencia y multitarea: combina labores comerciales, 
+logísticas y administrativas con jornadas variables por cirugías no 
+programadas. 
+18 | P á g i n a 
+• Ecosistema de herramientas fragmentado: uso simultáneo de CRM 
+limitado, formularios, correo, WhatsApp y registros manuales, generando 
+alta carga operativa y dependencia de procesos físicos. 
+• Falta de integración y trazabilidad: escasa conexión entre áreas clave y 
+ausencia de inventario actualizado con alertas, rastreo de equipos y 
+estado financiero de clientes en tiempo real. 
+• Problemas logísticos y de comunicación: errores en envíos, demoras y 
+poca visibilidad sobre soporte técnico disponible. 
+• Carga emocional alta: se percibe como responsable directa ante fallos 
+internos, con desgaste emocional y ansiedad en contextos quirúrgicos 
+críticos; falta de incentivos colectivos fuera del área comercial. 
+• Necesidad de sistema integrado: inventarios con alertas, estado 
+financiero en tiempo real, automatización de remisiones y gastos, 
+trazabilidad de soporte técnico, listas de precios personalizadas y 
+bitácoras internas. 
+• Enfoque en motivación y relaciones: tablero de indicadores regionales 
+para incentivar al equipo y registro personalizado de información sobre 
+médicos/clientes para fortalecer vínculos. 
+Soporte Técnico 
+Entrevistado No. 4 
+Desempeña un rol clave en la asignación, seguimiento y control de las 
+operaciones quirúrgicas. Su labor se desarrolla en un entorno caracterizado por alta 
+variabilidad y demandas de respuesta inmediata, donde la asignación de 
+procedimientos es dinámica y, en la mayoría de los casos, se comunica en horarios 
+tardíos (entre las 7 y 9 p.m. del día anterior).  
+Un pequeño porcentaje de las cirugías corresponde a urgencias que surgen 
+el 
+mismo día, lo que exige ajustes constantes frente a cancelaciones y 
+reprogramaciones. Este escenario provoca que, en muchas ocasiones, los técnicos 
+deban llegar con antelación excesiva a las instituciones, generando tiempos 
+muertos cuya magnitud no puede medirse con precisión por falta de herramientas 
+adecuadas. 
+Actualmente, la trazabilidad de las operaciones se gestiona de forma manual 
+mediante grupos de WhatsApp, lo que dificulta la generación automática de 
+informes, la medición del desempeño de cada técnico y la identificación de cuellos 
+de botella. No existen métricas claras para evaluar la productividad individual o 
+grupal, ni visibilidad en tiempo real que permita optimizar la distribución de cargas 
+de trabajo. Esta ausencia de control digital impacta directamente en procesos 
+críticos como la facturación, donde errores en la hoja de gasto o la falta de claridad 
+19 | P á g i n a 
+sobre el estado del paciente dentro del flujo de cierre, pueden detener el ciclo de 
+cobro. Otros factores, como precios no cargados en el sistema, ítems nuevos sin 
+registro en el ERP o clientes bloqueados, agravan la situación y retrasan la 
+conversión de procedimientos en facturas cerradas. 
+Identifica la necesidad de una herramienta integral que permita registrar hitos 
+clave de cada servicio (llegada, inicio de cirugía, finalización, envío de hoja de gasto, 
+salida de la institución), generar informes automáticos de tiempos improductivos y 
+cirugías modificadas, y medir el desempeño de los técnicos con base en su 
+productividad y eficiencia. Asimismo, resalta la importancia de visualizar 
+asignaciones con antelación y en un formato accesible, con indicadores de 
+disponibilidad en tiempo real, lo que facilitaría la respuesta ante urgencias y la 
+optimización de recursos. La digitalización de la hoja de gasto, con la posibilidad de 
+adjuntar documentos y observaciones, permitiría reducir errores y vincular la 
+información directamente al estado de facturación, mostrando de forma 
+transparente si un servicio está facturado, pendiente o detenido, y por qué motivo. 
+En su visión, la aplicación debe cubrir todo el flujo operativo, desde la solicitud 
+inicial del cliente hasta la facturación final, integrando áreas como comercial, técnica 
+y logística. El sistema debería permitir que las solicitudes comerciales alimenten 
+automáticamente la programación, que el equipo técnico consulte asignaciones y 
+datos del procedimiento desde la app, y que logística gestione materiales e 
+información con trazabilidad en tiempo real. Este enfoque no solo reduciría la 
+dependencia de canales informales como WhatsApp, sino que optimizaría la 
+coordinación interáreas y la eficiencia global del servicio. 
+Para garantizar que la solución propuesta se ajuste a las necesidades reales, 
+sugiere un ciclo de validación del prototipo que incluya fases de bosquejo funcional, 
+revisión estética y de experiencia por el equipo de mercadeo/diseño interno, y 
+ajustes iterativos basados en pruebas con usuarios clave. También recomienda que 
+el módulo de facturación en la app presente una vista por paciente con estados 
+claros y motivos de bloqueo, así como continuar con entrevistas a áreas 
+estratégicas como la comercial para completar la visión de usuario y asegurar la 
+coherencia del flujo en todas las etapas. 
+Hallazgos clave: 
+• Asignación impredecible y cambios constantes: mayoría de cirugías se 
+confirman tarde (7–9 p.m.), con alto impacto de urgencias y 
+reprogramaciones. 
+• Tiempos muertos sin medición: técnicos esperan horas en instituciones 
+sin herramienta para registrar improductividad. 
+20 | P á g i n a 
+• Falta de trazabilidad digital: gestión actual por WhatsApp, sin informes 
+automáticos ni métricas de desempeño. 
+• Problemas en facturación: errores en hojas de gasto y bloqueos por 
+precios/ítems no cargados o clientes en mora. 
+• Necesidad de control integral: registro de hitos, informes automáticos, 
+visibilidad de asignaciones y disponibilidad en tiempo real. 
+• Integración interáreas: flujo completo desde solicitud hasta facturación, 
+conectando comercial, técnico y logística. 
+• Validación de prototipo: revisión funcional y visual con mercadeo/diseño, 
+pruebas iterativas con usuarios clave. 
+Entrevistado No. 5 
+Coordinación y seguimiento de actividades entre clínicas, técnicos y el área 
+de facturación. Su labor comienza con la programación diaria de soportes técnicos, 
+que abarca turnos convencionales de 7:00 a. m. a 7:00 p. m., así como turnos 
+especiales en fines de semana y nocturnos, rotativos cada 15 días. En ocasiones, 
+debe reasignar técnicos cuando una cirugía finaliza antes de lo previsto, 
+optimizando así la disponibilidad del personal. El seguimiento operativo lo realiza 
+principalmente mediante WhatsApp, lo que exige atención constante y 
+comunicación simultánea con múltiples interlocutores. 
+Cada procedimiento quirúrgico requiere un registro detallado que incluye 
+hora de citación, llegada, inicio y fin de la intervención, así como el estado de la hoja 
+de gasto. La ausencia de este documento implica que la cirugía, aunque realizada, 
+no puede ser facturada. La revisión y validación de las hojas de gasto es un proceso 
+complejo, pues se generan desde tres fuentes distintas (Implameq, la clínica y 
+terceros) y en formatos variables, lo que provoca errores manuales y demoras. 
+Aunque el bosquejo inicial de la hoja de gasto contribuye a acelerar el cierre de mes, 
+las diferencias en los formatos impiden soluciones simples como el uso de copias 
+calcadas. 
+Ante eventualidades como cancelaciones o modificaciones de agenda, debe 
+diligenciar un formato específico que debería enviarse en menos de 24 horas, 
+aunque este plazo no siempre se cumple. La estandarización y automatización de 
+este proceso permitirían un registro más confiable de los motivos, lo que a su vez 
+alimentaría reportes mensuales más precisos. El manejo de inventario y materiales 
+también recae en su responsabilidad, lo que implica controlar el desgaste y registrar 
+cambios tanto físicamente como en formato digital, considerando nombre, lote y 
+referencia. Actualmente, el control se lleva en Google Drive, lo que genera confusión 
+por la similitud en los nombres y se ve afectado por problemas de conectividad en 
+21 | P á g i n a 
+algunas clínicas. La identificación automatizada de materiales por número de equipo 
+quirúrgico u otros métodos podría reducir significativamente los errores de 
+digitación. 
+Entre los problemas que impactan su gestión se encuentran los retrasos en 
+facturación por validación física manual, asignaciones incorrectas de crédito a 
+técnicos, facturas que se trasladan al mes siguiente por errores u omisiones, y la 
+falta de trazabilidad del tiempo muerto o del desempeño real de los técnicos. Las 
+limitaciones de acceso al sistema por parte de técnicos externos y los problemas de 
+cobertura en ciertas instituciones agravan estas dificultades. 
+En su visión, una aplicación podría convertirse en un soporte integral para la 
+programación y el seguimiento de soportes técnicos. Entre las funcionalidades clave 
+considera la automatización del registro de llegada, inicio y fin de cada cirugía, la 
+integración del diligenciamiento de la hoja de gasto con el sistema de facturación 
+para evitar reprocesos, la medición del tiempo total en la institución y el cálculo del 
+tiempo muerto en tiempo real. También, plantea la digitalización del reporte de 
+eventualidades con validación automática de plazos y generación de reportes 
+mensuales, un dashboard que permita medir el rendimiento de cada técnico frente 
+a la meta mensual y detectar inconsistencias con lo facturado, así como un módulo 
+de gestión de turnos que facilite reasignaciones rápidas. 
+La incorporación de un sistema de control de inventario digital, con alertas 
+por faltantes o materiales en mal estado, y la trazabilidad de los desplazamientos, 
+especialmente en casos de viajes intermunicipales, complementaría la optimización 
+del proceso. El diseño de la herramienta debería considerar accesos diferenciados 
+para técnicos internos y externos, garantizando que, aun sin acceso directo, estos 
+últimos puedan integrarse a través de reportes supervisados o formularios externos. 
+Hallazgos clave: 
+• La programación y reasignación de soportes técnicos es manual y 
+dependiente de WhatsApp, lo que dificulta la coordinación y genera riesgo 
+de errores. 
+• La gestión de hojas de gasto es compleja por múltiples formatos, errores 
+manuales y validaciones físicas lentas, lo que retrasa la facturación. 
+• El reporte de eventualidades y motivos de cancelación no siempre cumple 
+el plazo de 24 h y carece de automatización. 
+• El control de inventario presenta errores por digitación y confusión en 
+nombres, agravados por problemas de señal en clínicas. 
+• No existe trazabilidad confiable del tiempo muerto, desempeño real ni 
+desplazamientos de técnicos. 
+22 | P á g i n a 
+• Técnicos externos no tienen acceso al sistema, dificultando la integración 
+de su información. 
+• Falta un sistema centralizado que unifique seguimiento de cirugías, 
+control de inventario y gestión de turnos. 
+Entrevistado No. 6 
+Integrante del frente técnico, desempeña un rol enfocado en la operación y 
+soporte de los procesos digitales relacionados con la gestión de material quirúrgico. 
+Su trabajo diario combina la interacción directa con la plataforma tecnológica y la 
+coordinación con otros equipos para garantizar que la información registrada sea 
+precisa y actualizada. 
+En su descripción del proceso actual, señala que la trazabilidad depende de 
+un registro manual complementado con comunicaciones por canales informales 
+como WhatsApp, lo que puede generar inconsistencias. Explica que, aunque 
+existen pasos definidos para la actualización de inventarios y el seguimiento de 
+movimientos, la falta de una herramienta centralizada con validación automática 
+deja espacio para errores en la disponibilidad reportada del material. Esta situación 
+provoca que, en ocasiones, los equipos asignados no coincidan con lo que 
+realmente se encuentra en bodega, afectando la planificación de entregas y 
+recogidas. 
+Luego, enfatizo que el trabajo de verificación y actualización se realiza bajo 
+presión de tiempo, especialmente cuando las solicitudes de material llegan de forma 
+simultánea o con poca anticipación. Esto obliga a priorizar manualmente las tareas, 
+con riesgo de que ciertas actualizaciones se retrasen y no queden reflejadas en 
+tiempo real en los sistemas. Además, identifica que la dependencia de documentos 
+impresos y hojas de gasto físicas retrasa la validación final, ya que es necesario 
+esperar a su llegada para consolidar la información en el sistema. 
+En cuanto a oportunidades de mejora, propone que la aplicación cuente con 
+un módulo que no solo muestre el estado actual del material, sino que también 
+incluya alertas automáticas cuando haya inconsistencias entre lo registrado y lo 
+físicamente disponible. Sugiere que la carga de información pueda realizarse 
+directamente desde el punto donde se recibe o entrega el material, eliminando 
+pasos intermedios y reduciendo el riesgo de omisiones. También, considera clave 
+implementar una bitácora digital compartida que permita al equipo técnico y a las 
+áreas comerciales y logísticas acceder a la misma información en tiempo real, 
+evitando la duplicidad de reportes y las reconfirmaciones manuales. 
+La digitalización no debe limitarse a registrar lo que ocurre, sino que debe 
+facilitar la toma de decisiones inmediatas, integrando visibilidad, alertas y 
+23 | P á g i n a 
+herramientas de coordinación en un solo entorno. Esto, asegura, optimizaría el 
+trabajo diario, mejoraría la precisión del inventario y reduciría significativamente los 
+tiempos de respuesta ante cambios o imprevistos. 
+Hallazgos clave: 
+• Rol técnico operativo: gestiona y verifica información de material quirúrgico, 
+coordinando con otros equipos. 
+• Dependencia de procesos manuales: trazabilidad basada en registros físicos 
+y comunicaciones informales (WhatsApp), con riesgo de inconsistencias y 
+errores en disponibilidad. 
+• Falta de actualización en tiempo real: presión por solicitudes simultáneas o 
+de última hora retrasa el registro; dependencia de documentos impresos para 
+validación final. 
+• Impacto operativo: discrepancias entre inventario registrado y físico afectan 
+entregas y recogidas. 
+• Propuestas de mejora: módulo con alertas automáticas por inconsistencias, 
+carga de datos desde el punto de entrega/recepción, bitácora digital 
+compartida para áreas técnicas, comerciales y logísticas. 
+• Enfoque en digitalización proactiva: integrar visibilidad, alertas y coordinación 
+en una sola plataforma para optimizar tiempos de respuesta y precisión del 
+inventario. 
+Entrevistado No. 7 
+Es miembro del frente técnico, participa activamente en la gestión y control 
+de los procesos relacionados con el manejo de material quirúrgico, con especial 
+atención a la validación documental y la coordinación con las áreas logísticas. Su 
+experiencia le ha permitido identificar con claridad los puntos críticos donde la 
+información y el tiempo juegan un papel determinante para el éxito de las 
+operaciones. 
+En su día a día, se encarga de verificar que los registros coincidan con la 
+realidad operativa, revisando remisiones, hojas de gasto y estados de inventario 
+antes de aprobar movimientos. Describe que una de las dificultades más frecuentes 
+es la llegada tardía o incompleta de la documentación física, lo que retrasa la 
+actualización en el sistema y, por ende, la disponibilidad oficial del material. Esta 
+situación obliga, en ocasiones, a trabajar con datos parciales o a depender de 
+confirmaciones verbales para poder continuar con el flujo operativo. 
+Señala que la comunicación entre las áreas técnicas y comerciales, aunque 
+constante, suele ser fragmentada. Esto se debe a que la información fluye por 
+múltiples canales, correos, llamadas, mensajes, sin un repositorio único, lo que 
+24 | P á g i n a 
+aumenta el riesgo de duplicidades o inconsistencias. Además, la ausencia de 
+trazabilidad digital completa dificulta identificar con exactitud el estado y la ubicación 
+de cada pieza en tiempo real, lo que repercute directamente en la programación de 
+cirugías y en la satisfacción del cliente final. 
+Como propuesta de mejora, plantea que la herramienta digital incorpore un 
+sistema de control cruzado que valide automáticamente la coherencia entre la 
+información registrada y la documentación recibida. También, sugiere que los 
+cambios de estado del material se actualicen en línea, desde cualquier punto del 
+proceso, evitando así cuellos de botella en la carga de datos. Considera que sería 
+clave integrar un tablero de control compartido para que todo el personal autorizado 
+pueda visualizar, en un solo lugar, el inventario disponible, los pendientes de 
+entrega y las devoluciones en curso. 
+Para ella, la eficiencia no solo depende de acelerar procesos, sino de reducir 
+los puntos ciegos en la operación. Una solución digital robusta, que unifique la 
+información y minimice la intervención manual, permitiría disminuir los errores, 
+optimizar los tiempos y garantizar un nivel de servicio más alto para las instituciones 
+de salud. 
+Hallazgos clave: 
+• Rol técnico con foco en control documental: verifica registros, remisiones, 
+hojas de gasto e inventarios antes de aprobar movimientos. 
+• Problemas recurrentes: retraso o falta de documentación física, lo que 
+demora la actualización en el sistema y obliga a trabajar con datos 
+incompletos o confirmaciones verbales. 
+• Comunicación fragmentada: uso de múltiples canales sin repositorio 
+único, generando duplicidades e inconsistencias. 
+• Falta de trazabilidad en tiempo real: dificultad para ubicar material con 
+precisión, afectando la programación quirúrgica y la satisfacción del 
+cliente. 
+• Propuestas de mejora: control cruzado automático entre registros y 
+documentos, actualizaciones en línea desde cualquier punto, tablero de 
+control compartido con inventario y devoluciones. 
+• Meta operativa: unificar información, reducir intervención manual y 
+eliminar puntos ciegos para optimizar tiempos y calidad del servicio. 
+Entrevistado No. 8 
+25 | P á g i n a 
+Desempeña un rol clave en la gestión y validación de procesos operativos 
+relacionados con el manejo de material quirúrgico y la coordinación interárea. Su 
+trabajo combina el control minucioso de la información con la supervisión del flujo 
+físico de los insumos, lo que le permite tener una visión completa del ciclo logístico 
+y detectar con rapidez desviaciones que puedan impactar la operación. 
+En su labor diaria, revisa y valida datos en diferentes etapas del proceso, 
+asegurándose de que las remisiones, hojas de gasto y estados de inventario estén 
+correctos antes de autorizar movimientos. Una de las problemáticas que identifica 
+es la dependencia excesiva de documentación física y procesos manuales, lo que 
+provoca retrasos cuando la información no llega a tiempo o se presentan 
+inconsistencias entre lo registrado y lo entregado. Esta falta de sincronización 
+documental y operativa puede generar cuellos de botella, sobre todo en contextos 
+de alta demanda o urgencia médica. 
+Señala que la comunicación con otras áreas, aunque constante, se 
+fragmenta al no existir un canal único y centralizado. Esto obliga a confirmar datos 
+por diferentes vías, correos, llamadas, chats, aumentando el riesgo de duplicidad o 
+pérdida de información. Asimismo, destaca que la trazabilidad del material en 
+tiempo real es limitada, lo que dificulta saber exactamente dónde está cada insumo 
+y en qué etapa del proceso se encuentra, afectando la planificación y la capacidad 
+de respuesta. 
+En cuanto a mejoras, propone que la herramienta tecnológica centralice toda 
+la información y actualice automáticamente los cambios de estado del material, 
+eliminando la necesidad de confirmaciones manuales y reduciendo el tiempo de 
+respuesta. Sugiere además implementar un tablero de control visible para todos los 
+involucrados, donde se pueda verificar de forma inmediata el inventario, las 
+entregas pendientes y las devoluciones programadas. 
+Indica que la clave está en construir un sistema que no solo agilice los 
+procesos, sino que también garantice precisión y transparencia. Unificar la 
+información, reducir la dependencia de lo físico y aumentar la trazabilidad digital 
+serían pasos determinantes para optimizar el servicio y asegurar que las 
+instituciones de salud cuenten siempre con el material que necesitan, en el 
+momento adecuado. 
+Hallazgos clave: 
+• Rol operativo y de control: supervisa y valida información y flujo físico 
+del material quirúrgico, asegurando coherencia antes de autorizar 
+movimientos. 
+26 | P á g i n a 
+• Principales problemas: alta dependencia de documentación física, 
+procesos manuales y falta de sincronización entre registros y entregas, 
+lo que provoca retrasos y cuellos de botella. 
+• Comunicación fragmentada: múltiples canales no centralizados (correos, 
+llamadas, chats) generan duplicidad o pérdida de información. 
+• Baja trazabilidad en tiempo real: dificultad para ubicar insumos y 
+conocer su estado exacto en el proceso, afectando planificación y 
+respuesta. 
+• Propuestas de mejora: centralizar información, actualizar 
+automáticamente estados del material, tablero de control compartido 
+para inventarios, entregas y devoluciones. 
+• Objetivo final: agilizar procesos, garantizar precisión y transparencia, 
+reducir dependencia física y aumentar trazabilidad digital para optimizar 
+el servicio. 
+Entrevistado No. 9 
+Soporte técnico en campo durante procedimientos quirúrgicos (registro de 
+gastos, lavado y reporte postcirugía): parte del frente técnico, cumple funciones 
+esenciales en la operación logística y en la articulación con las áreas que gestionan 
+el suministro de material quirúrgico. Su labor se centra en garantizar que los 
+procesos se ejecuten conforme a los estándares, asegurando la correcta 
+preparación, traslado y retorno de los insumos. Esta responsabilidad implica no solo 
+el control operativo, sino también la verificación documental y la comunicación 
+directa con múltiples actores de la cadena. 
+En su rol, participa en la validación previa de las entregas, revisando que el 
+material coincida con lo indicado en las remisiones y que cumpla con las 
+especificaciones requeridas. Una parte crítica de su trabajo consiste en coordinar 
+con emisarios y auxiliares logísticos para confirmar tiempos y asegurar que no se 
+presenten retrasos que puedan impactar la programación quirúrgica. Identifica como 
+una de las principales dificultades la dispersión de la información: los registros 
+pueden estar repartidos entre documentos físicos, mensajes por aplicaciones de 
+mensajería y sistemas internos, lo que incrementa el riesgo de errores y retrabajos. 
+Otra problemática que señala es la limitada visibilidad en tiempo real sobre 
+el estado del material y su ubicación exacta, lo que obliga a depender de reportes 
+manuales o confirmaciones verbales. Esto, sumado a la ausencia de un sistema 
+unificado de seguimiento, dificulta anticiparse a contingencias como devoluciones 
+incompletas o material faltante para procedimientos urgentes. 
+Considera que una solución tecnológica integrada podría resolver gran parte 
+de estos inconvenientes. Propone que la aplicación cuente con un módulo de 
+27 | P á g i n a 
+trazabilidad dinámica, capaz de mostrar el recorrido completo de cada pieza, desde 
+su salida hasta su retorno, con alertas configurables que indiquen retrasos o 
+inconsistencias. También, sugiere incorporar un registro digital con firma y sello de 
+tiempo para cada entrega o recogida, evitando la dependencia de documentos 
+impresos y fortaleciendo la transparencia del proceso. 
+Para ella, la mejora no pasa únicamente por digitalizar, sino por centralizar y 
+estandarizar la información, de modo que todas las áreas puedan acceder a la 
+misma base de datos en tiempo real. Esta visibilidad compartida permitiría no solo 
+reducir errores, sino también planificar con mayor precisión, optimizando la 
+respuesta ante eventualidades y garantizando que los pacientes reciban la atención 
+sin demoras por problemas logísticos. 
+Hallazgos clave: 
+• Rol operativo en campo: soporte técnico durante procedimientos 
+quirúrgicos, gestionando todas las etapas desde la verificación del 
+material hasta el reporte final, incluyendo registro de gasto, lavado y 
+coordinación de reposición. 
+• Principales problemas: elaboración manual y lenta de la hoja de gasto 
+(hasta 1 hora en casos complejos), coexistencia de formatos físicos, 
+limitaciones de comunicación en quirófano y cancelaciones de 
+procedimientos por errores logísticos o de programación. 
+• Comunicación restringida: imposibilidad de atender llamadas durante la 
+cirugía, dependencia de terceros para transmitir mensajes y 
+confirmaciones tardías al equipo. 
+• Propuestas de mejora: digitalizar el registro de gasto quirúrgico con 
+acceso desde celular, generar reportes automáticos de estado de 
+material y cirugías, acceso en tiempo real a inventarios y canal 
+asincrónico de comunicación para quirófano. 
+• Objetivo final: optimizar tiempos y coordinación, reducir errores 
+administrativos, mejorar la trazabilidad y mantener la eficiencia sin 
+interrumpir el trabajo crítico en sala. 
+Logístico 
+Entrevistado No. 10 
+Sus funciones incluyen la coordinación de mensajeros, la supervisión de 
+despachos, la recogida y almacenamiento de equipos, así como la atención a 
+urgencias, la planificación de rutas y la resolución de imprevistos. Su labor implica 
+asegurar que cada eslabón del proceso logístico funcione con precisión, incluso en 
+entornos de alta variabilidad como el quirúrgico. 
+28 | P á g i n a 
+La programación de rutas parte de la agenda de cirugías planificadas, aunque 
+esta se ve constantemente alterada por la llegada de urgencias. El equipo de 
+mensajeros opera en turnos escalonados que cubren desde las 6:45 a. m. hasta 
+aproximadamente las 10 p. m., lo que exige una coordinación fina para responder a 
+cambios repentinos. Entre los retos recurrentes se encuentran los quiebres de 
+inventario, que obligan a mezclar stock entre sedes; retrasos en la recolección de 
+equipos post-cirugía, que impactan tanto en la disponibilidad como en la facturación; 
+y errores humanos en los despachos, como la omisión de piezas críticas, como por 
+ejemplo, las guías del sistema Rimer Dinámico. Si bien en algunos casos se han 
+implementado alertas en el sistema para evitar despachos incompletos, identifica la 
+necesidad de contar con trazabilidad del error y alertas asociadas al usuario 
+responsable. 
+Dentro de las funcionalidades que considera clave en una aplicación, 
+propone un dashboard tipo “aeropuerto” que permita visualizar en tiempo real el 
+estado de cirugías, despachos, entregas y pendientes, con indicadores de 
+efectividad, cancelaciones y agrupaciones por institución o tipo de procedimiento. 
+Este módulo se complementaría con una bitácora digital por servicio o despacho, 
+capaz de registrar los usuarios involucrados, la hora de entrega y observaciones, 
+además de identificar demoras y sus causas, aportando trazabilidad completa 
+desde la solicitud hasta la recolección. Asimismo, plantea la importancia de medir 
+tiempos y eficiencia mediante indicadores como el porcentaje de entregas a tiempo, 
+la duración total del ciclo del servicio, desde el despacho hasta la facturación y la 
+frecuencia de errores por despachos incompletos, con la posibilidad de fijar metas 
+concretas, como cerrar el ciclo en un máximo de 72 horas. 
+Otra funcionalidad de alto valor sería la geolocalización de mensajeros y 
+rutas, con confirmación de entrega en tiempo real y verificación de desvíos no 
+autorizados. Esto se reforzaría con un sistema de notificaciones automáticas para 
+alertar sobre urgencias, errores o retrasos, facilitando la comunicación ágil entre las 
+áreas de logística, comercial y técnica. 
+En cuanto al manejo de inventario, gestiona una reposición interna quincenal 
+para mantener stock disponible por dos semanas en cada sede, y coordina 
+importaciones basadas en promedios y comportamiento histórico de la demanda. 
+Sin embargo, reconoce como un punto crítico la falta de visibilidad anticipada de 
+quiebres de inventario en pedidos, especialmente dado que los tiempos de 
+importación son largos y pueden comprometer el cumplimiento. También menciona 
+que la apertura de nuevos clientes debería integrarse como variable en la 
+planeación. 
+En su visión, es prioritario reducir la dependencia de decisiones orales y 
+correos informales, implementar reportes automatizados que reflejen la línea de 
+29 | P á g i n a 
+tiempo del flujo completo y optimizar rutas combinando entregas y recogidas en un 
+mismo trayecto. Considera que la eficiencia es un factor diferenciador clave y que 
+una herramienta digital con estas capacidades podría transformar la coordinación 
+logística en un proceso más predecible, medible y alineado con los objetivos 
+operativos de la empresa. 
+Hallazgos clave: 
+• Rol de liderazgo logístico: coordina toda la operación desde la 
+recepción hasta la facturación, gestionando mensajeros, despachos, 
+rutas, urgencias y resolución de imprevistos. 
+• Principales problemas: quiebres de inventario, retrasos en recolección 
+postcirugía, errores en despachos (omisión de piezas críticas), falta de 
+trazabilidad de errores y visibilidad anticipada de quiebres. 
+• Propuestas de mejora: dashboard en tiempo real tipo “aeropuerto” con 
+indicadores clave, bitácora digital por despacho, geolocalización de 
+mensajeros, notificaciones automáticas, trazabilidad de principio a fin e 
+indicadores de eficiencia con metas claras. 
+• Objetivo final: reducir dependencia de comunicación informal, anticipar 
+fallos, optimizar rutas y convertir la logística en un proceso predecible, 
+medible y altamente eficiente. 
+Entrevistado No. 11 
+Se desempeña como Auxiliar Logístico en el área de lavado, donde es 
+responsable de la limpieza, reposición y almacenamiento de material quirúrgico. Su 
+labor incluye la recepción del material y la papelería post-cirugía, la verificación del 
+contenido físico contra las hojas de gasto, el diligenciamiento y entrega de formatos 
+al área de facturación, así como la coordinación con el equipo comercial y de 
+soporte para los cierres mensuales. Su rol requiere atención al detalle y una 
+coordinación constante para garantizar la disponibilidad oportuna del material en 
+todo el flujo quirúrgico.  
+El proceso operativo inicia con la recepción del material, generalmente 
+acompañado de la hoja de gasto física y, en ocasiones, de la nota operatoria. 
+Verifica que el contenido físico coincida con lo reportado; si detecta faltantes o 
+errores, lo comunica por correo al jefe de soporte y al área de facturación. La 
+facturación implica diligenciar un formato por cada paquete recibido, que se entrega 
+al área correspondiente para su revisión y firma de recibido. El paso más 
+demandante en tiempo es la revisión y limpieza del material, debido a la 
+minuciosidad que requiere. En paralelo, mantiene comunicación constante con el 
+equipo comercial para priorizar entregas, especialmente en cierres de clientes o 
+30 | P á g i n a 
+casos urgente, y con otros miembros del equipo logístico para coordinar entradas y 
+salidas de material. 
+En la operación actual, enfrenta problemas recurrentes como discrepancias 
+entre la hoja de gasto y el material físico, ausencia o sobrantes de piezas no 
+reportadas correctamente, y retrasos en la recogida de material post-cirugía que 
+generan cuellos de botella en el flujo. Estas dificultades se ven agravadas por la 
+falta de trazabilidad en tiempo real, la dependencia de documentación física, la 
+ausencia de alertas que permitan priorizar tareas y la falta de visibilidad sobre 
+materiales pendientes de recoger o procesar. 
+En su visión, una aplicación podría aportar soluciones clave al incorporar 
+alertas de recogida urgente para materiales críticos o escasos, priorización 
+automática según urgencias o cierres mensuales, y visualización en tiempo real de 
+los equipos recogidos (principal interés) y disponibles (interés secundario, pero útil 
+para otros miembros del equipo). También, sería valioso contar con un registro 
+digital de la trazabilidad del proceso, incluyendo fecha y hora de recogida, limpieza 
+y disponibilidad, así como alertas para fechas límite o necesidades comerciales 
+urgentes. Un flujo visual que indique qué materiales deben priorizarse facilitaría la 
+gestión diaria y reduciría el riesgo de retrasos. 
+Por último, considera que la herramienta ideal debe ser simple y práctica, 
+adaptada a la alta carga operativa del día a día, y capaz de facilitar la comunicación 
+rápida, aunque indirecta, entre logística, comercial, soporte y facturación, 
+minimizando tiempos muertos y evitando que el material pendiente de recoger se 
+convierta en un obstáculo para la continuidad de las operaciones. 
+Hallazgos clave: 
+• Rol operativo: auxiliar logístico encargado del lavado, reposición, 
+almacenamiento y verificación de material quirúrgico, así como del 
+diligenciamiento de formatos para facturación. 
+• Principales problemas: discrepancias entre hojas de gasto y material 
+recibido, retrasos en recolección post-cirugía, dependencia de 
+documentos físicos, falta de trazabilidad en tiempo real y ausencia de 
+alertas para priorizar tareas. 
+• Propuestas de mejora: alertas de recogida urgente, priorización 
+automática según urgencias o cierres, visualización en tiempo real de 
+material recogido y disponible, registro digital de trazabilidad y flujo visual 
+de prioridades. 
+• Objetivo final: herramienta simple y práctica que agilice la coordinación 
+entre áreas, minimice tiempos muertos y evite cuellos de botella en el flujo 
+quirúrgico. 
+31 | P á g i n a 
+Entrevistado No. 12 
+Sus responsabilidades abarcan el despacho de material de osteosíntesis, la 
+reposición de equipos devueltos, el lavado y verificación de material, la coordinación 
+de emisarios, el abastecimiento de estanterías y sedes, así como la gestión de 
+turnos especiales que, en ocasiones, se extienden hasta altas horas de la noche. 
+Su rol requiere una coordinación constante y un control exhaustivo de inventarios 
+para garantizar la disponibilidad de insumos en el momento preciso. 
+El flujo de trabajo inicia con la recepción de solicitudes, generalmente 
+enviadas vía chat o correo por la programadora, incluyendo datos del paciente, el 
+cirujano y los materiales requeridos. Estas solicitudes se imprimen, se registran en 
+el sistema SIESA y se transfieren al área de despacho. Para verificar la 
+disponibilidad, utiliza plantillas comparativas en Excel, especialmente en el caso de 
+grandes equipos como los sistemas Ilizarov o de columna. Cuando detecta faltantes, 
+lo comunica a la programadora; sin embargo, en ocasiones, también envía material 
+adicional basándose en su experiencia, incluso si no aparece en la solicitud, 
+anticipando posibles necesidades en quirófano. 
+A pesar de su experiencia y criterio, enfrenta errores recurrentes en el 
+proceso, como la entrega incompleta de material debido a solicitudes mal 
+elaboradas o a la presunción de disponibilidad sin confirmación, el envío de 
+productos vencidos, como los chans estérile, y la omisión de ítems por descuidos o 
+por falta de protocolos operativos claros. Estas situaciones generan reprocesos y 
+aumentan la carga de trabajo, además de poner en riesgo la continuidad operativa 
+en cirugías programadas o de urgencia. 
+Las limitaciones del sistema actual (SIESA) constituyen un reto importante, 
+ya que su lentitud en la generación de remisiones afecta la agilidad del despacho. 
+Además, carece de alertas automáticas para vencimientos, agotamiento de stock o 
+equipos pendientes de recogida, y no ofrece visibilidad en tiempo real del estado de 
+los equipos, ya sea que estén asignados, disponibles o en tránsito. Esta falta de 
+información inmediata obstaculiza la priorización y la toma de decisiones rápidas. 
+Desde su perspectiva, una aplicación podría resolver gran parte de estas 
+dificultades mediante la incorporación de alertas automáticas para productos 
+próximos a vencerse, equipos por recoger e inventarios bajos; así como paneles de 
+visualización en tiempo real que muestren la disponibilidad de equipos, remisiones 
+pendientes y rutas asignadas a los emisarios. La integración directa con el sistema 
+de solicitudes de cirugía, accesible desde el celular, permitiría optimizar el registro, 
+seguimiento y validación de pedidos. Asimismo, un flujo simplificado para crear, 
+revisar y aprobar remisiones, junto con la planificación y control digital de rutas de 
+32 | P á g i n a 
+recogida, podría agilizar el trabajo diario, reducir errores y mejorar la coordinación 
+entre logística, programación y despacho. 
+Hallazgos clave: 
+• Rol operativo: auxiliar de logística con experiencia en despacho, 
+reposición, lavado, verificación de material, coordinación de emisarios, 
+control de inventarios y gestión de turnos extendidos. 
+• Principales problemas: solicitudes incompletas o erróneas, envíos de 
+material vencido, omisión de ítems por falta de protocolos claros, lentitud 
+del sistema SIESA, ausencia de alertas y visibilidad en tiempo real de 
+inventario y equipos en tránsito. 
+• Propuestas de mejora: alertas automáticas para vencimientos, inventario 
+bajo y equipos por recoger; paneles en tiempo real con disponibilidad y 
+rutas; integración con solicitudes de cirugía; flujo digital para remisiones y 
+control de rutas. 
+• Objetivo final: optimizar agilidad, reducir errores y mejorar coordinación 
+entre logística, programación y despacho mediante una herramienta 
+digital centralizada. 
+Entrevistado No. 13 
+Desempeña actualmente el rol de auxiliar logístico en bodega. Su trayectoria 
+incluye también doce años en una clínica, donde desarrolló labores administrativas 
+vinculadas a la gestión de insumos. Esta combinación de experiencia operativa y 
+administrativa le otorga una visión integral de la cadena logística y sus puntos 
+críticos. 
+En su experiencia anterior como emisario. sus tareas comenzaban con la 
+verificación final de los equipos contra la remisión física, seguida del embalaje y 
+traslado a la institución o terminal correspondiente. La precisión era fundamental, 
+ya que cualquier falta podía implicar asumir costos directos. La recolección, por su 
+parte, requería una autorización interna y la verificación pieza por pieza según la 
+hoja de gasto. Este proceso se realizaba bajo alta presión, pues los errores podían 
+generar pérdidas económicas o retrabajos urgentes. La identificación del equipo 
+dependía de la remisión impresa y de las marcas físicas en los contenedores, lo que 
+hacía que la exactitud en la lectura y clasificación de referencias fuera clave para 
+evitar incidentes. 
+En su análisis, identifica problemas recurrentes que afectan la eficiencia 
+operativa. La falta de coordinación genera tiempos muertos significativos, en gran 
+parte porque los emisarios desconocen la ubicación o disponibilidad de otros 
+equipos y compañeros, y no cuentan con información precisa sobre qué material 
+33 | P á g i n a 
+está listo para recoger. La ausencia de trazabilidad digital obliga a depender de 
+mensajes de WhatsApp y llamadas individuales para coordinar entregas y 
+recogidas, con un reporte manual mediante fotos de remisiones. La saturación del 
+personal coordinador, que debe asumir múltiples funciones simultáneamente, limita 
+la capacidad de supervisar en tiempo real los movimientos externos. A esto se 
+suman las limitaciones impuestas por las clínicas, que exigen remisiones impresas, 
+dificultando la digitalización completa del proceso. 
+En cuanto a mejoras, considera que una aplicación podría centralizar la 
+visibilidad del inventario, mostrando el estado de cada equipo, asignado, recogido, 
+disponible o en préstamo y señalando qué debe recogerse y desde cuándo está 
+pendiente. También, propone integrar herramientas para coordinar rutas en tiempo 
+real, con la posibilidad de reasignar tareas a emisarios que ya se encuentren cerca, 
+eliminando la necesidad de “llamadas a ciegas” y permitiendo tomar decisiones 
+basadas en información precisa. Una bitácora digital de entregas y recogidas, con 
+registro de tiempos, geolocalización y firma de recepción, facilitaría el seguimiento 
+y la trazabilidad. 
+Las alertas inteligentes serían un componente clave, notificando sobre 
+equipos con retrasos en su retorno, material próximo a vencer o cambios de última 
+hora derivados de errores en el alistamiento. Además, una lista digital filtrada con lo 
+que realmente se debe recoger tras el gasto permitiría optimizar la verificación en 
+clínica y reducir errores. Finalmente, el reporte automático del estado de las 
+entregas a las áreas comercial, de soporte y de coordinación, sin necesidad de 
+reenvíos múltiples, cerraría el ciclo informativo de forma inmediata. 
+Enfatiza que la coordinación no debe depender de que los emisarios se 
+organicen entre sí de manera informal, ya que esto podría derivar en cargas 
+desiguales de trabajo. Una supervisión centralizada, apoyada en una herramienta 
+digital, permitiría optimizar rutas, reducir jornadas extendidas injustificadas y 
+mejorar la respuesta ante urgencias reales. En su visión, la optimización no implica 
+reducir el esfuerzo, sino orientarlo de forma más inteligente para maximizar la 
+productividad y minimizar los desperdicios operativos. 
+Hallazgos clave: 
+• Rol y experiencia: auxiliar logístico en bodega, ex emisario y con amplia 
+trayectoria administrativa en clínica, lo que le da visión integral de la 
+logística. 
+• Problemas actuales: falta de coordinación y trazabilidad digital, 
+dependencia de WhatsApp y llamadas, desconocimiento en tiempo real 
+del estado del material, saturación de coordinadores, exigencia de 
+remisiones físicas por parte de clínicas. 
+34 | P á g i n a 
+• Propuestas de mejora: aplicación con visibilidad centralizada de 
+inventario y estado de equipos, rutas coordinadas en tiempo real con 
+reasignación inteligente, bitácora digital con tiempos, geolocalización y 
+firmas, alertas automáticas por retrasos o vencimientos, lista digital 
+filtrada post-gasto y reportes automáticos a todas las áreas. 
+• Objetivo final: optimizar rutas y cargas de trabajo, reducir tiempos muertos 
+y mejorar respuesta ante urgencias mediante supervisión centralizada y 
+datos en tiempo real. 
+Análisis de patrones y factores clave por área 
+Comercial 
+En el área comercial se evidencia un patrón claro de necesidades orientadas 
+a la centralización, trazabilidad y disponibilidad en tiempo real de la información 
+crítica para la operación. Los líderes y asesoras coinciden en que la dispersión 
+actual de herramientas: CRM con funcionalidades limitadas, formularios, correos, 
+WhatsApp y registros manuales; generan reprocesos, pérdida de tiempo y falta de 
+control operativo, afectando directamente la eficiencia, la coordinación y la 
+experiencia del cliente. Existe un consenso en que la solución debe integrar 
+módulos que permitan el seguimiento diario de ventas, facturación, cartera y 
+cotizaciones, con desgloses por cliente, línea de producto y estado de avance, 
+incorporando alertas automáticas para situaciones como clientes inactivos, cartera 
+vencida, cirugías no facturadas, materiales pendientes o stock crítico. 
+La trazabilidad es un elemento recurrente y prioritario, se requiere registrar 
+y visualizar en un mismo flujo el tiempo de permanencia de técnicos en cirugía, 
+retrasos, movimientos logísticos, hojas de gasto, devoluciones y validaciones de 
+inventario. Esto debe complementarse con la visualización en tiempo real de 
+agendas quirúrgicas, tanto programadas como urgentes, cruzadas con la 
+disponibilidad de sets e insumos, para anticipar compras y evitar cancelaciones por 
+falta de materiales. La integración logística-comercial es percibida como esencial 
+para automatizar procesos desde la solicitud hasta el traslado interregional, con 
+comunicación en tiempo real que reduzca errores y reprocesos. 
+En cuanto a la interfaz, se plantea un dashboard inicial personalizable que 
+funcione como centro de control diario, con indicadores de avance en ventas y 
+recaudo, métricas regionales visibles, notificaciones sobre incidencias y 
+recordatorios de acciones prioritarias. Elementos motivacionales y de comunicación 
+interna como mensajes, reportes de progreso, metas compartidas, se consideran 
+valiosos para alinear esfuerzos y fomentar la colaboración entre áreas. También, se 
+identifica la necesidad de que la aplicación contemple herramientas para el registro 
+y consulta inmediata de información clave de médicos y clientes, listas de precios 
+35 | P á g i n a 
+personalizadas y bitácoras de comunicación interna, fortaleciendo la relación 
+comercial y la capacidad de respuesta en contextos críticos. 
+En síntesis, los patrones y elementos relevantes convergen en una 
+plataforma única que unifique información comercial, logística y operativa, 
+ofreciendo trazabilidad de punta a punta, visibilidad financiera y de inventarios, 
+automatización de tareas administrativas y comunicación transversal. Esto 
+permitiría optimizar tiempos, reducir el caos operativo, mejorar la toma de 
+decisiones y, en última instancia, elevar tanto la productividad del equipo como la 
+satisfacción del cliente. 
+Soporte Técnico 
+En el sector de soporte técnico, las entrevistas revelan un patrón consistente 
+de dispersión y fragmentación de la información, con registros distribuidos entre 
+canales informales, documentos físicos y sistemas no integrados. Esta falta de 
+trazabilidad unificada genera reprocesos, dependencia de confirmaciones verbales, 
+demoras en la actualización de inventarios y riesgos de inconsistencias entre lo 
+registrado y la disponibilidad real del material. La documentación física, al llegar 
+incompleta o con retraso, retrasa la validación final y provoca que se opere con 
+datos parciales, afectando la programación quirúrgica y la satisfacción del cliente. 
+La comunicación entre áreas, aunque constante, es fragmentada y multicanal, 
+dificultando la sincronización y aumentando la probabilidad de errores. 
+Entre los elementos clave que emergen, se destaca la necesidad de una 
+herramienta digital centralizada que concentre la gestión de incidentes, inventarios 
+y documentación, con bitácoras automáticas, trazabilidad por usuario y fecha, y 
+validaciones en tiempo real antes de guardar o transmitir información. La solución 
+debe ofrecer paneles de control compartidos y actualizados al instante, con métricas 
+de disponibilidad, indicadores de cumplimiento y alertas automáticas ante 
+inconsistencias, retrasos o urgencias. Se propone que los cambios de estado del 
+material puedan registrarse desde cualquier punto del proceso, incluyendo campo, 
+con carga directa de datos, eliminando pasos intermedios y reduciendo el riesgo de 
+omisiones. La integración segura con otros sistemas corporativos y la exportación 
+en formatos estándar se consideran esenciales para evitar duplicidad de trabajo. 
+Las funcionalidades más relevantes se concentran en la trazabilidad 
+dinámica del material desde su salida hasta su retorno, con visibilidad total para 
+todas las áreas; la estandarización de procesos y formatos para minimizar 
+intervención manual; la incorporación de controles cruzados que validen la 
+coherencia entre registros y documentación; y la generación de alertas y reportes 
+que permitan actuar proactivamente. El objetivo transversal es transformar la 
+operación en un flujo coordinado, preciso y transparente, donde la información fluya 
+en un único entorno confiable, reduciendo los puntos ciegos, optimizando tiempos 
+36 | P á g i n a 
+y garantizando que el soporte técnico cumpla con las exigencias críticas del entorno 
+quirúrgico. 
+Logístico 
+En el sector logístico, las entrevistas evidencian una operación altamente 
+sensible a la variabilidad, especialmente por la dependencia de agendas quirúrgicas 
+sujetas a cambios y la atención de urgencias que alteran la planificación inicial. La 
+coordinación de mensajeros, la gestión de inventarios y la trazabilidad de equipos 
+se identifican como ejes críticos para garantizar el cumplimiento y la continuidad del 
+servicio. Los actores coinciden en que las limitaciones actuales provienen de la falta 
+de visibilidad en tiempo real sobre el estado de materiales, la dependencia de 
+documentación física y canales informales de comunicación, así como la ausencia 
+de alertas automáticas para vencimientos, quiebres de inventario, urgencias o 
+retrasos. 
+Se plantea la necesidad de una herramienta digital centralizada que permita 
+integrar la programación de rutas con geolocalización, confirmación de entregas, 
+registro de tiempos y causas de demora, bitácoras digitales por despacho y 
+coordinación dinámica de mensajeros para evitar tiempos muertos. La aplicación 
+ideal incluiría un dashboard en tiempo real tipo “aeropuerto”, indicadores de 
+eficiencia y cumplimiento, priorización automática según urgencia o impacto 
+comercial, y reportes automáticos que conecten logística, área comercial y soporte 
+sin duplicidad de esfuerzos. La trazabilidad completa desde la solicitud hasta la 
+recolección se considera indispensable, incorporando control de responsables en 
+caso de errores y medición del ciclo total del servicio con metas concretas de cierre. 
+En la gestión de inventarios, se resalta la importancia de detectar con 
+anticipación los quiebres y coordinar la reposición interna y las importaciones según 
+proyecciones, integrando variables como la apertura de nuevos clientes. Se solicita 
+visibilidad anticipada de agotamientos y vencimientos, así como flujos visuales que 
+faciliten la priorización de tareas, evitando que el material pendiente de recoger o 
+procesar se convierta en un cuello de botella. La digitalización de remisiones, la 
+integración con el sistema de solicitudes de cirugía y la eliminación de reprocesos 
+por errores en el alistamiento o envío incompleto son prioridades transversales. 
+En conjunto, el patrón común apunta a una logística que, para alcanzar altos 
+niveles de eficiencia, debe evolucionar hacia un modelo proactivo y coordinado en 
+tiempo real, con datos unificados, alertas inteligentes y control centralizado de la 
+operación. Esto permitiría reducir la dependencia de la coordinación oral o manual, 
+optimizar rutas y recursos, garantizar disponibilidad y puntualidad, y minimizar 
+riesgos operativos y costos asociados a errores o retrasos. 
+37 | P á g i n a 
+Definición de jobs por área para funcionalidad de la aplicación 
+Comercial 
+Job principal: Planificar, coordinar y dar trazabilidad a todo el ciclo comercial desde 
+la solicitud hasta la post-venta, garantizando información centralizada y en tiempo 
+real. 
+Jobs específicos: 
+1. Programar cirugías con confirmación automática de recursos disponibles. 
+2. Visualizar agenda consolidada con cambios y actualizaciones en tiempo real. 
+3. Gestionar y actualizar hojas de gasto y documentación comercial sin papel. 
+4. Coordinar con logística y soporte técnico en un canal unificado para evitar 
+reprocesos. 
+5. Acceder a reportes e indicadores de cierres, cancelaciones y tiempos de 
+respuesta. 
+6. Recibir alertas de vencimientos, quiebres de stock o cambios urgentes en la 
+agenda. 
+Logístico 
+Job principal: Asegurar la entrega, recogida y control de insumos quirúrgicos con 
+trazabilidad completa, minimizando errores, tiempos muertos y cuellos de botella. 
+Jobs específicos: 
+1. Monitorear inventarios en tiempo real y anticipar quiebres o vencimientos. 
+2. Coordinar rutas y asignaciones de mensajeros con geolocalización y 
+priorización automática. 
+3. Registrar cada movimiento (despacho, entrega, devolución) en una bitácora 
+digital. 
+4. Integrar solicitudes quirúrgicas y comerciales para planificar despachos sin 
+reprocesos. 
+5. Visualizar panel tipo “aeropuerto” con estado de despachos, urgencias y 
+KPIs. 
+6. Generar y recibir alertas automáticas por retrasos, errores o eventos críticos. 
+Soporte Técnico 
+Job principal: Brindar soporte técnico integral en quirófano y fuera de él, con 
+trazabilidad de tareas, tiempos y recursos, evitando interrupciones y errores 
+administrativos. 
+38 | P á g i n a 
+Jobs específicos: 
+1. Recibir y aceptar asignaciones de soporte en tiempo real, incluso con 
+cambios de última hora. 
+2. Registrar digitalmente hojas de gasto y consumos desde el punto de 
+atención. 
+3. Medir y reportar tiempos muertos o improductivos para optimización de 
+recursos. 
+4. Acceder al inventario y disponibilidad de material quirúrgico en tiempo real. 
+5. Reportar eventualidades y cancelaciones con carga automática de 
+evidencias y datos. 
+6. Usar un canal asincrónico para comunicación durante procedimientos 
+quirúrgicos. 
+7. Consultar indicadores de desempeño y cumplimiento de protocolos.
+ 39 | P á g i n a 
+ 
+40 | Página 
+ 
+Insights en Requerimientos Funcionales 
+Comercial 
+Insight Justificación Requerimiento funcional derivado 
+Centralización de 
+información comercial en 
+tiempo real 
+La dispersión de datos entre herramientas y canales 
+genera errores y retrasos en la toma de decisiones. 
+Dashboard unificado con ventas, facturación, 
+cotizaciones y estado de clientes en tiempo real. 
+Trazabilidad operativa y 
+logística 
+La falta de visibilidad sobre el material y tiempos 
+críticos provoca cuellos de botella en cirugías y 
+entregas. 
+Sistema de seguimiento en tiempo real con alertas 
+automáticas de demoras y ubicación de insumos. 
+Seguimiento proactivo 
+de cotizaciones 
+La ausencia de control centralizado reduce la tasa de 
+conversión y retrasa el cierre de ventas. 
+Módulo de cotizaciones con estatus, motivo de 
+rechazo y alertas para seguimiento. 
+Integración logística
+comercial 
+La desconexión entre áreas aumenta reprocesos y 
+reduce la capacidad de respuesta. 
+Flujo automatizado desde la solicitud hasta la 
+entrega, con comunicación en tiempo real entre 
+áreas. 
+Gestión anticipada de 
+agendas y urgencias 
+La falta de planificación a corto plazo impacta la 
+disponibilidad de material y personal. 
+Agenda integrada con visualización diaria, 
+semanal y de urgencias, conectada a inventario. 
+Unificación de canales 
+de comunicación interna 
+La comunicación fragmentada provoca pérdida de 
+información y duplicidad de tareas. 
+Plataforma única de comunicación y registro para 
+todo el equipo comercial y logístico. 
+Control de inventario y 
+estado financiero en 
+tiempo real 
+La ausencia de datos actualizados genera 
+cancelaciones y afecta la relación con el cliente. 
+Inventario con alertas automáticas y consulta 
+instantánea del estado financiero de cada cliente. 
+Motivación y alineación 
+del equipo 
+La alta carga operativa y emocional reduce el 
+rendimiento y compromiso del equipo. 
+Tablero motivacional con indicadores, metas y 
+mensajes automáticos para incentivar el 
+desempeño. 
+ 
+ 
+Soporte Técnico  
+ 
+41 | Página 
+ 
+Insight Justificación Requerimiento funcional derivado 
+Asignación y programación 
+en tiempo real con manejo 
+de cambios 
+La programación actual es manual, tardía y sujeta 
+a cambios constantes, lo que genera 
+descoordinación y pérdida de tiempo. 
+Módulo de programación dinámica con asignación 
+en tiempo real, reasignación automática y 
+notificaciones instantáneas. 
+Registro digital y 
+trazabilidad del tiempo 
+muerto 
+La falta de medición de improductividad impide 
+optimizar recursos y evaluar desempeño. 
+Herramienta para registrar tiempos de espera, 
+ubicación y actividades no productivas con 
+reportes automáticos. 
+Digitalización del registro 
+de gasto quirúrgico 
+Los formatos físicos y la digitación manual 
+consumen tiempo y generan errores, retrasando 
+la facturación. 
+Aplicación móvil para registro inmediato de gastos, 
+validación automática y carga directa al sistema. 
+Sistema centralizado de 
+seguimiento y 
+comunicación 
+El uso de múltiples canales no integrados 
+provoca duplicidad de información y errores de 
+coordinación. 
+Plataforma unificada para seguimiento de cirugías, 
+control de inventario, mensajes y registro de 
+incidencias. 
+Trazabilidad de inventario y 
+material en tiempo real 
+La dependencia de documentos físicos y 
+confirmaciones verbales impide conocer el estado 
+real del material. 
+Tablero de control en tiempo real con inventario, 
+ubicación de insumos y estado de devoluciones. 
+Alertas automáticas por 
+inconsistencias y 
+vencimientos 
+La falta de avisos inmediatos genera errores en 
+entregas y procedimientos. 
+Sistema de alertas automáticas por discrepancias 
+de inventario, vencimientos y urgencias. 
+Integración de técnicos 
+externos al sistema 
+La exclusión de técnicos externos limita la 
+trazabilidad y coordinación completa del proceso. 
+Acceso controlado para técnicos externos con 
+permisos específicos de registro y consulta. 
+Reporte automatizado de 
+eventualidades y 
+cancelaciones 
+El reporte manual y tardío impide la reacción 
+oportuna y la trazabilidad de problemas. 
+Formulario digital con obligatoriedad de envío en 
+24 h y generación automática de reportes 
+estadísticos. 
+Indicadores de desempeño 
+técnico 
+No se cuenta con métricas objetivas que permitan 
+medir eficiencia, calidad y capacidad de 
+respuesta. 
+Dashboard de KPIs técnicos (tiempo de respuesta, 
+incidencias resueltas, cumplimiento de protocolos). 
+Canal de comunicación 
+asincrónica para quirófano 
+Las restricciones en quirófano impiden la 
+comunicación fluida, afectando la coordinación. 
+Módulo de mensajería asincrónica integrado, con 
+notificaciones diferidas y registro automático en la 
+bitácora. 
+ 
+42 | Página 
+ 
+Logístico 
+Insight Justificación Requerimiento funcional derivado 
+Necesidad de 
+trazabilidad logística 
+de principio a fin 
+La ausencia de registro y seguimiento digital en 
+cada etapa genera errores, pérdidas de tiempo y 
+falta de control sobre el material. 
+Módulo de trazabilidad con registro en tiempo real 
+desde despacho hasta devolución postcirugía, 
+incluyendo estado, ubicación y responsables. 
+Alertas tempranas 
+para quiebres, 
+vencimientos y 
+urgencias 
+La falta de notificaciones automáticas provoca 
+retrasos, envío de material vencido y 
+cancelaciones por inventario insuficiente. 
+Sistema de alertas automáticas para inventario bajo, 
+material vencido, recogidas urgentes y equipos 
+pendientes. 
+Visualización 
+centralizada y en 
+tiempo real de 
+inventarios y rutas 
+El desconocimiento del stock y del estado del 
+material en tránsito impide tomar decisiones 
+rápidas y eficientes. 
+Dashboard tipo “aeropuerto” con disponibilidad de 
+inventario, estado de equipos y rutas activas en tiempo 
+real. 
+Geolocalización y 
+coordinación de 
+mensajeros 
+La falta de control sobre la ubicación y tiempos de 
+los emisarios retrasa entregas y recolecciones 
+críticas. 
+Integración de geolocalización en tiempo real, 
+optimización y reasignación dinámica de rutas y 
+mensajeros. 
+Estandarización y 
+digitalización de 
+procesos 
+La dependencia de formatos físicos y 
+comunicación informal aumenta errores y retrasa 
+la facturación y cierre de casos. 
+Bitácora digital de despachos, remisiones electrónicas y 
+control de rutas con registro de tiempos, firmas y 
+observaciones. 
+Priorización 
+automática de tareas 
+según urgencia 
+Actualmente no existe un mecanismo claro para 
+asignar prioridades, lo que genera cuellos de 
+botella en cirugías y logística. 
+Algoritmo de priorización automática basado en 
+urgencias quirúrgicas, cierres de facturación y 
+disponibilidad de recursos. 
+Integración entre 
+logística y 
+programación 
+quirúrgica 
+La falta de conexión entre agendas y logística 
+genera envíos incompletos o descoordinados. 
+Sincronización automática entre solicitudes de cirugía y 
+flujo logístico, con validación de material e inventario 
+previo al despacho. 
+Indicadores de 
+desempeño y 
+eficiencia logística 
+No se cuenta con métricas claras que permitan 
+evaluar y optimizar el rendimiento del equipo. 
+Panel de KPIs logísticos (tiempos de entrega, 
+efectividad de rutas, cumplimiento de protocolos) con 
+metas y reportes automáticos. 
+Construcción de la Hoja de Ruta de Desarrollo 
+Figura 1. Propuesta de interacción preliminar con la APP. 
+El uso de un Diagrama de Secuencia de Mensajes o MSC (Message Sequence 
+Chart) como el de la Figura 1 para representar el flujo de información en la APP es 
+especialmente adecuado porque permite visualizar de manera clara y lineal cómo 
+interactúan los distintos actores y componentes del sistema a lo largo del tiempo. 
+43 | P á g i n a 
+Esta herramienta facilita entender la secuencia exacta de eventos y mensajes que 
+se producen desde el inicio de la interacción hasta la respuesta final, lo que ayuda 
+a identificar posibles cuellos de botella, redundancias o errores en la comunicación 
+entre los módulos de la aplicación. Además, al mostrar la “película” de los procesos, 
+el MSC aporta una perspectiva dinámica que trasciende la simple descripción 
+textual, convirtiéndose en un recurso que mejora la comunicación entre los 
+miembros del equipo, optimiza la planificación del desarrollo y sirve como referencia 
+confiable durante las pruebas y la implementación de nuevas funcionalidades. Su 
+estructura visual, que diferencia claramente entre actores y sistemas, permite que 
+incluso personas con distintos niveles de conocimiento técnico puedan comprender 
+rápidamente cómo fluye la información dentro de la APP. 
+El diagrama de la Figura 1 muestra una de las primeras iteraciones para el flujo de 
+la información entre los distintos actores y componentes de la APP a lo largo del 
+tiempo y está sujeta a cambios. Los actores principales, como el Cliente, el Usuario 
+Comercial, el Usuario de Logística y el Usuario de Soporte Técnico, interactúan con 
+la APP, que a su vez se comunica con el Sistema Central (ERP o CRM). Cada línea 
+vertical representa la “vida” de un participante (tiempo) y las flechas horizontales 
+indican los mensajes o solicitudes que se envían de un actor a otro, incluyendo 
+respuestas o confirmaciones. El desarrollo refleja el orden cronológico de las 
+acciones, comenzando desde la autenticación del Cliente y de los usuarios internos, 
+pasando por solicitudes de información, gestión de inventario, soporte y 
+notificaciones, hasta la respuesta final del sistema. En conjunto, muestra la 
+“película” de la operación de la APP, permitiendo entender quién hace qué, en qué 
+momento y cómo interactúan los diferentes módulos. 
+Cabe mencionar que las líneas continuas representan un flujo de información y con 
+interrumpciones un flujo de dato, además, los flujos con letra en color rojo indican 
+procesos que están próximos a ser evaluados para se incorporados y los flujos con 
+letra en color azul son procesos que podrían llegar a dar y se presenta una pequeña 
+secuencia de interacciones para abordarla. flujo de información y con 
+interrumpciones un flujo de dato, además, los flujos con letra en color rojo indican 
+procesos que están próximos a ser evaluados para se incorporados y los flujos con 
+letra en color azul son procesos que podrían llegar a dar y se presenta una pequeña 
+secuencia de interacciones para abordarla.  
+4. RETOS Y DESAFÍOS 
+44 | P á g i n a 
+Actualmente no se dispone de un diseño detallado de la arquitectura de 
+integración entre la aplicación, el ERP y el CRM. Esto obedece a que aún se evalúan 
+alternativas técnicas: por ejemplo, que el módulo de inventario de la aplicación 
+consulte el stock directamente en tiempo real desde el ERP, o que el módulo de 
+cirugías solicite información del cliente al CRM antes de confirmar un pedido. Si bien 
+no se ha definido el esquema definitivo, se han identificado puntos potenciales de 
+interacción tomando como base los procesos actuales y las funcionalidades 
+previstas, lo que permitirá acelerar la integración una vez se adopte la arquitectura 
+final. 
+Para esto, se planteó una articulación con SIESA, sin embargo, la programación 
+de una reunión conjunta ha representado un desafío considerable debido a la 
+complejidad de coordinar agendas entre todos los actores clave. Sin embargo, se 
+llevará a cabo dicha reunión el viernes 15 de agosto. 
+Otro de los principales retos del levantamiento de información ha sido la 
+coordinación de reuniones y entrevistas con los distintos equipos. Lograr espacios 
+con personal operativo, cuya disponibilidad se ve limitada por la naturaleza crítica 
+de sus funciones, requirió recurrir a entrevistas telefónicas como mecanismo para 
+asegurar su participación y captar insumos de alto valor. 
+5. MODIFICACIONES REALIZADAS 
+Considerando que la aplicación está concebida para optimizar procesos internos 
+y facilitar el trabajo del cliente interno, la evaluación con clientes externos no 
+constituye una prioridad en esta fase. En términos de desarrollo, el valor agregado 
+esperado en esta etapa proviene de mejorar la eficiencia operativa, la trazabilidad y 
+la disponibilidad de información para los equipos internos, lo cual servirá como base 
+para una posterior integración o adaptación hacia el cliente externo. Involucrar a 
+este último en la validación inicial implicaría ampliar el alcance del proyecto, 
+introducir variables adicionales de diseño y extender los tiempos de desarrollo sin 
+un retorno proporcional en la etapa actual. Por ello, la estrategia se centra en 
+consolidar primero una solución funcional y validada internamente, que 
+posteriormente pueda escalarse hacia interacciones externas de forma controlada 
+y más efectiva. 
+45 | P á g i n a 
+6. REFERENCIAS 
+1. Healthcare Logistics Market 2025-2034 | Demand for - GlobeNewswire, fecha 
+de acceso: junio 19, 2025, https://www.globenewswire.com/news
+release/2025/06/16/3099985/0/en/Healthcare-Logistics-Market-2025-2034
+Demand-for-Temperature-sensitive-Biologics-E-commerce-Growth-and
+Enhanced-Supply-Chain-Resilience-Driving-Growth.html 
+2.  Tecnología RFID - POL Colombia, fecha de acceso: junio 19, 2025, 
+https://polcolombia.com/tecnologia-rfid-2/ 
+3. Software de eficiencia hospitalaria para la gestión de quirófanos. fecha de 
+acceso: junio 19, 2025, https://www.getinge.com/lat/productos/torin/ 
+4. Medical Supply Distribution Software | Epicor U.S. and Canada, fecha de 
+acceso: 
+junio 
+19, 
+2025, 
+https://www.epicor.com/en
+us/solutions/industries/distribution/medical-supply-distribution-software/ 
+5. TEMA 1. TRAZABILIDAD EN EL ÁMBITO QUIRÚRGICO - SalusPlay, fecha 
+de acceso: junio 19, 2025, https://www.salusplay.com/apuntes/quirofano-y
+anestesia/tema-1-trazabilidad-en-el-ambito-quirurgico 
+6. Addressing Top 10 Challenges In Healthcare With An ERP Solution - 
+Himcos, fecha de acceso: junio 19, 2025, https://himcos.com/addressing
+top-10-challenges-in-healthcare-with-erp/ 
+7. What Is Automation in Healthcare? How Does It Help? - NetSuite, fecha de 
+acceso: junio 19, 2025, 
+https://www.netsuite.com/portal/resource/articles/erp/healthcare
+automation.shtml 
+8. Supply chain automation in healthcare: Transforming logistics for ..., fecha 
+de acceso: junio 19, 2025, 
+https://journalwjarr.com/sites/default/files/fulltext_pdf/WJARR-2025-1223.pdf 
+9. The Convergence of Medical Devices and Digital Health: What's Next? - 
+IQVIA, fecha de acceso: junio 19, 2025, 
+https://www.iqvia.com/blogs/2025/03/the-convergence-of-medical-devices
+and-digital-health-whats-next 
+10. Best ROI in Health: A Trusted Expert View - Number Analytics, fecha de 
+acceso: junio 19, 2025, https://www.numberanalytics.com/blog/best-roi-in
+health 
+11. Líder en Tecnología RFID, fecha de acceso: junio 19, 2025, 
+https://telectronica.com/ 
+12. Caso de éxito RPA Sector Salud Colombia - stela, fecha de acceso: junio 
+46 | P á g i n a 
+19, 2025, https://www.stela.ai/caso-de-exito-rpa-sector-salud-colombia/ 
+13. Casos de éxito - Zebra Technologies, fecha de acceso: junio 19, 2025, 
+https://www.zebra.com/la/es/resource-library/success-stories.html 
+14. Fundación Cardiovascular de Colombia optimiza la trazabilidad y ..., fecha 
+de acceso: junio 19, 2025, https://www.zebra.com/la/es/resource
+library/success-stories/cardiovascular-foundation-of-colombia-optimizes
+traceability-improves-patient-care.html 
+15. Startups Colombianas de Inteligencia Artificial en Salud - Oscar Efrem, 
+fecha de acceso: junio 19, 2025, https://oscarefrem.com/startups
+colombianas-de-inteligencia-artificial-en-salud/ 
+16. Top de impacto: emprendimientos colombianos de Salud Digital, fecha de 
+acceso: junio 19, 2025, https://impactotic.co/tecnologia/top-de-impacto
+emprendimientos-colombianos-de-salud-digital/ 
+47 | P á g i n a 
+•  
+48 | P á g i n a 

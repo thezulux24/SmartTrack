@@ -19,5 +19,29 @@ export const LOGISTICA_ROUTES: Routes = [
     loadComponent: () => import('./kit-preparacion/kit-preparacion.component')
       .then(m => m.KitPreparacionComponent),
     canActivate: [internalGuard]
+  },
+  {
+    path: 'kits-preparacion',
+    loadComponent: () => import('./kits-preparacion-list/kits-preparacion-list.component')
+      .then(m => m.KitsPreparacionListComponent),
+    canActivate: [internalGuard]
+  },
+  {
+    path: 'kits-listos',
+    loadComponent: () => import('./kits-listos-list/kits-listos-list.component')
+      .then(m => m.KitsListosListComponent),
+    canActivate: [internalGuard]
+  },
+  {
+    path: 'asignar-mensajero/:id',
+    loadComponent: () => import('./asignar-mensajero/asignar-mensajero.component')
+      .then(m => m.AsignarMensajeroComponent),
+    canActivate: [internalGuard]
+  },
+  {
+    path: 'envios-transito',
+    loadComponent: () => import('./envios-transito-list/envios-transito-list.component')
+      .then(m => m.EnviosTransitoListComponent),
+    canActivate: [internalGuard]
   }
 ];

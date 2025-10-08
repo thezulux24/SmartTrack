@@ -9,6 +9,11 @@ export const routes: Routes = [
         loadChildren: () => import('./auth/features/auth-shell/auth-routing').then(m => m.default)
     },
     {
+        path: 'qr/:codigo',
+        loadComponent: () => import('./features/public/qr-validacion/qr-validacion.component')
+            .then(m => m.QrValidacionComponent)
+    },
+    {
         path: 'client',
         canActivate: [privateGuard, clientGuard],
         loadChildren: () => import('./features/client/client-shell/client-routing').then(m => m.default)

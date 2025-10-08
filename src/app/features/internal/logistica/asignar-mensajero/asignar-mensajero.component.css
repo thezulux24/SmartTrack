@@ -1,0 +1,35 @@
+/* Estilos personalizados para el componente */
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(200, 217, 0, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 217, 0, 0.5);
+}
+
+/* Animación de selección de tarjeta */
+.cursor-pointer {
+  transition: all 0.2s ease-in-out;
+}
+
+.cursor-pointer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Estrellas de calificación */
+.text-yellow-400 {
+  letter-spacing: 2px;
+}
