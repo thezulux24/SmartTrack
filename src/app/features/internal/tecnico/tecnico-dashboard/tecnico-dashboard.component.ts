@@ -10,9 +10,11 @@ interface KitPendiente {
   estado: string;
   fecha_recepcion: string;
   cirugia: {
+    id: string;
     numero_cirugia: string;
     fecha_programada: string;
     medico_cirujano: string;
+    estado?: string;
     hospital: {
       nombre: string;
       ciudad: string;
@@ -40,6 +42,7 @@ export class TecnicoDashboardComponent implements OnInit {
   // Signals
   kitsPendientes = signal<KitPendiente[]>([]);
   kitsValidados = signal<KitPendiente[]>([]);
+  cirugiasEnCurso = signal<KitPendiente[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
   tecnicoId = signal<string | null>(null);
@@ -48,6 +51,7 @@ export class TecnicoDashboardComponent implements OnInit {
   // Computed
   totalPendientes = computed(() => this.kitsPendientes().length);
   totalValidados = computed(() => this.kitsValidados().length);
+  totalEnCurso = computed(() => this.cirugiasEnCurso().length);
 
   async ngOnInit() {
     await this.cargarDatosTecnico();
@@ -120,6 +124,7 @@ export class TecnicoDashboardComponent implements OnInit {
             numero_cirugia,
             fecha_programada,
             medico_cirujano,
+            estado,
             tecnico_asignado_id,
             hospital_id,
             cliente_id,
@@ -169,9 +174,11 @@ export class TecnicoDashboardComponent implements OnInit {
             estado: kit.estado,
             fecha_recepcion: kit.fecha_recepcion,
             cirugia: {
+              id: cirugia?.id || '',
               numero_cirugia: cirugia?.numero_cirugia || 'N/A',
               fecha_programada: cirugia?.fecha_programada || '',
               medico_cirujano: cirugia?.medico_cirujano || 'N/A',
+              estado: cirugia?.estado || 'programada',
               hospital: {
                 nombre: hospital?.nombre || 'N/A',
                 ciudad: hospital?.ciudad || 'N/A'
@@ -188,12 +195,14 @@ export class TecnicoDashboardComponent implements OnInit {
 
       console.log('Kits con productos:', kitsConProductos);
 
-      // Separar pendientes de validados
+      // Separar por estado
       const pendientes = kitsConProductos.filter(k => k.estado === 'entregado');
-      const validados = kitsConProductos.filter(k => ['validado', 'en_uso'].includes(k.estado));
+      const validados = kitsConProductos.filter(k => k.estado === 'validado');
+      const enCurso = kitsConProductos.filter(k => k.estado === 'en_uso' && k.cirugia.estado === 'en_curso');
 
       this.kitsPendientes.set(pendientes);
       this.kitsValidados.set(validados);
+      this.cirugiasEnCurso.set(enCurso);
 
     } catch (err: any) {
       console.error('Error cargando kits:', err);
@@ -209,6 +218,77 @@ export class TecnicoDashboardComponent implements OnInit {
 
   verDetalleKit(kitId: string) {
     this.router.navigate(['/internal/tecnico/validar-kit', kitId]);
+  }
+
+  async iniciarCirugia(kit: KitPendiente, event: Event) {
+    event.stopPropagation(); // Evitar que se dispare el click del card
+
+    if (!confirm(`¿Iniciar cirugía ${kit.cirugia.numero_cirugia}?\n\nEsto marcará la cirugía como "En Curso" y el kit como "En Uso".`)) {
+      return;
+    }
+
+    try {
+      const currentUserId = await this.supabase.getCurrentUserId();
+      if (!currentUserId) {
+        alert('No se pudo identificar al usuario');
+        return;
+      }
+
+      // 1. Actualizar estado de la cirugía a 'en_curso'
+      const { error: cirugiaError } = await this.supabase.client
+        .from('cirugias')
+        .update({
+          estado: 'en_curso',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', kit.cirugia.id);
+
+      if (cirugiaError) throw cirugiaError;
+
+      // 2. Actualizar estado del kit a 'en_uso'
+      const { error: kitError } = await this.supabase.client
+        .from('kits_cirugia')
+        .update({
+          estado: 'en_uso',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', kit.id);
+
+      if (kitError) throw kitError;
+
+      // 3. Registrar en trazabilidad de cirugía
+      const { error: trazError } = await this.supabase.client
+        .from('cirugia_trazabilidad')
+        .insert({
+          cirugia_id: kit.cirugia.id,
+          accion: 'inicio_cirugia',
+          estado_anterior: kit.cirugia.estado || 'programada',
+          estado_nuevo: 'en_curso',
+          usuario_id: currentUserId,
+          observaciones: `Cirugía iniciada por técnico`,
+          metadata: {
+            kit_id: kit.id,
+            numero_kit: kit.numero_kit
+          }
+        });
+
+      if (trazError) throw trazError;
+
+      alert('Cirugía iniciada correctamente');
+      
+      // Navegar al dashboard de cirugía en vivo
+      this.router.navigate(['/internal/tecnico/cirugia', kit.cirugia.id]);
+
+    } catch (error: any) {
+      console.error('Error iniciando cirugía:', error);
+      alert('Error al iniciar la cirugía: ' + (error.message || 'Error desconocido'));
+    }
+  }
+
+  continuarCirugia(kit: KitPendiente, event: Event) {
+    event.stopPropagation();
+    // Navegar directamente a la cirugía en curso
+    this.router.navigate(['/internal/tecnico/cirugia', kit.cirugia.id]);
   }
 
   regresar() {

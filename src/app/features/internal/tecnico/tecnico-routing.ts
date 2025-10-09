@@ -8,5 +8,9 @@ export const tecnicoRoutes: Routes = [
   {
     path: 'validar-kit/:id',
     loadComponent: () => import('./tecnico-validacion-kit/tecnico-validacion-kit.component').then(m => m.TecnicoValidacionKitComponent)
+  },
+  {
+    path: 'cirugia/:cirugiaId',
+    loadComponent: () => import('./cirugia-ejecucion/cirugia-ejecucion.component').then(m => m.CirugiaEjecucionComponent)
   }
 ];
