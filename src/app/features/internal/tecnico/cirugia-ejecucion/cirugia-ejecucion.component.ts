@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
+import { HojaGastoService } from '../../hojas-gasto/data-access/hoja-gasto.service';
+import { CreateHojaGastoRequest, HojaGastoItem } from '../../hojas-gasto/data-access/hoja-gasto.model';
 
 interface ProductoCirugia {
   id: string;
@@ -48,6 +50,7 @@ export class CirugiaEjecucionComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private supabase = inject(SupabaseService);
+  private hojaGastoService = inject(HojaGastoService);
 
   // Signals
   cirugia = signal<CirugiaDetalle | null>(null);
@@ -208,7 +211,7 @@ export class CirugiaEjecucionComponent implements OnInit {
   }
 
   async finalizarCirugia() {
-    if (!confirm('¿Finalizar cirugía?\n\nEsto marcará la cirugía como completada y el kit quedará listo para devolución.')) {
+    if (!confirm('¿Finalizar cirugía?\n\nEsto marcará la cirugía como completada, el kit quedará listo para devolución y se creará automáticamente la hoja de gasto con los productos utilizados.')) {
       return;
     }
 
@@ -222,7 +225,7 @@ export class CirugiaEjecucionComponent implements OnInit {
       if (!cirugia) throw new Error('No hay datos de cirugía');
 
       // 1. Actualizar estado de la cirugía
-      const { error: cirugiaError } = await this.supabase.client
+      const { error: cirugiaError} = await this.supabase.client
         .from('cirugias')
         .update({
           estado: 'completada',
@@ -244,7 +247,68 @@ export class CirugiaEjecucionComponent implements OnInit {
 
       if (kitError) throw kitError;
 
-      // 3. Registrar en trazabilidad
+      // 3. Crear hoja de gasto automáticamente con productos UTILIZADOS
+      const productosUtilizados = this.productos().filter(p => p.cantidad_utilizada > 0);
+      
+      let hojaGastoCreada = false;
+      if (productosUtilizados.length > 0) {
+        console.log('📝 Creando hoja de gasto automática con productos utilizados:', productosUtilizados);
+        
+        try {
+          // Obtener información de precios desde la tabla productos
+          const productosConPrecio: Omit<HojaGastoItem, 'hoja_gasto_id'>[] = await Promise.all(
+            productosUtilizados.map(async (producto) => {
+              const { data: productoData } = await this.supabase.client
+                .from('productos')
+                .select('precio')
+                .eq('id', producto.producto_id)
+                .single();
+
+              const precio = productoData?.precio || 0;
+              
+              return {
+                producto_id: producto.producto_id,
+                categoria: 'productos' as const,
+                descripcion: `${producto.nombre} (${producto.codigo})`,
+                cantidad: producto.cantidad_utilizada,
+                precio_unitario: precio,
+                precio_total: precio * producto.cantidad_utilizada,
+                observaciones: `Lote: ${producto.lote || 'N/A'}${producto.fecha_vencimiento ? ' - Venc: ' + producto.fecha_vencimiento : ''}`
+              };
+            })
+          );
+
+          const createHojaGastoRequest: CreateHojaGastoRequest = {
+            cirugia_id: cirugia.id,
+            tecnico_id: currentUserId,
+            fecha_cirugia: new Date(cirugia.fecha_programada).toISOString().split('T')[0],
+            observaciones: `Hoja de gasto generada automáticamente al finalizar la cirugía ${cirugia.numero_cirugia}`,
+            items: productosConPrecio as HojaGastoItem[]
+          };
+
+          // Crear la hoja de gasto y ESPERAR a que termine
+          await new Promise<void>((resolve, reject) => {
+            this.hojaGastoService.createHojaGasto(createHojaGastoRequest).subscribe({
+              next: (hojaCreada) => {
+                console.log('✅ Hoja de gasto creada automáticamente:', hojaCreada);
+                hojaGastoCreada = true;
+                resolve();
+              },
+              error: (error) => {
+                console.error('⚠️ Error al crear hoja de gasto automática:', error);
+                reject(error);
+              }
+            });
+          });
+        } catch (hojaGastoError: any) {
+          console.error('❌ Error crítico al crear hoja de gasto:', hojaGastoError);
+          alert('⚠️ Advertencia: La cirugía se completó pero hubo un error al crear la hoja de gasto.\n\nError: ' + (hojaGastoError.message || 'Error desconocido') + '\n\nDeberá crear la hoja de gasto manualmente.');
+        }
+      } else {
+        console.log('⚠️ No hay productos utilizados, no se creará hoja de gasto');
+      }
+
+      // 4. Registrar en trazabilidad
       const { error: trazError } = await this.supabase.client
         .from('cirugia_trazabilidad')
         .insert({
@@ -253,25 +317,37 @@ export class CirugiaEjecucionComponent implements OnInit {
           estado_anterior: 'en_curso',
           estado_nuevo: 'completada',
           usuario_id: currentUserId,
-          observaciones: 'Cirugía finalizada - Kit listo para proceso de devolución',
+          observaciones: `Cirugía finalizada - Kit listo para devolución - Hoja de gasto ${hojaGastoCreada ? 'creada automáticamente' : 'NO creada'} con ${productosUtilizados.length} productos utilizados`,
           metadata: {
             kit_id: cirugia.kit.id,
             productos_utilizados: this.productosUtilizados(),
-            total_productos: this.totalProductos()
+            total_productos: this.totalProductos(),
+            hoja_gasto_creada: hojaGastoCreada
           }
         });
 
       if (trazError) throw trazError;
 
-      alert(
-        '✅ Cirugía finalizada correctamente\n\n' +
-        '📋 Próximos pasos:\n' +
+      // Mensaje personalizado según si se creó o no la hoja de gasto
+      let mensaje = '✅ Cirugía finalizada correctamente\n\n';
+      
+      if (hojaGastoCreada) {
+        mensaje += `📋 Hoja de gasto creada automáticamente con ${productosUtilizados.length} producto(s) utilizado(s)\n\n`;
+      } else if (productosUtilizados.length === 0) {
+        mensaje += '⚠️ No se creó hoja de gasto (no hay productos utilizados)\n\n';
+      }
+      
+      mensaje += '� Próximos pasos:\n' +
         '1. Validar devolución del kit\n' +
         '2. Separar productos usados/sin usar\n' +
         '3. Enviar productos reutilizables a limpieza/esterilización\n' +
-        '4. Actualizar inventario\n\n' +
-        'El kit está marcado como "DEVUELTO" y listo para proceso de devolución.'
-      );
+        '4. Actualizar inventario\n\n';
+      
+      if (hojaGastoCreada) {
+        mensaje += 'El personal logístico puede agregar gastos adicionales (transporte, etc.) en el módulo de Hojas de Gasto.';
+      }
+
+      alert(mensaje);
       this.router.navigate(['/internal/tecnico']);
 
     } catch (error: any) {
