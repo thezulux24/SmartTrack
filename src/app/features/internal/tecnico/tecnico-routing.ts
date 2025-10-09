@@ -12,5 +12,9 @@ export const tecnicoRoutes: Routes = [
   {
     path: 'cirugia/:cirugiaId',
     loadComponent: () => import('./cirugia-ejecucion/cirugia-ejecucion.component').then(m => m.CirugiaEjecucionComponent)
+  },
+  {
+    path: 'procesar-devolucion/:kitId',
+    loadComponent: () => import('./tecnico-procesar-devolucion/tecnico-procesar-devolucion.component').then(m => m.TecnicoProcesamDevolucionComponent)
   }
 ];

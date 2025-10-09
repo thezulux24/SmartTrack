@@ -42,6 +42,11 @@ export default [
   },
 
   {
+    path: 'limpieza',
+    loadChildren: () => import('../limpieza/limpieza-routing').then(m => m.limpiezaRoutes)
+  },
+
+  {
     path: '**', redirectTo: ''
   }
 

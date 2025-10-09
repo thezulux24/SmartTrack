@@ -43,6 +43,7 @@ export class TecnicoDashboardComponent implements OnInit {
   kitsPendientes = signal<KitPendiente[]>([]);
   kitsValidados = signal<KitPendiente[]>([]);
   cirugiasEnCurso = signal<KitPendiente[]>([]);
+  kitsDevueltos = signal<KitPendiente[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
   tecnicoId = signal<string | null>(null);
@@ -52,6 +53,7 @@ export class TecnicoDashboardComponent implements OnInit {
   totalPendientes = computed(() => this.kitsPendientes().length);
   totalValidados = computed(() => this.kitsValidados().length);
   totalEnCurso = computed(() => this.cirugiasEnCurso().length);
+  totalDevueltos = computed(() => this.kitsDevueltos().length);
 
   async ngOnInit() {
     await this.cargarDatosTecnico();
@@ -138,7 +140,7 @@ export class TecnicoDashboardComponent implements OnInit {
             )
           )
         `)
-        .in('estado', ['entregado', 'validado', 'en_uso'])
+        .in('estado', ['entregado', 'validado', 'en_uso', 'devuelto'])
         .order('fecha_recepcion', { ascending: false });
 
       if (kitsError) {
@@ -199,10 +201,12 @@ export class TecnicoDashboardComponent implements OnInit {
       const pendientes = kitsConProductos.filter(k => k.estado === 'entregado');
       const validados = kitsConProductos.filter(k => k.estado === 'validado');
       const enCurso = kitsConProductos.filter(k => k.estado === 'en_uso' && k.cirugia.estado === 'en_curso');
+      const devueltos = kitsConProductos.filter(k => k.estado === 'devuelto');
 
       this.kitsPendientes.set(pendientes);
       this.kitsValidados.set(validados);
       this.cirugiasEnCurso.set(enCurso);
+      this.kitsDevueltos.set(devueltos);
 
     } catch (err: any) {
       console.error('Error cargando kits:', err);
@@ -289,6 +293,10 @@ export class TecnicoDashboardComponent implements OnInit {
     event.stopPropagation();
     // Navegar directamente a la cirugía en curso
     this.router.navigate(['/internal/tecnico/cirugia', kit.cirugia.id]);
+  }
+
+  procesarDevolucion(kitId: string) {
+    this.router.navigate(['/internal/tecnico/procesar-devolucion', kitId]);
   }
 
   regresar() {

@@ -161,9 +161,37 @@ CREATE TABLE public.kit_productos (
   fecha_vencimiento date,
   observaciones text,
   created_at timestamp with time zone DEFAULT now(),
+  cantidad_recuperable integer DEFAULT 0,
+  es_desechable boolean DEFAULT false,
+  notas_devolucion text,
   CONSTRAINT kit_productos_pkey PRIMARY KEY (id),
   CONSTRAINT kit_productos_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
   CONSTRAINT kit_productos_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id)
+);
+CREATE TABLE public.kit_productos_limpieza (
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  kit_producto_id uuid NOT NULL,
+  kit_id uuid NOT NULL,
+  producto_id uuid NOT NULL,
+  estado_limpieza text NOT NULL DEFAULT 'pendiente'::text CHECK (estado_limpieza = ANY (ARRAY['pendiente'::text, 'en_proceso'::text, 'esterilizado'::text, 'aprobado'::text, 'desechado'::text])),
+  cantidad_a_recuperar integer NOT NULL DEFAULT 0,
+  cantidad_aprobada integer DEFAULT 0,
+  es_desechable boolean DEFAULT false,
+  notas text,
+  observaciones_limpieza text,
+  procesado_por uuid,
+  fecha_inicio_proceso timestamp with time zone,
+  fecha_fin_proceso timestamp with time zone,
+  aprobado_por uuid,
+  fecha_aprobacion timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT kit_productos_limpieza_pkey PRIMARY KEY (id),
+  CONSTRAINT kit_productos_limpieza_kit_producto_id_fkey FOREIGN KEY (kit_producto_id) REFERENCES public.kit_productos(id),
+  CONSTRAINT kit_productos_limpieza_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
+  CONSTRAINT kit_productos_limpieza_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id),
+  CONSTRAINT kit_productos_limpieza_procesado_por_fkey FOREIGN KEY (procesado_por) REFERENCES auth.users(id),
+  CONSTRAINT kit_productos_limpieza_aprobado_por_fkey FOREIGN KEY (aprobado_por) REFERENCES auth.users(id)
 );
 CREATE TABLE public.kit_trazabilidad (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -187,7 +215,7 @@ CREATE TABLE public.kits_cirugia (
   cirugia_id uuid NOT NULL,
   numero_kit character varying NOT NULL UNIQUE,
   qr_code character varying NOT NULL UNIQUE,
-  estado character varying DEFAULT 'preparando'::character varying CHECK (estado::text = ANY (ARRAY['solicitado'::character varying::text, 'preparando'::character varying::text, 'listo_envio'::character varying::text, 'en_transito'::character varying::text, 'entregado'::character varying::text, 'en_uso'::character varying::text, 'devuelto'::character varying::text, 'finalizado'::character varying::text, 'cancelado'::character varying::text])),
+  estado character varying DEFAULT 'preparando'::character varying CHECK (estado::text = ANY (ARRAY['solicitado'::text, 'preparando'::text, 'listo_envio'::text, 'en_transito'::text, 'entregado'::text, 'validado'::text, 'en_uso'::text, 'devuelto'::text, 'en_limpieza'::text, 'finalizado'::text, 'cancelado'::text])),
   fecha_creacion timestamp with time zone DEFAULT now(),
   fecha_preparacion timestamp with time zone,
   fecha_envio timestamp with time zone,
@@ -204,11 +232,16 @@ CREATE TABLE public.kits_cirugia (
   cliente_receptor_cedula text,
   cliente_validacion_fecha timestamp with time zone,
   cliente_validacion_qr text,
+  fecha_inicio_limpieza timestamp with time zone,
+  fecha_fin_limpieza timestamp with time zone,
+  limpieza_aprobada_por uuid,
+  fecha_aprobacion_limpieza timestamp with time zone,
   CONSTRAINT kits_cirugia_pkey PRIMARY KEY (id),
   CONSTRAINT kits_cirugia_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
   CONSTRAINT kits_cirugia_comercial_id_fkey FOREIGN KEY (comercial_id) REFERENCES public.profiles(id),
   CONSTRAINT kits_cirugia_tecnico_id_fkey FOREIGN KEY (tecnico_id) REFERENCES public.profiles(id),
-  CONSTRAINT kits_cirugia_logistica_id_fkey FOREIGN KEY (logistica_id) REFERENCES public.profiles(id)
+  CONSTRAINT kits_cirugia_logistica_id_fkey FOREIGN KEY (logistica_id) REFERENCES public.profiles(id),
+  CONSTRAINT kits_cirugia_limpieza_aprobada_por_fkey FOREIGN KEY (limpieza_aprobada_por) REFERENCES auth.users(id)
 );
 CREATE TABLE public.mensajeros (
   id uuid NOT NULL DEFAULT gen_random_uuid(),

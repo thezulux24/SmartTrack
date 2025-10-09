@@ -253,7 +253,7 @@ export class CirugiaEjecucionComponent implements OnInit {
           estado_anterior: 'en_curso',
           estado_nuevo: 'completada',
           usuario_id: currentUserId,
-          observaciones: 'Cirugía finalizada',
+          observaciones: 'Cirugía finalizada - Kit listo para proceso de devolución',
           metadata: {
             kit_id: cirugia.kit.id,
             productos_utilizados: this.productosUtilizados(),
@@ -263,7 +263,15 @@ export class CirugiaEjecucionComponent implements OnInit {
 
       if (trazError) throw trazError;
 
-      alert('Cirugía finalizada correctamente');
+      alert(
+        '✅ Cirugía finalizada correctamente\n\n' +
+        '📋 Próximos pasos:\n' +
+        '1. Validar devolución del kit\n' +
+        '2. Separar productos usados/sin usar\n' +
+        '3. Enviar productos reutilizables a limpieza/esterilización\n' +
+        '4. Actualizar inventario\n\n' +
+        'El kit está marcado como "DEVUELTO" y listo para proceso de devolución.'
+      );
       this.router.navigate(['/internal/tecnico']);
 
     } catch (error: any) {
