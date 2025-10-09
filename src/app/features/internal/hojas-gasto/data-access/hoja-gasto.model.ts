@@ -32,6 +32,25 @@ export interface HojaGasto {
   // Relaciones
   items?: HojaGastoItem[];
   hoja_gasto_items?: HojaGastoItem[];
+  // Relaciones expandidas
+  tecnico?: {
+    id: string;
+    full_name: string;
+    email: string;
+  };
+  cirugia?: {
+    id: string;
+    numero_cirugia: string;
+    medico_cirujano: string;
+    fecha_programada: string;
+    cliente?: {
+      nombre: string;
+      apellido: string;
+    };
+    hospital?: {
+      nombre: string;
+    };
+  };
 }
 
 export interface HojaGastoItem {

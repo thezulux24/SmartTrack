@@ -380,3 +380,14 @@
   (close)="onSuccessDialogClose()"
   (crearOtra)="onCrearOtraHoja()">
 </app-hoja-gasto-success-dialog>
+<!-- Warning Dialog -->
+<app-confirm-dialog
+  [isOpen]="showWarningDialog()"
+  [title]="' Advertencia'"
+  [message]="'Las hojas de gasto se crean automáticamente al finalizar cirugías. ¿Está seguro que desea crear una manualmente?'"
+  [confirmText]="'Continuar'"
+  [cancelText]="'Cancelar'"
+  [confirmButtonClass]="'bg-[#CBDD00] hover:bg-[#b5c500] text-[#10284C]'"
+  (confirm)="onWarningConfirm()"
+  (cancel)="onWarningCancel()">
+</app-confirm-dialog>

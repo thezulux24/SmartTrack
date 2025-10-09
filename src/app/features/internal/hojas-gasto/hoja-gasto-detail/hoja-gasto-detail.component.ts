@@ -31,12 +31,18 @@ export class HojaGastoDetailComponent implements OnInit {
   });
   
   clienteNombre = computed(() => {
-    // Por ahora retornamos N/A hasta que tengamos la relación con cirugia
+    const hoja = this.hojaGasto();
+    if (hoja?.cirugia?.cliente) {
+      return `${hoja.cirugia.cliente.nombre} ${hoja.cirugia.cliente.apellido}`;
+    }
     return 'N/A';
   });
   
   tecnicoNombre = computed(() => {
-    // Por ahora retornamos N/A hasta que tengamos la relación con cirugia  
+    const hoja = this.hojaGasto();
+    if (hoja?.tecnico?.full_name) {
+      return hoja.tecnico.full_name;
+    }
     return 'N/A';
   });
 

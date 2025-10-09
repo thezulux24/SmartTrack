@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { HojaGastoService } from '../data-access/hoja-gasto.service';
 import { CirugiasService } from '../../agenda/data-access/cirugias.service';
 import { HojaGastoSuccessDialogComponent } from '../components/hoja-gasto-success-dialog.component';
+import { ConfirmDialogComponent } from '../../agenda/components/confirm-dialog.component';
 import { 
   HojaGasto, 
   HojaGastoItem, 
@@ -45,7 +46,7 @@ interface CirugiaOption {
 @Component({
   selector: 'app-hoja-gasto-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HojaGastoSuccessDialogComponent],
+  imports: [CommonModule, ReactiveFormsModule, HojaGastoSuccessDialogComponent, ConfirmDialogComponent],
   templateUrl: './hoja-gasto-form.component.html',
   styleUrl: './hoja-gasto-form.component.css'
 })
@@ -61,6 +62,7 @@ export class HojaGastoFormComponent implements OnInit {
   saving = signal(false);
   error = signal<string | null>(null);
   showSuccessDialog = signal(false);
+  showWarningDialog = signal(false);
   successHojaNumero = signal('');
   hojaGasto = signal<HojaGasto | null>(null);
   cirugias = signal<CirugiaOption[]>([]);
@@ -87,7 +89,13 @@ export class HojaGastoFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadData();
+    // Si NO estamos en modo edición, mostrar advertencia
+    const hojaIdFromRoute = this.route.snapshot.paramMap.get('id');
+    if (!hojaIdFromRoute) {
+      this.showWarningDialog.set(true);
+    } else {
+      this.loadData();
+    }
   }
 
   get itemsFormArray() {
@@ -435,5 +443,16 @@ export class HojaGastoFormComponent implements OnInit {
       style: 'currency',
       currency: 'COP'
     }).format(valor);
+  }
+
+  // Métodos para el diálogo de advertencia
+  onWarningConfirm() {
+    this.showWarningDialog.set(false);
+    this.loadData();
+  }
+
+  onWarningCancel() {
+    this.showWarningDialog.set(false);
+    this.router.navigate(['/internal/hojas-gasto']);
   }
 }

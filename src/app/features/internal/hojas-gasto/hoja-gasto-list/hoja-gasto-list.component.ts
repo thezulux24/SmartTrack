@@ -92,12 +92,16 @@ export class HojaGastoListComponent implements OnInit {
   }
 
   getClienteNombre(hoja: HojaGasto): string {
-    // Por ahora retornamos N/A hasta que tengamos la relación con cirugia
+    if (hoja.cirugia?.cliente) {
+      return `${hoja.cirugia.cliente.nombre} ${hoja.cirugia.cliente.apellido}`;
+    }
     return 'N/A';
   }
 
   getTecnicoNombre(hoja: HojaGasto): string {
-    // Por ahora retornamos N/A hasta que tengamos la relación con cirugia
+    if (hoja.tecnico?.full_name) {
+      return hoja.tecnico.full_name;
+    }
     return 'N/A';
   }
 

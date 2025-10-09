@@ -136,7 +136,16 @@ export class HojaGastoService {
         .from('hojas_gasto')
         .select(`
           *,
-          hoja_gasto_items(*)
+          hoja_gasto_items(*),
+          tecnico:profiles!hojas_gasto_tecnico_id_fkey(id, full_name, email),
+          cirugia:cirugias!hojas_gasto_cirugia_id_fkey(
+            id,
+            numero_cirugia,
+            medico_cirujano,
+            fecha_programada,
+            cliente:clientes(nombre, apellido),
+            hospital:hospitales(nombre)
+          )
         `);
 
       // Aplicar filtros
@@ -173,7 +182,16 @@ export class HojaGastoService {
         .from('hojas_gasto')
         .select(`
           *,
-          hoja_gasto_items(*)
+          hoja_gasto_items(*),
+          tecnico:profiles!hojas_gasto_tecnico_id_fkey(id, full_name, email),
+          cirugia:cirugias!hojas_gasto_cirugia_id_fkey(
+            id,
+            numero_cirugia,
+            medico_cirujano,
+            fecha_programada,
+            cliente:clientes(nombre, apellido),
+            hospital:hospitales(nombre)
+          )
         `)
         .eq('id', id)
         .single();
@@ -513,6 +531,25 @@ export class HojaGastoService {
       updated_at: data.updated_at,
       created_by: data.created_by,
       updated_by: data.updated_by,
+      // Datos relacionales
+      tecnico: data.tecnico ? {
+        id: data.tecnico.id,
+        full_name: data.tecnico.full_name,
+        email: data.tecnico.email
+      } : undefined,
+      cirugia: data.cirugia ? {
+        id: data.cirugia.id,
+        numero_cirugia: data.cirugia.numero_cirugia,
+        medico_cirujano: data.cirugia.medico_cirujano,
+        fecha_programada: data.cirugia.fecha_programada,
+        cliente: data.cirugia.cliente ? {
+          nombre: data.cirugia.cliente.nombre,
+          apellido: data.cirugia.cliente.apellido
+        } : undefined,
+        hospital: data.cirugia.hospital ? {
+          nombre: data.cirugia.hospital.nombre
+        } : undefined
+      } : undefined,
       items: data.hoja_gasto_items?.map((item: any) => ({
         id: item.id,
         hoja_gasto_id: item.hoja_gasto_id,
