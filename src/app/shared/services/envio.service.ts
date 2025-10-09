@@ -278,11 +278,12 @@ export class EnvioService {
       if (envioError) throw envioError;
 
       // 2. Actualizar envío a entregado
+      const ahora = new Date().toISOString();
       const { error: updateEnvioError } = await this.supabase.client
         .from('envios')
         .update({
           estado: 'entregado',
-          hora_llegada: new Date().toISOString()
+          hora_llegada: ahora
         })
         .eq('id', envioId);
 
@@ -293,7 +294,11 @@ export class EnvioService {
         .from('kits_cirugia')
         .update({
           estado: 'entregado',
-          updated_at: new Date().toISOString()
+          fecha_recepcion: ahora,
+          cliente_receptor_nombre: datosEntrega.nombre_receptor,
+          cliente_receptor_cedula: datosEntrega.documento_receptor || null,
+          cliente_validacion_fecha: ahora,
+          updated_at: ahora
         })
         .eq('id', envio.kit_id);
 
@@ -307,13 +312,15 @@ export class EnvioService {
           accion: 'Kit entregado al cliente',
           estado_anterior: 'en_transito',
           estado_nuevo: 'entregado',
-          usuario_id: (await this.supabase.client.auth.getUser()).data.user?.id,
-          timestamp: new Date().toISOString(),
+          usuario_id: null, // Cliente público sin sesión
+          timestamp: ahora,
           observaciones: `Recibido por: ${datosEntrega.nombre_receptor}${datosEntrega.documento_receptor ? ` - Doc: ${datosEntrega.documento_receptor}` : ''}`,
           metadata: {
             envio_id: envioId,
             mensajero_id: envio.mensajero_id,
-            receptor: datosEntrega
+            receptor: datosEntrega,
+            validado_via: 'qr_scan',
+            ubicacion_validacion: 'destino_final'
           }
         });
 

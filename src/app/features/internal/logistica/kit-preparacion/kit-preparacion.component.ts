@@ -7,6 +7,7 @@ import { KitService } from '../../../../shared/services/kit.service';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
 import { KitCirugia, KitProducto } from '../../../../shared/models/kit.model';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 interface ProductoPreparacion {
   id: string;
@@ -120,7 +121,7 @@ export class KitPreparacionComponent implements OnInit {
       // Si el kit ya tiene QR code, cargar la URL con hash location
       if (kitData.qr_code) {
         this.qrCode.set(kitData.qr_code);
-        this.qrUrl.set(`https://thezulux24.github.io/SmartTrack/#/qr/${kitData.qr_code}`);
+        this.qrUrl.set(`${environment.PUBLIC_URL}/qr/${kitData.qr_code}`);
       }
 
       // Procesar productos para preparación
@@ -252,7 +253,7 @@ export class KitPreparacionComponent implements OnInit {
 
       // Mostrar QR con URL completa usando hash location
       this.qrCode.set(qrCode);
-      this.qrUrl.set(`https://thezulux24.github.io/SmartTrack/#/qr/${qrCode}`);
+      this.qrUrl.set(`${environment.PUBLIC_URL}/qr/${qrCode}`);
       this.mostrarQR.set(true);
 
     } catch (error) {

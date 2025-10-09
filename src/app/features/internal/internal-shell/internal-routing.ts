@@ -37,6 +37,11 @@ export default [
   },
 
   {
+    path: 'tecnico',
+    loadChildren: () => import('../tecnico/tecnico-routing').then(m => m.tecnicoRoutes)
+  },
+
+  {
     path: '**', redirectTo: ''
   }
 

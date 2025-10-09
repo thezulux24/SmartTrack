@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { QRCodeModule } from 'angularx-qrcode';
 import { EnvioService } from '../../../../shared/services/envio.service';
 import { Envio } from '../../../../shared/models/envio.model';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-envios-transito-list',
@@ -121,9 +122,8 @@ export class EnviosTransitoListComponent implements OnInit {
     this.mostrarQR.set(envio.kit.id);
     this.codigoQR.set(envio.kit.codigo_qr);
     
-    // Generar URL pública para el QR
-    const baseUrl = window.location.origin;
-    this.urlQR.set(`${baseUrl}/qr/${envio.kit.codigo_qr}`);
+    // Generar URL pública para el QR usando variable de entorno
+    this.urlQR.set(`${environment.PUBLIC_URL}/qr/${envio.kit.codigo_qr}`);
   }
 
   cerrarQR() {
