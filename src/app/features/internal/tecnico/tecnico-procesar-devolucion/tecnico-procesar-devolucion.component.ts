@@ -139,8 +139,14 @@ export class TecnicoProcesamDevolucionComponent {
       // Mapear productos con valores iniciales
       const productosDevolucion: ProductoDevolucion[] = (productosData || []).map((kp: any) => {
         const producto = (kp.productos as any);
-        const cantidadDisponible = (kp.cantidad_enviada || 0) - (kp.cantidad_utilizada || 0);
-        const fueUtilizado = (kp.cantidad_utilizada || 0) > 0;
+        const cantidadUtilizada = kp.cantidad_utilizada || 0;
+        const cantidadDisponible = (kp.cantidad_enviada || 0) - cantidadUtilizada;
+        const fueUtilizado = cantidadUtilizada > 0;
+        
+        // LÓGICA CORREGIDA:
+        // - Si fue utilizado → cantidad_a_recuperar = cantidad_utilizada (para enviar a limpieza)
+        // - Si NO fue utilizado → cantidad_a_recuperar = cantidad_disponible (para devolver directo)
+        const cantidadARecuperar = fueUtilizado ? cantidadUtilizada : cantidadDisponible;
         
         return {
           id: kp.id,
@@ -148,11 +154,11 @@ export class TecnicoProcesamDevolucionComponent {
           nombre: producto.nombre,
           codigo: producto.codigo,
           cantidad_enviada: kp.cantidad_enviada || 0,
-          cantidad_utilizada: kp.cantidad_utilizada || 0,
+          cantidad_utilizada: cantidadUtilizada,
           cantidad_disponible: cantidadDisponible,
           es_desechable: false, // Por defecto no es desechable
           requiere_limpieza: fueUtilizado, // Si fue utilizado, requiere limpieza
-          cantidad_a_recuperar: cantidadDisponible, // Por defecto recuperar todo lo disponible
+          cantidad_a_recuperar: cantidadARecuperar, // ✅ Corregido: utilizada si fue usado, disponible si no
           notas: ''
         };
       });
@@ -189,8 +195,15 @@ export class TecnicoProcesamDevolucionComponent {
     const productos = this.productos();
     const index = productos.findIndex(p => p.id === producto.id);
     if (index !== -1 && !productos[index].es_desechable) {
+      // El máximo depende de si el producto fue utilizado o no:
+      // - Utilizado → máximo = cantidad_utilizada (lo que se puede recuperar de limpieza)
+      // - No utilizado → máximo = cantidad_disponible (lo que quedó sin usar)
+      const cantidadMaxima = productos[index].requiere_limpieza 
+        ? productos[index].cantidad_utilizada 
+        : productos[index].cantidad_disponible;
+      
       const nuevaCantidad = Math.max(0, 
-        Math.min(productos[index].cantidad_disponible, productos[index].cantidad_a_recuperar + cambio)
+        Math.min(cantidadMaxima, productos[index].cantidad_a_recuperar + cambio)
       );
       productos[index].cantidad_a_recuperar = nuevaCantidad;
       this.productos.set([...productos]);
@@ -310,6 +323,7 @@ export class TecnicoProcesamDevolucionComponent {
             cantidad_aprobada: 0,
             es_desechable: false,
             estado_limpieza: 'pendiente',
+            estado: 'enviado_limpieza', // ✅ Nuevo campo para flujo de recepción logística
             notas: producto.notas,
             procesado_por: userId,
             fecha_inicio_proceso: new Date().toISOString()

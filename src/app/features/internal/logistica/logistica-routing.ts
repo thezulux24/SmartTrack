@@ -43,5 +43,11 @@ export const LOGISTICA_ROUTES: Routes = [
     loadComponent: () => import('./envios-transito-list/envios-transito-list.component')
       .then(m => m.EnviosTransitoListComponent),
     canActivate: [internalGuard]
+  },
+  {
+    path: 'recepcion-limpieza',
+    loadComponent: () => import('./logistica-recepcion-limpieza/logistica-recepcion-limpieza.component')
+      .then(m => m.LogisticaRecepcionLimpiezaComponent),
+    canActivate: [internalGuard]
   }
 ];
