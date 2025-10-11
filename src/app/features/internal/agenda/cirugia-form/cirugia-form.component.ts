@@ -12,6 +12,9 @@ import { KitService } from '../../../../shared/services/kit.service';
 import { ClientesService, Cliente } from '../../clientes/data-acces/clientes.service';
 import { Hospital, TipoCirugia, TecnicoAsignado, Cirugia, CirugiaCreate } from '../data-access/models';
 import { SuccessDialogComponent } from '../components/success-dialog.component';
+import { NotificationService } from '../../../../shared/services/notification.service';
+import { AuthService } from '../../../../auth/data-access/auth.service';
+import { SupabaseService } from '../../../../shared/data-access/supabase.service';
 
 @Component({
   selector: 'app-cirugia-form',
@@ -30,6 +33,9 @@ export class CirugiaFormComponent implements OnInit {
   private readonly tecnicosService = inject(TecnicosService);
   private readonly kitService = inject(KitService);
   private readonly clientesService = inject(ClientesService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly authService = inject(AuthService);
+  private readonly supabaseService = inject(SupabaseService);
 
   // Signals
   loading = signal(false);
@@ -392,9 +398,55 @@ export class CirugiaFormComponent implements OnInit {
   private createCirugia(data: CirugiaCreate) {
     console.log('➕ Creando nueva cirugía...');
     this.cirugiasService.createCirugia(data).subscribe({
-      next: (cirugia) => {
+      next: async (cirugia) => {
         console.log('✅ Cirugía creada exitosamente:', cirugia);
         this.cirugiaCreada.set(cirugia);
+        
+        // Enviar notificaciones en tiempo real
+        try {
+          // Obtener el usuario actual desde la sesión
+          const { data: sessionData } = await this.authService.session();
+          const currentUserId = sessionData?.session?.user?.id;
+          
+          let creatorName = 'Un comercial';
+          if (currentUserId) {
+            // Obtener el perfil del usuario
+            const { data: profile } = await this.supabaseService.supabaseClient
+              .from('profiles')
+              .select('full_name')
+              .eq('id', currentUserId)
+              .single();
+            
+            if (profile?.full_name) {
+              creatorName = profile.full_name;
+            }
+          }
+          
+          const hospital = this.hospitales().find(h => h.id === data.hospital_id);
+          const hospitalName = hospital?.nombre || 'Hospital no especificado';
+          
+          const fechaFormateada = new Date(data.fecha_programada).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+
+          await this.notificationService.notifyNewCirugia(
+            data.tecnico_asignado_id || null,
+            cirugia.id,
+            cirugia.numero_cirugia,
+            data.medico_cirujano,
+            fechaFormateada,
+            hospitalName,
+            creatorName
+          );
+          
+          console.log('✅ Notificaciones de nueva cirugía enviadas');
+        } catch (error) {
+          console.error('❌ Error al enviar notificaciones:', error);
+          // No bloqueamos el flujo si falla la notificación
+        }
+
         this.loading.set(false);
         // Mostrar diálogo de éxito
         this.successDialogTitle.set('La cirugía se ha programado\nexitosamente');

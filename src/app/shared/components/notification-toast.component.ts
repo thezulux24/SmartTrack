@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { NotificationService } from '../services/notification.service';
 import { Router } from '@angular/router';
 
@@ -7,6 +8,17 @@ import { Router } from '@angular/router';
   selector: 'app-notification-toast',
   standalone: true,
   imports: [CommonModule],
+  animations: [
+    trigger('slideIn', [
+      transition(':enter', [
+        style({ transform: 'translateX(400px)', opacity: 0 }),
+        animate('300ms ease-out', style({ transform: 'translateX(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ transform: 'translateX(400px)', opacity: 0 }))
+      ])
+    ])
+  ],
   template: `
     <div class="fixed top-4 right-4 left-4 md:left-auto z-50 space-y-2 max-w-md md:max-w-md mx-auto md:mx-0">
       @for (toast of notificationService.activeToasts(); track toast.id) {
@@ -59,17 +71,6 @@ import { Router } from '@angular/router';
     </div>
   `,
   styles: [`
-    @keyframes slideIn {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
     @keyframes progressBar {
       from {
         width: 100%;

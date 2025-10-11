@@ -420,6 +420,69 @@ export class NotificationService {
     );
   }
 
+  // Nueva cirugía creada (notifica a técnico asignado + logística)
+  async notifyNewCirugia(
+    tecnico_asignado_id: string | null,
+    cirugia_id: string,
+    numero_cirugia: string,
+    medico_cirujano: string,
+    fecha_programada: string,
+    hospital_nombre: string,
+    creador_nombre: string
+  ) {
+    console.log('🏥 NotificationService.notifyNewCirugia called:', {
+      tecnico_asignado_id,
+      cirugia_id,
+      numero_cirugia
+    });
+
+    try {
+      // Preparar datos comunes
+      const data = {
+        cirugia_id,
+        numero_cirugia,
+        medico_cirujano,
+        fecha_programada,
+        hospital_nombre
+      };
+
+      // Obtener usuarios de logística
+      const logistica_ids = await this.getLogisticaUsers();
+
+      // Notificar al técnico asignado (si existe)
+      if (tecnico_asignado_id) {
+        console.log('📨 Notificando a técnico asignado:', tecnico_asignado_id);
+        await this.createNotification(
+          tecnico_asignado_id,
+          'asignacion_cirugia',
+          '🏥 Nueva cirugía asignada',
+          `${numero_cirugia} - ${medico_cirujano} en ${hospital_nombre}`,
+          'high',
+          data,
+          `/internal/agenda/${cirugia_id}`
+        );
+      }
+
+      // Notificar a TODA logística
+      if (logistica_ids.length > 0) {
+        console.log('📦 Notificando a logística:', logistica_ids);
+        await this.notifyUsers(
+          logistica_ids,
+          'asignacion_cirugia',
+          '📋 Nueva cirugía programada',
+          `${numero_cirugia} - ${medico_cirujano} (creada por ${creador_nombre})`,
+          'medium',
+          data,
+          `/internal/agenda/${cirugia_id}`
+        );
+      }
+
+      console.log('✅ NotificationService.notifyNewCirugia: Notifications sent successfully');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyNewCirugia: Error:', error);
+    }
+  }
+
   // ======================
   // GESTIÓN DE NOTIFICACIONES
   // ======================
@@ -533,6 +596,30 @@ export class NotificationService {
   // ======================
   // UTILIDADES
   // ======================
+
+  // Obtener todos los usuarios de logística
+  private async getLogisticaUsers(): Promise<string[]> {
+    try {
+      const { data, error } = await this.supabase.client
+        .from('profiles')
+        .select('id')
+        .eq('role', 'logistica')
+        .eq('is_active', true);
+
+      if (error) {
+        console.error('❌ Error fetching logistica users:', error);
+        return [];
+      }
+
+      const ids = (data || []).map((user: any) => user.id);
+      console.log('📦 Logistica users found:', ids.length);
+      return ids;
+    } catch (error) {
+      console.error('❌ Exception getting logistica users:', error);
+      return [];
+    }
+  }
+
   private getIconForType(type: NotificationType): string {
     const icons: Record<NotificationType, string> = {
       nuevo_mensaje: '💬',
