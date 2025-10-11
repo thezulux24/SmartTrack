@@ -290,7 +290,7 @@ export class ChatService {
         const chatList: ChatListItem[] = [];
 
         for (const cirugia of cirugias || []) {
-          const { data: ultimoMensaje } = await this.supabase.client
+          const { data: mensajes } = await this.supabase.client
             .from('mensajes_cirugia')
             .select(`
               mensaje,
@@ -299,8 +299,14 @@ export class ChatService {
             `)
             .eq('cirugia_id', cirugia.id)
             .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
+            .limit(1);
+
+          const ultimoMensaje = mensajes && mensajes.length > 0 ? mensajes[0] : null;
+
+          // Solo agregar cirugías que tienen mensajes
+          if (!ultimoMensaje) {
+            continue; // Saltar cirugías sin mensajes
+          }
 
           const { data: unreadCount } = await this.supabase.client
             .rpc('get_unread_messages_count', {
@@ -308,18 +314,16 @@ export class ChatService {
               p_cirugia_id: cirugia.id
             });
 
-          if (ultimoMensaje) {
-            chatList.push({
-              cirugia_id: cirugia.id,
-              numero_cirugia: cirugia.numero_cirugia,
-              ultimo_mensaje: ultimoMensaje.mensaje,
-              ultimo_mensaje_fecha: ultimoMensaje.created_at,
-              ultimo_mensaje_usuario: (ultimoMensaje.usuario as any)?.full_name || 'Desconocido',
-              mensajes_no_leidos: unreadCount || 0,
-              participantes_count: 2, // TODO: calcular correctamente
-              estado_cirugia: cirugia.estado
-            });
-          }
+          chatList.push({
+            cirugia_id: cirugia.id,
+            numero_cirugia: cirugia.numero_cirugia,
+            ultimo_mensaje: ultimoMensaje.mensaje,
+            ultimo_mensaje_fecha: ultimoMensaje.created_at,
+            ultimo_mensaje_usuario: (ultimoMensaje.usuario as any)?.full_name || 'Desconocido',
+            mensajes_no_leidos: unreadCount || 0,
+            participantes_count: 2, // TODO: calcular correctamente
+            estado_cirugia: cirugia.estado
+          });
         }
 
         return chatList.sort((a, b) => 
