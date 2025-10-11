@@ -292,6 +292,22 @@ CREATE TABLE public.movimientos_inventario (
   CONSTRAINT movimientos_inventario_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id),
   CONSTRAINT movimientos_inventario_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
 );
+CREATE TABLE public.notificaciones (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL CHECK (user_id IS NOT NULL),
+  type USER-DEFINED NOT NULL,
+  priority USER-DEFINED DEFAULT 'medium'::notification_priority,
+  title text NOT NULL,
+  message text NOT NULL,
+  icon text,
+  icon_color text,
+  link text,
+  data jsonb DEFAULT '{}'::jsonb,
+  read boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT notificaciones_pkey PRIMARY KEY (id),
+  CONSTRAINT notificaciones_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
 CREATE TABLE public.productos (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   codigo character varying NOT NULL UNIQUE,

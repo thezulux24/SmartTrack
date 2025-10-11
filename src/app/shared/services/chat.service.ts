@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map, switchMap, BehaviorSubject } from 'rxjs';
+import { Observable, from, map, switchMap, BehaviorSubject, tap } from 'rxjs';
 import { SupabaseService } from '../data-access/supabase.service';
 import {
   MensajeCirugia,
@@ -9,12 +9,14 @@ import {
   ChatParticipante
 } from '../models/chat.model';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
   private supabase = inject(SupabaseService);
+  private notificationService = inject(NotificationService);
   private activeChannels = new Map<string, RealtimeChannel>();
   private unreadCountsSubject = new BehaviorSubject<Map<string, number>>(new Map());
   
@@ -71,8 +73,110 @@ export class ChatService {
       map(({ data, error }) => {
         if (error) throw error;
         return data as MensajeCirugia;
+      }),
+      tap(async (mensaje) => {
+        // Enviar notificaciones a otros participantes
+        await this.notifyParticipants(mensaje);
       })
     );
+  }
+
+  /**
+   * Notificar a participantes sobre nuevo mensaje
+   */
+  private async notifyParticipants(mensaje: MensajeCirugia) {
+    try {
+      console.log('💬 ChatService: notifyParticipants called for message', mensaje.id);
+      
+      const session = await this.supabase.getSession();
+      if (!session?.user?.id) {
+        console.warn('⚠️ ChatService: No session, skipping notifications');
+        return;
+      }
+
+      console.log('💬 ChatService: Current user is', session.user.id);
+
+      // Obtener info de la cirugía y participantes
+      const { data: cirugia } = await this.supabase.client
+        .from('cirugias')
+        .select(`
+          id,
+          numero_cirugia,
+          usuario_creador_id,
+          tecnico_asignado_id
+        `)
+        .eq('id', mensaje.cirugia_id)
+        .single();
+
+      if (!cirugia) {
+        console.warn('⚠️ ChatService: Cirugia not found');
+        return;
+      }
+
+      console.log('💬 ChatService: Cirugia info', cirugia);
+
+      // Obtener logística (si existe kit asignado)
+      const { data: kits } = await this.supabase.client
+        .from('kits_cirugia')
+        .select('preparado_por_id')
+        .eq('cirugia_id', mensaje.cirugia_id)
+        .limit(1);
+
+      console.log('💬 ChatService: Kits info', kits);
+
+      // Recopilar IDs de participantes (excluyendo al remitente)
+      const participantIds = new Set<string>();
+      
+      if (cirugia.usuario_creador_id && cirugia.usuario_creador_id !== session.user.id) {
+        participantIds.add(cirugia.usuario_creador_id);
+        console.log('💬 ChatService: Added creator to participants', cirugia.usuario_creador_id);
+      }
+      
+      if (cirugia.tecnico_asignado_id && cirugia.tecnico_asignado_id !== session.user.id) {
+        participantIds.add(cirugia.tecnico_asignado_id);
+        console.log('💬 ChatService: Added tecnico to participants', cirugia.tecnico_asignado_id);
+      }
+
+      if (kits && kits.length > 0 && kits[0].preparado_por_id) {
+        if (kits[0].preparado_por_id !== session.user.id) {
+          participantIds.add(kits[0].preparado_por_id);
+          console.log('💬 ChatService: Added logistics to participants', kits[0].preparado_por_id);
+        }
+      }
+
+      console.log('💬 ChatService: Total participants to notify:', participantIds.size);
+
+      // Enviar notificaciones
+      if (participantIds.size > 0) {
+        const remitente = mensaje.usuario?.full_name || 'Usuario';
+        const preview = mensaje.tipo === 'texto' 
+          ? mensaje.mensaje 
+          : mensaje.tipo === 'ubicacion' 
+            ? '📍 Compartió ubicación' 
+            : '📎 Envió un archivo';
+
+        console.log('💬 ChatService: Calling notifyNewMessage with:', {
+          participantIds: Array.from(participantIds),
+          cirugia: cirugia.numero_cirugia,
+          remitente,
+          preview
+        });
+
+        await this.notificationService.notifyNewMessage(
+          Array.from(participantIds),
+          mensaje.cirugia_id,
+          cirugia.numero_cirugia,
+          remitente,
+          preview
+        );
+        
+        console.log('✅ ChatService: Notifications sent successfully');
+      } else {
+        console.log('ℹ️ ChatService: No participants to notify (you are the only one)');
+      }
+    } catch (error) {
+      console.error('❌ ChatService: Error notifying participants:', error);
+    }
   }
 
   /**

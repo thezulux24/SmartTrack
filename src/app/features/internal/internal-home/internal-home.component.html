@@ -1,4 +1,7 @@
 <div class="min-h-screen relative bg-white">
+  <!-- Componente de Toast para notificaciones -->
+  <app-notification-toast />
+
   <!-- HEADER con gradiente + imagen + WAVE dentro -->
   <div class="relative overflow-hidden bg-gradient-to-b from-[#10284C] via-[#0098A8] to-[#0098A8]">
     <!-- Imagen de fondo -->
@@ -9,14 +12,21 @@
     <div class="relative z-10">
       <header class="px-4 py-6">
         <div class="max-w-lg mx-auto">
-          <!-- Top bar with logo and logout -->
+          <!-- Top bar with logo, notifications and logout -->
           <div class="flex justify-between items-center mb-8">
             <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp"
                  alt="Implameq" class="h-10 brightness-0 invert">
-            <button (click)="logout()"
-              class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md">
-              Salir
-            </button>
+            
+            <div class="flex items-center gap-2">
+              <!-- Panel de notificaciones -->
+              <app-notification-panel />
+              
+              <!-- Botón de salir -->
+              <button (click)="logout()"
+                class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md">
+                Salir
+              </button>
+            </div>
           </div>
 
           <!-- Title -->
