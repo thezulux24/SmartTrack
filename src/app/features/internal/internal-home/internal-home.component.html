@@ -66,6 +66,34 @@
   <div class="bg-white px-4 pt-6 pb-8">
     <div class="max-w-lg mx-auto space-y-5">
 
+      <!-- Chat/Mensajes -->
+      <a routerLink="/internal/chat"
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200 relative">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0 relative">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+              <!-- Badge de mensajes no leídos -->
+              @if (totalUnreadMessages() > 0) {
+                <span class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                  {{ totalUnreadMessages() > 99 ? '99+' : totalUnreadMessages() }}
+                </span>
+              }
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white">Mensajes</h2>
+              <p class="text-sm text-white/70">Chat por cirugía</p>
+            </div>
+          </div>
+          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </a>
+
       <!-- Agenda -->
       <a routerLink="/internal/agenda"
         class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
@@ -134,11 +162,11 @@
 
       <!-- Recepción de Limpieza -->
       <a routerLink="/internal/logistica/recepcion-limpieza"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200 border-l-4 border-[#6EE7B7]">
+        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#6EE7B7] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#064E3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

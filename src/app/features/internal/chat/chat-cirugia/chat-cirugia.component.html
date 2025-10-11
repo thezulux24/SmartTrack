@@ -1,0 +1,197 @@
+<div class="min-h-screen bg-gradient-to-br from-[#10284C] via-[#0e1f3a] to-[#0a1628] pb-safe">
+  <!-- Header fijo -->
+  <header class="sticky top-0 z-50 bg-[#10284C]/95 backdrop-blur-md border-b border-white/10 shadow-xl">
+    <div class="px-4 py-4">
+      <div class="flex items-center justify-between mb-3">
+        <button (click)="volver()"
+                class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+        </button>
+
+        @if (cirugiaInfo()) {
+          <div class="flex-1 text-center">
+            <h1 class="text-xl font-bold text-white">{{ cirugiaInfo()!.numero_cirugia }}</h1>
+            <p class="text-sm text-white/60">{{ cirugiaInfo()!.medico_cirujano }}</p>
+          </div>
+        }
+
+        <div class="w-10"></div> <!-- Spacer for centering -->
+      </div>
+
+      <!-- Participantes -->
+      @if (participantes().length > 0) {
+        <div class="flex items-center justify-center gap-2 flex-wrap">
+          @for (participante of participantes(); track participante.id) {
+            <span class="px-3 py-1 rounded-full text-xs font-medium {{ getRolColor(participante.rol) }}">
+              {{ participante.nombre }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="flex items-center justify-center h-96">
+      <div class="text-center">
+        <div class="w-12 h-12 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-white/70">Cargando chat...</p>
+      </div>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (error() && !loading()) {
+    <div class="p-4">
+      <div class="bg-red-500/20 border border-red-500 rounded-xl p-6 text-center">
+        <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <h3 class="text-xl font-bold text-red-500 mb-2">Error</h3>
+        <p class="text-white">{{ error() }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Chat messages -->
+  @if (!loading() && !error()) {
+    <div class="flex flex-col h-[calc(100vh-180px)]">
+      <!-- Messages container -->
+      <div #messagesContainer class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+        @if (mensajes().length === 0) {
+          <div class="text-center py-12">
+            <svg class="w-20 h-20 text-white/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            <p class="text-white/50 text-sm">No hay mensajes aún</p>
+            <p class="text-white/30 text-xs mt-2">Sé el primero en escribir</p>
+          </div>
+        }
+
+        @for (mensaje of mensajes(); track mensaje.id) {
+          <div class="flex {{ esMiMensaje(mensaje) ? 'justify-end' : 'justify-start' }}">
+            <div class="max-w-[80%]">
+              <!-- Nombre y rol del usuario (solo si no es mi mensaje) -->
+              @if (!esMiMensaje(mensaje)) {
+                <div class="flex items-center gap-2 mb-1 ml-2">
+                  <span class="text-xs font-medium text-white/70">{{ getNombreUsuario(mensaje) }}</span>
+                  <span class="px-2 py-0.5 rounded-full text-xs {{ getRolColor(mensaje.usuario?.role || '') }}">
+                    {{ getRolUsuario(mensaje) }}
+                  </span>
+                </div>
+              }
+
+              <!-- Mensaje -->
+              <div class="{{
+                esMiMensaje(mensaje) 
+                  ? 'bg-[#C8D900] text-[#10284C] rounded-2xl rounded-tr-sm' 
+                  : 'bg-white/10 text-white rounded-2xl rounded-tl-sm'
+                }} px-4 py-3 backdrop-blur-sm">
+                
+                <!-- Mensaje de texto -->
+                @if (mensaje.tipo === 'texto') {
+                  <p class="text-sm break-words whitespace-pre-wrap">{{ mensaje.mensaje }}</p>
+                }
+
+                <!-- Mensaje de ubicación -->
+                @if (mensaje.tipo === 'ubicacion' && mensaje.metadata?.latitud && mensaje.metadata?.longitud) {
+                  <div>
+                    <p class="text-sm font-medium mb-2">{{ mensaje.mensaje }}</p>
+                    <button (click)="verEnMapa(mensaje.metadata?.latitud, mensaje.metadata?.longitud)"
+                            class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      </svg>
+                      <span class="text-xs">Ver en mapa</span>
+                    </button>
+                  </div>
+                }
+
+                <!-- Mensaje de alerta -->
+                @if (mensaje.tipo === 'alerta') {
+                  <div class="flex items-start gap-2">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <div>
+                      @if (mensaje.metadata?.titulo) {
+                        <p class="font-bold text-sm mb-1">{{ mensaje.metadata?.titulo }}</p>
+                      }
+                      <p class="text-sm">{{ mensaje.mensaje }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <!-- Timestamp -->
+              <p class="text-xs {{ esMiMensaje(mensaje) ? 'text-right' : 'text-left' }} mt-1 px-2 text-white/40">
+                {{ formatearFecha(mensaje.created_at) }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Input area -->
+      <div class="border-t border-white/10 bg-[#10284C]/95 backdrop-blur-md p-4">
+        <div class="flex items-end gap-2">
+          <!-- Botones de acciones -->
+          <div class="flex flex-col gap-2">
+            <button (click)="abrirArchivos()"
+                    class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                    title="Adjuntar archivo">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+              </svg>
+            </button>
+            
+            <button (click)="enviarUbicacion()"
+                    class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                    title="Compartir ubicación">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Input de mensaje -->
+          <div class="flex-1 flex items-end gap-2">
+            <textarea
+              [(ngModel)]="nuevoMensaje"
+              (keypress)="onKeyPress($event)"
+              [disabled]="enviando()"
+              placeholder="Escribe un mensaje..."
+              rows="1"
+              class="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#C8D900] focus:border-transparent resize-none max-h-32"
+            ></textarea>
+
+            <button
+              (click)="enviarMensaje()"
+              [disabled]="!nuevoMensaje().trim() || enviando()"
+              class="p-3 rounded-xl bg-[#C8D900] hover:bg-[#b5c500] text-[#10284C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0">
+              @if (enviando()) {
+                <div class="w-6 h-6 border-2 border-[#10284C] border-t-transparent rounded-full animate-spin"></div>
+              } @else {
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- Input oculto para archivos -->
+        <input #fileInput
+               type="file"
+               (change)="onFileSelected($event)"
+               accept="image/*,.pdf,.doc,.docx"
+               class="hidden"/>
+      </div>
+    </div>
+  }
+</div>

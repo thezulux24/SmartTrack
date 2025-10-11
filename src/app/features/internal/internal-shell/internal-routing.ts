@@ -47,6 +47,11 @@ export default [
   },
 
   {
+    path: 'chat',
+    loadChildren: () => import('../chat/chat-routing').then(m => m.chatRoutes)
+  },
+
+  {
     path: '**', redirectTo: ''
   }
 

@@ -186,12 +186,17 @@ CREATE TABLE public.kit_productos_limpieza (
   fecha_aprobacion timestamp with time zone,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  estado character varying DEFAULT 'enviado_limpieza'::character varying,
+  fecha_devuelto_limpio timestamp without time zone,
+  recibido_por_id uuid,
+  observaciones_recepcion text,
   CONSTRAINT kit_productos_limpieza_pkey PRIMARY KEY (id),
   CONSTRAINT kit_productos_limpieza_kit_producto_id_fkey FOREIGN KEY (kit_producto_id) REFERENCES public.kit_productos(id),
   CONSTRAINT kit_productos_limpieza_kit_id_fkey FOREIGN KEY (kit_id) REFERENCES public.kits_cirugia(id),
   CONSTRAINT kit_productos_limpieza_producto_id_fkey FOREIGN KEY (producto_id) REFERENCES public.productos(id),
   CONSTRAINT kit_productos_limpieza_procesado_por_fkey FOREIGN KEY (procesado_por) REFERENCES auth.users(id),
-  CONSTRAINT kit_productos_limpieza_aprobado_por_fkey FOREIGN KEY (aprobado_por) REFERENCES auth.users(id)
+  CONSTRAINT kit_productos_limpieza_aprobado_por_fkey FOREIGN KEY (aprobado_por) REFERENCES auth.users(id),
+  CONSTRAINT kit_productos_limpieza_recibido_por_id_fkey FOREIGN KEY (recibido_por_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.kit_trazabilidad (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -251,6 +256,20 @@ CREATE TABLE public.mensajeros (
   estado character varying NOT NULL DEFAULT 'disponible'::character varying CHECK (estado::text = ANY (ARRAY['disponible'::character varying, 'ocupado'::character varying]::text[])),
   created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT mensajeros_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.mensajes_cirugia (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  cirugia_id uuid NOT NULL,
+  usuario_id uuid NOT NULL,
+  mensaje text NOT NULL,
+  tipo character varying DEFAULT 'texto'::character varying,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  leido_por jsonb DEFAULT '[]'::jsonb,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT mensajes_cirugia_pkey PRIMARY KEY (id),
+  CONSTRAINT mensajes_cirugia_cirugia_id_fkey FOREIGN KEY (cirugia_id) REFERENCES public.cirugias(id),
+  CONSTRAINT mensajes_cirugia_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.movimientos_inventario (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
