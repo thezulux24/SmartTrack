@@ -149,10 +149,12 @@ export class NotificationService {
 
     // Limpiar canal previo
     if (this.channel) {
+      console.log('🔌 NotificationService: Removing previous channel');
       this.supabase.client.removeChannel(this.channel);
     }
 
-    console.log('🔌 NotificationService: Subscribing to realtime channel for', this.userId);
+    console.log('🔌 NotificationService: Creating realtime subscription for user:', this.userId);
+    console.log('📡 Channel name:', `notifications:${this.userId}`);
 
     // Crear nuevo canal
     this.channel = this.supabase.client
@@ -166,13 +168,27 @@ export class NotificationService {
           filter: `user_id=eq.${this.userId}`
         },
         (payload) => {
-          console.log('📬 NotificationService: Received new notification via realtime', payload);
+          console.log('📬 NotificationService: ✨ REALTIME EVENT RECEIVED! ✨');
+          console.log('📬 Payload:', payload);
           const notification = payload.new as Notification;
           this.handleNewNotification(notification);
         }
       )
-      .subscribe((status) => {
+      .subscribe((status, error) => {
         console.log('🔌 NotificationService: Subscription status:', status);
+        if (error) {
+          console.error('❌ NotificationService: Subscription error:', error);
+        }
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ NotificationService: Successfully subscribed to realtime!');
+          console.log('⏳ Waiting for new notifications...');
+        }
+        if (status === 'CHANNEL_ERROR') {
+          console.error('❌ NotificationService: Channel error - Realtime may not be enabled');
+        }
+        if (status === 'TIMED_OUT') {
+          console.error('❌ NotificationService: Subscription timed out');
+        }
       });
   }
 

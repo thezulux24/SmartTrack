@@ -440,11 +440,16 @@ export class ChatService {
    * Suscribirse a mensajes en tiempo real
    */
   suscribirMensajes(cirugiaId: string, callback: (mensaje: MensajeCirugia) => void): void {
+    console.log('💬 ChatService: Subscribing to messages for cirugia', cirugiaId);
+    
     // Desuscribir canal existente si hay
     this.desuscribirMensajes(cirugiaId);
 
+    const channelName = `chat_${cirugiaId}`;
+    console.log('📡 ChatService: Creating channel:', channelName);
+
     const channel = this.supabase.client
-      .channel(`chat_${cirugiaId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -454,9 +459,14 @@ export class ChatService {
           filter: `cirugia_id=eq.${cirugiaId}`
         },
         async (payload) => {
+          console.log('📬 ChatService: ✨ NEW MESSAGE RECEIVED VIA REALTIME! ✨');
+          console.log('📬 Payload:', payload);
+          
           // Obtener info completa del mensaje con relaciones
           const messageId = (payload.new as any)['id'];
-          const { data } = await this.supabase.client
+          console.log('📬 Fetching full message data for ID:', messageId);
+          
+          const { data, error } = await this.supabase.client
             .from('mensajes_cirugia')
             .select(`
               *,
@@ -465,14 +475,39 @@ export class ChatService {
             .eq('id', messageId)
             .single();
 
+          if (error) {
+            console.error('❌ ChatService: Error fetching message:', error);
+            return;
+          }
+
           if (data) {
+            console.log('✅ ChatService: Message data fetched:', data);
+            console.log('📤 ChatService: Calling callback with message');
             callback(data as MensajeCirugia);
+          } else {
+            console.warn('⚠️ ChatService: No data returned for message', messageId);
           }
         }
       )
-      .subscribe();
+      .subscribe((status, error) => {
+        console.log('🔌 ChatService: Subscription status:', status);
+        if (error) {
+          console.error('❌ ChatService: Subscription error:', error);
+        }
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ ChatService: Successfully subscribed to chat messages!');
+          console.log('⏳ Waiting for new messages in cirugia', cirugiaId);
+        }
+        if (status === 'CHANNEL_ERROR') {
+          console.error('❌ ChatService: Channel error - Check if Realtime is enabled for mensajes_cirugia');
+        }
+        if (status === 'TIMED_OUT') {
+          console.error('❌ ChatService: Subscription timed out');
+        }
+      });
 
     this.activeChannels.set(cirugiaId, channel);
+    console.log('💾 ChatService: Channel stored in activeChannels');
   }
 
   /**

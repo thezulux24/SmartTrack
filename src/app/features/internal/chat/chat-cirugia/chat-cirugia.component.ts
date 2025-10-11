@@ -84,23 +84,42 @@ export class ChatCirugiaComponent implements OnInit, OnDestroy {
   }
 
   suscribirMensajes(cirugiaId: string) {
+    console.log('💬 ChatComponent: Subscribing to messages for cirugia', cirugiaId);
+    
     this.chatService.suscribirMensajes(cirugiaId, (mensaje: MensajeCirugia) => {
+      console.log('📨 ChatComponent: Received new message via callback:', mensaje);
+      console.log('📨 Message ID:', mensaje.id);
+      console.log('📨 From user:', mensaje.usuario_id);
+      console.log('📨 Current user:', this.currentUserId());
+      
       // Evitar duplicados: verificar si el mensaje ya existe
       const mensajesActuales = this.mensajes();
       const existe = mensajesActuales.some(m => m.id === mensaje.id);
       
+      console.log('📨 Message already exists?', existe);
+      console.log('📨 Current messages count:', mensajesActuales.length);
+      
       if (!existe) {
+        console.log('✅ ChatComponent: Adding new message to list');
         this.mensajes.update(msgs => [...msgs, mensaje]);
+        console.log('✅ New messages count:', this.mensajes().length);
         
         // Scroll al final
         setTimeout(() => this.scrollToBottom(), 100);
+      } else {
+        console.log('⚠️ ChatComponent: Message already exists, skipping');
       }
       
       // Marcar como leído si no es mi mensaje
       if (mensaje.usuario_id !== this.currentUserId()) {
+        console.log('📖 ChatComponent: Marking as read (not my message)');
         this.chatService.marcarComoLeido(cirugiaId).subscribe();
+      } else {
+        console.log('✋ ChatComponent: Not marking as read (my own message)');
       }
     });
+    
+    console.log('✅ ChatComponent: Subscription callback registered');
   }
 
   enviarMensaje() {
@@ -110,6 +129,9 @@ export class ChatCirugiaComponent implements OnInit, OnDestroy {
     const cirugiaId = this.route.snapshot.params['id'];
     if (!cirugiaId) return;
 
+    console.log('📤 ChatComponent: Sending message:', mensaje);
+    console.log('📤 To cirugia:', cirugiaId);
+    
     this.enviando.set(true);
 
     this.chatService.enviarMensaje({
@@ -118,8 +140,20 @@ export class ChatCirugiaComponent implements OnInit, OnDestroy {
       tipo: 'texto'
     }).subscribe({
       next: (nuevoMensaje: MensajeCirugia) => {
+        console.log('✅ ChatComponent: Message sent successfully:', nuevoMensaje);
+        console.log('✅ Message ID:', nuevoMensaje.id);
+        
         // Agregar el mensaje a la lista local inmediatamente
-        this.mensajes.update(msgs => [...msgs, nuevoMensaje]);
+        const mensajesActuales = this.mensajes();
+        const existe = mensajesActuales.some(m => m.id === nuevoMensaje.id);
+        
+        if (!existe) {
+          console.log('➕ ChatComponent: Adding sent message to local list');
+          this.mensajes.update(msgs => [...msgs, nuevoMensaje]);
+        } else {
+          console.log('⚠️ ChatComponent: Sent message already in list (via Realtime?)');
+        }
+        
         this.nuevoMensaje.set('');
         this.enviando.set(false);
         
@@ -127,7 +161,7 @@ export class ChatCirugiaComponent implements OnInit, OnDestroy {
         setTimeout(() => this.scrollToBottom(), 100);
       },
       error: (err: any) => {
-        console.error('Error al enviar mensaje:', err);
+        console.error('❌ ChatComponent: Error sending message:', err);
         alert('Error al enviar mensaje');
         this.enviando.set(false);
       }
