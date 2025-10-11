@@ -12,20 +12,17 @@
     <div class="relative z-10">
       <header class="px-4 py-6">
         <div class="max-w-lg mx-auto">
-          <!-- Top bar with logo, notifications and logout -->
+          <!-- Top bar with logo, notifications and profile -->
           <div class="flex justify-between items-center mb-8">
             <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp"
                  alt="Implameq" class="h-10 brightness-0 invert">
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3">
               <!-- Panel de notificaciones -->
               <app-notification-panel />
               
-              <!-- Botón de salir -->
-              <button (click)="logout()"
-                class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-md">
-                Salir
-              </button>
+              <!-- Menú de perfil (reemplaza botón Salir) -->
+              <app-profile-menu />
             </div>
           </div>
 
@@ -76,252 +73,49 @@
   <div class="bg-white px-4 pt-6 pb-8">
     <div class="max-w-lg mx-auto space-y-5">
 
-      <!-- Chat/Mensajes -->
-      <a routerLink="/internal/chat"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200 relative">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0 relative">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-              </svg>
-              <!-- Badge de mensajes no leídos -->
-              @if (totalUnreadMessages() > 0) {
-                <span class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                  {{ totalUnreadMessages() > 99 ? '99+' : totalUnreadMessages() }}
-                </span>
-              }
+      <!-- Tarjetas dinámicas según rol -->
+      @for (item of menuItems(); track item.route) {
+        <a [routerLink]="item.route"
+          class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200 relative">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0 relative">
+                <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    [attr.d]="getIconPath(item.icon)"/>
+                </svg>
+                <!-- Badge de mensajes no leídos solo para Chat -->
+                @if (item.route === '/internal/chat' && totalUnreadMessages() > 0) {
+                  <span class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {{ totalUnreadMessages() > 99 ? '99+' : totalUnreadMessages() }}
+                  </span>
+                }
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-white">{{ item.title }}</h2>
+                <p class="text-sm text-white/70">{{ item.description }}</p>
+              </div>
             </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Mensajes</h2>
-              <p class="text-sm text-white/70">Chat por cirugía</p>
-            </div>
+            <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
+        </a>
+      }
 
-      <!-- Agenda -->
-      <a routerLink="/internal/agenda"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Agenda</h2>
-              <p class="text-sm text-white/70">Gestión de cirugías</p>
-            </div>
+      <!-- Si no hay items que mostrar -->
+      @if (menuItems().length === 0) {
+        <div class="text-center py-12">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-[#C8D900] rounded-full mb-4">
+            <svg class="w-8 h-8 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
           </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
+          <h3 class="text-lg font-semibold text-[#10284C] mb-2">Sin módulos disponibles</h3>
+          <p class="text-gray-600">No tienes permisos asignados. Contacta al administrador.</p>
         </div>
-      </a>
+      }
 
-      <!-- Clientes -->
-      <a routerLink="/internal/clientes"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Clientes</h2>
-              <p class="text-sm text-white/70">Gestión de clientes</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
-
-      <!-- Logística -->
-      <a routerLink="/internal/logistica"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Logística</h2>
-              <p class="text-sm text-white/70">Gestión de kits</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
-
-      <!-- Recepción de Limpieza -->
-      <a routerLink="/internal/logistica/recepcion-limpieza"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Recepción de Limpieza</h2>
-              <p class="text-sm text-white/70">Confirmar productos limpios</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
-
-      <!-- Inventario -->
-      <a routerLink="/internal/inventario"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Inventario</h2>
-              <p class="text-sm text-white/70">Control de stock</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
-
-      <!-- Soporte (deshabilitado) -->
-      <div class="block bg-[#10284C] rounded-2xl p-5 opacity-60">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Soporte</h2>
-              <p class="text-sm text-white/70">Tickets y asistencia</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </div>
-
-      <!-- Dashboard Técnico -->
-      <a routerLink="/internal/tecnico"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Validación Técnica</h2>
-              <p class="text-sm text-white/70">Recepción de kits</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
-
-      <!-- Hojas de Gasto -->
-      <a routerLink="/internal/hojas-gasto"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Hojas de Gasto</h2>
-              <p class="text-sm text-white/70">Registro de gastos</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
-
-      <!-- Trazabilidad -->
-      <a routerLink="/internal/trazabilidad"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Trazabilidad</h2>
-              <p class="text-sm text-white/70">Seguimiento completo</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
-
-      <!-- Mi Agenda -->
-      <a routerLink="/internal/agenda/mi-agenda"
-        class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-lg font-bold text-white">Mi Agenda</h2>
-              <p class="text-sm text-white/70">Cirugías asignadas</p>
-            </div>
-          </div>
-          <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </a>
     </div>
   </div>
 </div>

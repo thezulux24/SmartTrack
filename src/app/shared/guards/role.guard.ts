@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CanActivateFn } from '@angular/router';
 import { SupabaseService } from '../data-access/supabase.service';
+import { hasRoutePermission } from './role-permissions.config';
 
 export const clientGuard: CanActivateFn = async (route, state) => {
   const supabase = inject(SupabaseService);
@@ -74,7 +75,52 @@ export const internalGuard: CanActivateFn = async (route, state) => {
   }
 };
 
-// Guard específico para cada área (opcional)
+/**
+ * Guard genérico que verifica permisos basado en la configuración de roles
+ * Usa el sistema RBAC definido en role-permissions.config.ts
+ */
+export const roleBasedGuard: CanActivateFn = async (route, state) => {
+  const supabase = inject(SupabaseService);
+  const router = inject(Router);
+
+  try {
+    const session = await supabase.getSession();
+    const uid = session?.user?.id;
+    
+    if (!uid) {
+      console.warn('🔒 roleBasedGuard: No hay sesión, redirigiendo a /auth');
+      router.navigate(['/auth']);
+      return false;
+    }
+
+    const profile = await supabase.getUserProfile(uid);
+    
+    if (!profile) {
+      console.warn('🔒 roleBasedGuard: No se encontró perfil');
+      router.navigate(['/']);
+      return false;
+    }
+
+    const currentRoute = state.url;
+    const hasPermission = hasRoutePermission(profile.role, currentRoute);
+
+    if (hasPermission) {
+      console.log(`✅ roleBasedGuard: ${profile.role} tiene acceso a ${currentRoute}`);
+      return true;
+    }
+
+    console.warn(`🚫 roleBasedGuard: ${profile.role} NO tiene acceso a ${currentRoute}`);
+    router.navigate(['/internal']);
+    return false;
+
+  } catch (error) {
+    console.error('❌ Error en roleBasedGuard:', error);
+    router.navigate(['/internal']);
+    return false;
+  }
+};
+
+// Guards específicos para cada área (con admin siempre permitido)
 export const comercialGuard: CanActivateFn = async (route, state) => {
   const supabase = inject(SupabaseService);
   const router = inject(Router);

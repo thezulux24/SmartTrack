@@ -8,11 +8,22 @@ import { ChatService } from '../../../shared/services/chat.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { NotificationPanelComponent } from '../../../shared/components/notification-panel.component';
 import { NotificationToastComponent } from '../../../shared/components/notification-toast.component';
+import { ProfileMenuComponent } from '../../../shared/components/profile-menu.component';
+import { SupabaseService } from '../../../shared/data-access/supabase.service';
+import { hasRoutePermission } from '../../../shared/guards/role-permissions.config';
+
+interface MenuItem {
+  route: string;
+  title: string;
+  description: string;
+  icon: string;
+  roles: string[]; // Roles que pueden ver este item
+}
 
 @Component({
   selector: 'app-internal-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, NotificationPanelComponent, NotificationToastComponent],
+  imports: [CommonModule, RouterModule, NotificationPanelComponent, NotificationToastComponent, ProfileMenuComponent],
   templateUrl: './internal-home.component.html',
   styleUrl: './internal-home.component.css'
 })
@@ -21,11 +32,82 @@ export default class InternalHomeComponent implements OnInit {
   private _authService = inject(AuthService);
   private _router = inject(Router);
   private _chatService = inject(ChatService);
+  private _supabaseService = inject(SupabaseService);
   notificationService = inject(NotificationService);
 
   totalUnreadMessages = signal(0);
+  userRole = signal<string>('');
+  menuItems = signal<MenuItem[]>([]);
+
+  // Definición completa del menú con permisos
+  private allMenuItems: MenuItem[] = [
+    {
+      route: '/internal/chat',
+      title: 'Mensajes',
+      description: 'Chat por cirugía',
+      icon: 'chat',
+      roles: ['admin', 'comercial', 'logistica', 'soporte_tecnico']
+    },
+    {
+      route: '/internal/agenda',
+      title: 'Agenda',
+      description: 'Gestión de cirugías',
+      icon: 'calendar',
+      roles: ['admin', 'comercial', 'logistica', 'soporte_tecnico']
+    },
+    {
+      route: '/internal/clientes',
+      title: 'Clientes',
+      description: 'Gestión de clientes',
+      icon: 'users',
+      roles: ['admin', 'comercial', 'logistica']
+    },
+    {
+      route: '/internal/logistica',
+      title: 'Logística',
+      description: 'Gestión de kits',
+      icon: 'clipboard',
+      roles: ['admin', 'logistica']
+    },
+    {
+      route: '/internal/inventario',
+      title: 'Inventario',
+      description: 'Control de stock',
+      icon: 'cube',
+      roles: ['admin', 'logistica', 'soporte_tecnico']
+    },
+    {
+      route: '/internal/tecnico',
+      title: 'Validación Técnica',
+      description: 'Recepción de kits',
+      icon: 'check-circle',
+      roles: ['admin', 'soporte_tecnico']
+    },
+    {
+      route: '/internal/limpieza',
+      title: 'Recepción de Limpieza',
+      description: 'Confirmar productos limpios',
+      icon: 'check',
+      roles: ['admin', 'soporte_tecnico']
+    },
+    {
+      route: '/internal/hojas-gasto',
+      title: 'Hojas de Gasto',
+      description: 'Registro de gastos',
+      icon: 'document',
+      roles: ['admin', 'comercial', 'soporte_tecnico']
+    },
+    {
+      route: '/internal/trazabilidad',
+      title: 'Trazabilidad',
+      description: 'Seguimiento completo',
+      icon: 'clock',
+      roles: ['admin', 'comercial', 'logistica', 'soporte_tecnico']
+    }
+  ];
 
   async ngOnInit() {
+    await this.loadUserRole();
     await this.loadUnreadMessagesCount();
     await this.initializeNotifications();
     
@@ -33,6 +115,35 @@ export default class InternalHomeComponent implements OnInit {
     setInterval(() => {
       this.loadUnreadMessagesCount();
     }, 30000);
+  }
+
+  async loadUserRole() {
+    try {
+      const session = await this._supabaseService.getSession();
+      if (session?.user?.id) {
+        const profile = await this._supabaseService.getUserProfile(session.user.id);
+        if (profile) {
+          this.userRole.set(profile.role);
+          this.filterMenuByRole(profile.role);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user role:', error);
+    }
+  }
+
+  filterMenuByRole(role: string) {
+    const filteredMenu = this.allMenuItems.filter(item => {
+      // Verificar si el rol está en la lista de roles permitidos
+      if (item.roles.includes(role)) {
+        // También verificar con el sistema RBAC
+        return hasRoutePermission(role, item.route);
+      }
+      return false;
+    });
+    
+    this.menuItems.set(filteredMenu);
+    console.log(`📋 Menú filtrado para rol ${role}:`, filteredMenu.length, 'items');
   }
 
   async initializeNotifications() {
@@ -58,17 +169,19 @@ export default class InternalHomeComponent implements OnInit {
     }
   }
 
-  async logout() {
-    await this._authService.logOut();
-    this._router.navigate(['/auth/log-in']);
-  }
-
-  async navigateToAgenda() {
-    this._router.navigate(['/agenda']);
-  }
-
-  async navigateToInventario() {
-    this._router.navigate(['/inventario']);
+  getIconPath(icon: string): string {
+    const iconPaths: Record<string, string> = {
+      'chat': 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+      'calendar': 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+      'users': 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+      'clipboard': 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+      'cube': 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+      'check-circle': 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+      'check': 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+      'document': 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+      'clock': 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
+    };
+    return iconPaths[icon] || iconPaths['check'];
   }
 
 }
