@@ -1,1 +1,0 @@
-import"./chunk-ODN5LVDJ.js";var o=[{path:"",loadComponent:()=>import("./chunk-V4WK3DKB.js").then(t=>t.ChatListComponent)},{path:":id",loadComponent:()=>import("./chunk-3UM4UATI.js").then(t=>t.ChatCirugiaComponent)}];export{o as chatRoutes};

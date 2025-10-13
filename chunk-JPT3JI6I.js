@@ -1,0 +1,1 @@
+import"./chunk-ODN5LVDJ.js";var t=[{path:"",loadComponent:()=>import("./chunk-6BU3HOCN.js").then(o=>o.LimpiezaDashboardComponent)},{path:"aprobacion",loadComponent:()=>import("./chunk-6TI4O6IR.js").then(o=>o.AprobacionLimpiezaComponent)}];export{t as limpiezaRoutes};
