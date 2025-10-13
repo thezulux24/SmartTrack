@@ -9,6 +9,20 @@ export type NotificationType =
   | 'alerta_stock'
   | 'alerta_vencimiento'
   | 'asignacion_cirugia'
+  | 'cambio_agenda'              // Cambios en fecha/hora/técnico de cirugía
+  | 'asignacion_mensajero'        // Mensajero asignado a envío
+  | 'cambio_estado_envio'         // Estado de envío cambia
+  | 'retraso_envio'               // Envío retrasado
+  | 'error_logistico'             // Error en logística
+  | 'solicitud_urgente'           // Solicitud urgente
+  | 'cambio_estado_hoja_gasto'    // Estado hoja de gasto cambia
+  | 'aprobacion_pendiente'        // Hoja de gasto necesita aprobación
+  | 'incidente_cirugia'           // Incidente durante cirugía
+  | 'cirugia_cancelada'           // Cirugía cancelada
+  | 'cotizacion_aprobada'         // 🆕 Cotización aprobada por cliente
+  | 'cotizacion_rechazada'        // 🆕 Cotización rechazada
+  | 'cotizacion_proxima_vencer'   // 🆕 Cotización próxima a vencer
+  | 'cotizacion_vencida'          // 🆕 Cotización vencida sin respuesta
   | 'sistema';
 
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
@@ -46,6 +60,38 @@ export interface NotificationData {
   cantidad_actual?: number;
   cantidad_minima?: number;
   fecha_vencimiento?: string;
+  
+  // Para envíos y logística
+  envio_id?: string;
+  mensajero_id?: string;
+  mensajero_nombre?: string;
+  direccion_destino?: string;
+  fecha_programada?: string;
+  motivo_retraso?: string;
+  
+  // Para hojas de gasto
+  hoja_gasto_id?: string;
+  monto_total?: number;
+  aprobador_id?: string;
+  
+  // Para cambios de agenda
+  fecha_anterior?: string;
+  fecha_nueva?: string;
+  tecnico_anterior_id?: string;
+  tecnico_nuevo_id?: string;
+  hospital_nombre?: string;
+  motivo_cambio?: string;
+  
+  // Para incidentes
+  tipo_incidente?: string;
+  descripcion_incidente?: string;
+  
+  // Para cotizaciones 🆕
+  cotizacion_id?: string;
+  numero_cotizacion?: string;
+  cliente_nombre?: string;
+  total?: number;
+  dias_hasta_vencimiento?: number;
   
   // Datos adicionales
   [key: string]: any;

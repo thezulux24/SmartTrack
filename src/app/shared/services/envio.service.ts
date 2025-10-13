@@ -2,12 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, from, map } from 'rxjs';
 import { SupabaseService } from '../data-access/supabase.service';
 import { Mensajero, Envio, AsignacionEnvioDTO } from '../models/envio.model';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EnvioService {
   private supabase = inject(SupabaseService);
+  private notificationService = inject(NotificationService);
 
   /**
    * Obtener mensajeros activos y disponibles
@@ -81,6 +83,32 @@ export class EnvioService {
             mensajero_id: datos.mensajero_id
           }
         });
+
+      // 4. 📢 Obtener datos del kit y mensajero para notificación
+      const { data: kitData } = await this.supabase.client
+        .from('kits_cirugia')
+        .select('numero_kit')
+        .eq('id', datos.kit_id)
+        .single();
+
+      const { data: mensajeroData } = await this.supabase.client
+        .from('mensajeros')
+        .select('nombre')
+        .eq('id', datos.mensajero_id)
+        .single();
+
+      // 5. 📢 Enviar notificación
+      if (kitData && mensajeroData) {
+        await this.notificationService.notifyMensajeroAssigned(
+          envioData.id,
+          datos.kit_id,
+          kitData.numero_kit,
+          datos.mensajero_id,
+          mensajeroData.nombre,
+          datos.direccion_destino,
+          datos.fecha_programada
+        ).catch(err => console.error('Error enviando notificación de asignación:', err));
+      }
 
       return {
         exito: true,
@@ -323,6 +351,37 @@ export class EnvioService {
             ubicacion_validacion: 'destino_final'
           }
         });
+
+      // 5. 📢 Obtener datos del kit para notificación
+      const { data: kitData } = await this.supabase.client
+        .from('kits_cirugia')
+        .select(`
+          numero_kit,
+          cirugia_id,
+          cirugia:cirugias!kits_cirugia_cirugia_id_fkey(
+            tecnico_asignado_id,
+            hospital_id,
+            hospital_data:hospitales(direccion)
+          )
+        `)
+        .eq('id', envio.kit_id)
+        .single();
+
+      // 6. 📢 Enviar notificación de entrega
+      if (kitData && kitData.cirugia) {
+        const cirugia: any = Array.isArray(kitData.cirugia) ? kitData.cirugia[0] : kitData.cirugia;
+        const hospitalData: any = cirugia?.hospital_data ? (Array.isArray(cirugia.hospital_data) ? cirugia.hospital_data[0] : cirugia.hospital_data) : null;
+        
+        await this.notificationService.notifyDeliveryStatusChange(
+          envioId,
+          envio.kit_id,
+          kitData.numero_kit,
+          'en_transito',
+          'entregado',
+          cirugia?.tecnico_asignado_id || null,
+          hospitalData?.direccion || 'Destino'
+        ).catch(err => console.error('Error enviando notificación de entrega:', err));
+      }
 
       return { exito: true, mensaje: 'Entrega confirmada exitosamente' };
     } catch (error) {

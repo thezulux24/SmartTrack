@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, from, map, catchError, of } from 'rxjs';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
+import { NotificationService } from '../../../../shared/services/notification.service';
 import { 
   HojaGasto, 
   HojaGastoItem, 
@@ -16,6 +17,7 @@ import {
 })
 export class HojaGastoService {
   private supabase = inject(SupabaseService);
+  private notificationService = inject(NotificationService);
 
   // Obtener todas las hojas de gasto con filtros
   getHojasGasto(filters?: HojaGastoFilters): Observable<HojaGasto[]> {
@@ -440,6 +442,13 @@ export class HojaGastoService {
 
   private async updateEstado(id: string, nuevoEstado: EstadoHojaGasto): Promise<HojaGasto> {
     try {
+      // 1. Obtener datos actuales
+      const hojaActual = await this.fetchHojaGasto(id) as HojaGasto;
+      if (!hojaActual) throw new Error('Hoja de gasto no encontrada');
+
+      const estadoAnterior = hojaActual.estado;
+
+      // 2. Actualizar estado
       const { error } = await this.supabase.client
         .from('hojas_gasto')
         .update({ 
@@ -451,6 +460,46 @@ export class HojaGastoService {
       if (error) {
         console.error('Error updating estado:', error);
         throw error;
+      }
+
+      // 3. 📢 Obtener usuario actual para notificación
+      const { data: userData } = await this.supabase.client.auth.getUser();
+      const aprobadorNombre = userData?.user?.email || 'Sistema';
+
+      // 4. 📢 Enviar notificación de cambio de estado
+      await this.notificationService.notifyHojaGastoStatusChange(
+        id,
+        hojaActual.numero_hoja,
+        hojaActual.tecnico_id, // Usuario creador (técnico)
+        estadoAnterior,
+        nuevoEstado,
+        aprobadorNombre,
+        undefined // Sin comentario por ahora
+      ).catch(err => console.error('Error enviando notificación de cambio estado:', err));
+
+      // 5. 📢 Si pasa a 'revision', notificar a aprobadores
+      if (nuevoEstado === 'revision' && estadoAnterior !== 'revision') {
+        // Obtener cirugía asociada
+        const { data: cirugiaData } = await this.supabase.client
+          .from('cirugias')
+          .select('numero_cirugia')
+          .eq('id', hojaActual.cirugia_id)
+          .single();
+
+        // Obtener nombre del técnico
+        const { data: tecnicoData } = await this.supabase.client
+          .from('profiles')
+          .select('full_name')
+          .eq('id', hojaActual.tecnico_id)
+          .single();
+
+        await this.notificationService.notifyHojaGastoNeedsApproval(
+          id,
+          hojaActual.numero_hoja,
+          tecnicoData?.full_name || 'Técnico',
+          hojaActual.total_general,
+          cirugiaData?.numero_cirugia
+        ).catch(err => console.error('Error enviando notificación de aprobación pendiente:', err));
       }
 
       return await this.fetchHojaGasto(id) as HojaGasto;

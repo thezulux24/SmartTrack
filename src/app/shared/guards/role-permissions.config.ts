@@ -34,6 +34,7 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
       '/internal/agenda/crear',
       '/internal/agenda/editar',
       '/internal/clientes',          // ✅ Gestión de clientes
+      '/internal/cotizaciones',      // ✅ Job 5: Gestión de cotizaciones
       '/internal/hojas-gasto',       // ✅ Job 3: Gestionar hojas de gasto
       '/internal/chat',              // ✅ Job 4: Coordinar con logística y soporte
       '/internal/trazabilidad',      // ✅ Job 1: Dar trazabilidad al ciclo
@@ -77,13 +78,14 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
     allowedRoutes: [
       '/internal',
       '/internal/tecnico',           // ✅ Job 1: Asignaciones de soporte
-      '/internal/agenda',            // ✅ Job 1: Ver agenda de cirugías asignadas
+      '/internal/agenda/mi-agenda',  // ✅ Job 1: Ver SU agenda de cirugías asignadas (NO la agenda general)
       '/internal/hojas-gasto',       // ✅ Job 2: Registrar hojas de gasto desde campo
       '/internal/inventario',        // ✅ Job 4: Ver inventario en tiempo real
       '/internal/limpieza',          // ✅ Gestión de limpieza y esterilización
       '/internal/chat',              // ✅ Job 6: Comunicación asincrónica
       '/internal/trazabilidad',      // ✅ Job 1-3: Trazabilidad de tareas y tiempos
       // NO tiene acceso a:
+      // - /internal/agenda (agenda general es solo para comercial y logística)
       // - logistica (módulo específico de logística)
       // - clientes (no necesita gestión comercial)
     ],

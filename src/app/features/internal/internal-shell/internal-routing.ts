@@ -32,6 +32,12 @@ export default [
   },
 
   {
+    path: 'cotizaciones',
+    canActivate: [roleBasedGuard], // ✅ Solo Comercial + Admin
+    loadChildren: () => import('../cotizaciones/cotizaciones-routing').then(m => m.COTIZACIONES_ROUTES)
+  },
+
+  {
     path: 'logistica',
     canActivate: [roleBasedGuard], // ✅ Solo Logística + Admin
     loadChildren: () => import('../logistica/logistica-routing').then(m => m.LOGISTICA_ROUTES)

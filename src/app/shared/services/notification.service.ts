@@ -61,7 +61,21 @@ export class NotificationService {
         alerta_stock: 0,
         alerta_vencimiento: 0,
         asignacion_cirugia: 0,
-        sistema: 0
+        cambio_agenda: 0,
+        asignacion_mensajero: 0,
+        cambio_estado_envio: 0,
+        retraso_envio: 0,
+        error_logistico: 0,
+        solicitud_urgente: 0,
+        cambio_estado_hoja_gasto: 0,
+        aprobacion_pendiente: 0,
+        incidente_cirugia: 0,
+        cirugia_cancelada: 0,
+        sistema: 0,
+        cotizacion_aprobada: 0,
+        cotizacion_rechazada: 0,
+        cotizacion_proxima_vencer: 0,
+        cotizacion_vencida: 0
       }
     };
 
@@ -483,6 +497,434 @@ export class NotificationService {
     }
   }
 
+  // Notificar cambio en agenda (fecha, hora, técnico)
+  async notifyAgendaChange(
+    cirugia_id: string,
+    numero_cirugia: string,
+    comercial_id: string,
+    tecnico_anterior_id: string | null,
+    tecnico_nuevo_id: string | null,
+    motivo_cambio: string,
+    cambios_detalle: string,
+    fecha_programada: string,
+    hospital_nombre: string,
+    is_urgent: boolean = false
+  ) {
+    try {
+      const userIds: string[] = [comercial_id];
+      
+      // Notificar al técnico anterior si existe y cambió
+      if (tecnico_anterior_id && tecnico_anterior_id !== tecnico_nuevo_id) {
+        userIds.push(tecnico_anterior_id);
+      }
+      
+      // Notificar al técnico nuevo si existe
+      if (tecnico_nuevo_id && tecnico_anterior_id !== tecnico_nuevo_id) {
+        userIds.push(tecnico_nuevo_id);
+      }
+
+      const priority: NotificationPriority = is_urgent ? 'urgent' : 'high';
+      const icon = is_urgent ? '🚨' : '📅';
+
+      await this.notifyUsers(
+        userIds.filter((v, i, a) => a.indexOf(v) === i), // Eliminar duplicados
+        'cambio_agenda',
+        `${icon} Cambio en agenda - ${numero_cirugia}`,
+        `${cambios_detalle} en ${hospital_nombre}. Motivo: ${motivo_cambio}`,
+        priority,
+        {
+          cirugia_id,
+          numero_cirugia,
+          fecha_programada,
+          hospital_nombre,
+          motivo_cambio,
+          tecnico_anterior_id: tecnico_anterior_id || undefined,
+          tecnico_nuevo_id: tecnico_nuevo_id || undefined
+        },
+        `/internal/agenda/${cirugia_id}`
+      );
+
+      console.log('✅ NotificationService.notifyAgendaChange: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyAgendaChange: Error:', error);
+    }
+  }
+
+  // Notificar asignación de mensajero
+  async notifyMensajeroAssigned(
+    envio_id: string,
+    kit_id: string,
+    numero_kit: string,
+    mensajero_id: string,
+    mensajero_nombre: string,
+    direccion_destino: string,
+    fecha_programada: string
+  ) {
+    try {
+      const logistica_ids = await this.getLogisticaUsers();
+
+      // Notificar a logística
+      if (logistica_ids.length > 0) {
+        await this.notifyUsers(
+          logistica_ids,
+          'asignacion_mensajero',
+          '🚚 Mensajero asignado',
+          `${mensajero_nombre} asignado para entregar ${numero_kit} en ${direccion_destino}`,
+          'medium',
+          {
+            envio_id,
+            kit_id,
+            numero_kit,
+            mensajero_id,
+            mensajero_nombre,
+            direccion_destino,
+            fecha_programada
+          },
+          `/internal/logistica/envios/${envio_id}`
+        );
+      }
+
+      console.log('✅ NotificationService.notifyMensajeroAssigned: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyMensajeroAssigned: Error:', error);
+    }
+  }
+
+  // Notificar cambio de estado de envío
+  async notifyDeliveryStatusChange(
+    envio_id: string,
+    kit_id: string,
+    numero_kit: string,
+    estado_anterior: string,
+    estado_nuevo: string,
+    tecnico_id: string | null,
+    direccion_destino: string
+  ) {
+    try {
+      const userIds: string[] = [];
+      const logistica_ids = await this.getLogisticaUsers();
+      userIds.push(...logistica_ids);
+
+      // Si hay técnico receptor, notificar
+      if (tecnico_id) {
+        userIds.push(tecnico_id);
+      }
+
+      const estadosMap: Record<string, string> = {
+        programado: 'Programado',
+        en_camino: 'En camino',
+        entregado: 'Entregado',
+        devuelto: 'Devuelto',
+        cancelado: 'Cancelado'
+      };
+
+      await this.notifyUsers(
+        userIds.filter((v, i, a) => a.indexOf(v) === i),
+        'cambio_estado_envio',
+        '📍 Estado de envío actualizado',
+        `${numero_kit}: ${estadosMap[estado_anterior] || estado_anterior} → ${estadosMap[estado_nuevo] || estado_nuevo}`,
+        'medium',
+        {
+          envio_id,
+          kit_id,
+          numero_kit,
+          estado_anterior,
+          estado_nuevo,
+          direccion_destino
+        },
+        `/internal/logistica/envios/${envio_id}`
+      );
+
+      console.log('✅ NotificationService.notifyDeliveryStatusChange: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyDeliveryStatusChange: Error:', error);
+    }
+  }
+
+  // Notificar retraso en envío
+  async notifyDeliveryDelay(
+    envio_id: string,
+    kit_id: string,
+    numero_kit: string,
+    motivo_retraso: string,
+    nueva_fecha_estimada: string
+  ) {
+    try {
+      const logistica_ids = await this.getLogisticaUsers();
+
+      if (logistica_ids.length > 0) {
+        await this.notifyUsers(
+          logistica_ids,
+          'retraso_envio',
+          '⏱️ Retraso en envío',
+          `${numero_kit} retrasado. ${motivo_retraso}. Nueva fecha estimada: ${nueva_fecha_estimada}`,
+          'high',
+          {
+            envio_id,
+            kit_id,
+            numero_kit,
+            motivo_retraso,
+            fecha_programada: nueva_fecha_estimada
+          },
+          `/internal/logistica/envios/${envio_id}`
+        );
+      }
+
+      console.log('✅ NotificationService.notifyDeliveryDelay: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyDeliveryDelay: Error:', error);
+    }
+  }
+
+  // Notificar error logístico
+  async notifyDeliveryError(
+    envio_id: string,
+    kit_id: string,
+    numero_kit: string,
+    tipo_error: string,
+    descripcion_error: string
+  ) {
+    try {
+      const logistica_ids = await this.getLogisticaUsers();
+
+      if (logistica_ids.length > 0) {
+        await this.notifyUsers(
+          logistica_ids,
+          'error_logistico',
+          '❌ Error en envío',
+          `${numero_kit}: ${tipo_error}. ${descripcion_error}`,
+          'urgent',
+          {
+            envio_id,
+            kit_id,
+            numero_kit,
+            tipo_incidente: tipo_error,
+            descripcion_incidente: descripcion_error
+          },
+          `/internal/logistica/envios/${envio_id}`
+        );
+      }
+
+      console.log('✅ NotificationService.notifyDeliveryError: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyDeliveryError: Error:', error);
+    }
+  }
+
+  // Notificar solicitud urgente
+  async notifyUrgentRequest(
+    cirugia_id: string,
+    numero_cirugia: string,
+    tipo_urgencia: string,
+    descripcion: string,
+    solicitante_nombre: string
+  ) {
+    try {
+      const logistica_ids = await this.getLogisticaUsers();
+
+      if (logistica_ids.length > 0) {
+        await this.notifyUsers(
+          logistica_ids,
+          'solicitud_urgente',
+          '🚨 SOLICITUD URGENTE',
+          `${numero_cirugia} - ${tipo_urgencia}: ${descripcion} (por ${solicitante_nombre})`,
+          'urgent',
+          {
+            cirugia_id,
+            numero_cirugia,
+            tipo_incidente: tipo_urgencia,
+            descripcion_incidente: descripcion
+          },
+          `/internal/agenda/${cirugia_id}`
+        );
+      }
+
+      console.log('✅ NotificationService.notifyUrgentRequest: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyUrgentRequest: Error:', error);
+    }
+  }
+
+  // Notificar cambio de estado de hoja de gasto
+  async notifyHojaGastoStatusChange(
+    hoja_gasto_id: string,
+    numero_hoja: string,
+    creador_id: string,
+    estado_anterior: string,
+    estado_nuevo: string,
+    aprobador_nombre?: string,
+    comentario?: string
+  ) {
+    try {
+      const userIds = [creador_id];
+
+      const estadosMap: Record<string, string> = {
+        borrador: 'Borrador',
+        pendiente_aprobacion: 'Pendiente de aprobación',
+        aprobada: 'Aprobada',
+        rechazada: 'Rechazada',
+        pagada: 'Pagada'
+      };
+
+      const priority: NotificationPriority = estado_nuevo === 'rechazada' ? 'high' : 'medium';
+
+      let mensaje = `${numero_hoja}: ${estadosMap[estado_anterior] || estado_anterior} → ${estadosMap[estado_nuevo] || estado_nuevo}`;
+      if (aprobador_nombre) {
+        mensaje += ` (por ${aprobador_nombre})`;
+      }
+      if (comentario) {
+        mensaje += `. ${comentario}`;
+      }
+
+      await this.notifyUsers(
+        userIds,
+        'cambio_estado_hoja_gasto',
+        '💰 Estado de hoja de gasto',
+        mensaje,
+        priority,
+        {
+          hoja_gasto_id,
+          numero_hoja,
+          estado_anterior,
+          estado_nuevo
+        },
+        `/internal/hojas-gasto/${hoja_gasto_id}`
+      );
+
+      console.log('✅ NotificationService.notifyHojaGastoStatusChange: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyHojaGastoStatusChange: Error:', error);
+    }
+  }
+
+  // Notificar hoja de gasto pendiente de aprobación
+  async notifyHojaGastoNeedsApproval(
+    hoja_gasto_id: string,
+    numero_hoja: string,
+    creador_nombre: string,
+    monto_total: number,
+    cirugia_numero?: string
+  ) {
+    try {
+      // Obtener usuarios con rol que pueden aprobar (admin, supervisor, etc.)
+      const { data: aprobadores, error } = await this.supabase.client
+        .from('profiles')
+        .select('id')
+        .in('role', ['admin', 'comercial']) // Ajustar según roles que aprueban
+        .eq('is_active', true);
+
+      if (error || !aprobadores || aprobadores.length === 0) {
+        console.log('⚠️ No hay aprobadores disponibles');
+        return;
+      }
+
+      const aprobadorIds = aprobadores.map((u: any) => u.id);
+
+      let mensaje = `${numero_hoja} por ${creador_nombre} - Monto: $${monto_total.toLocaleString()}`;
+      if (cirugia_numero) {
+        mensaje += ` (${cirugia_numero})`;
+      }
+
+      await this.notifyUsers(
+        aprobadorIds,
+        'aprobacion_pendiente',
+        '✍️ Aprobación pendiente',
+        mensaje,
+        'high',
+        {
+          hoja_gasto_id,
+          numero_hoja,
+          monto_total
+        },
+        `/internal/hojas-gasto/${hoja_gasto_id}`
+      );
+
+      console.log('✅ NotificationService.notifyHojaGastoNeedsApproval: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyHojaGastoNeedsApproval: Error:', error);
+    }
+  }
+
+  // Notificar incidente durante cirugía
+  async notifyCirugiaIncident(
+    cirugia_id: string,
+    numero_cirugia: string,
+    tipo_incidente: string,
+    descripcion: string,
+    reportado_por: string,
+    tecnico_id: string | null,
+    comercial_id: string
+  ) {
+    try {
+      const userIds = [comercial_id];
+      if (tecnico_id) userIds.push(tecnico_id);
+
+      // Notificar también a logística para coordinación
+      const logistica_ids = await this.getLogisticaUsers();
+      userIds.push(...logistica_ids);
+
+      await this.notifyUsers(
+        userIds.filter((v, i, a) => a.indexOf(v) === i),
+        'incidente_cirugia',
+        '⚕️ Incidente en cirugía',
+        `${numero_cirugia} - ${tipo_incidente}: ${descripcion} (reportado por ${reportado_por})`,
+        'urgent',
+        {
+          cirugia_id,
+          numero_cirugia,
+          tipo_incidente,
+          descripcion_incidente: descripcion
+        },
+        `/internal/agenda/${cirugia_id}`
+      );
+
+      console.log('✅ NotificationService.notifyCirugiaIncident: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyCirugiaIncident: Error:', error);
+    }
+  }
+
+  // Notificar cancelación de cirugía
+  async notifyCirugiaCanceled(
+    cirugia_id: string,
+    numero_cirugia: string,
+    motivo_cancelacion: string,
+    fecha_programada: string,
+    hospital_nombre: string,
+    tecnico_id: string | null,
+    comercial_id: string,
+    cancelado_por: string
+  ) {
+    try {
+      const userIds = [comercial_id];
+      if (tecnico_id) userIds.push(tecnico_id);
+
+      // Notificar a logística para liberar recursos
+      const logistica_ids = await this.getLogisticaUsers();
+      userIds.push(...logistica_ids);
+
+      await this.notifyUsers(
+        userIds.filter((v, i, a) => a.indexOf(v) === i),
+        'cirugia_cancelada',
+        '🚫 Cirugía cancelada',
+        `${numero_cirugia} en ${hospital_nombre} (${fecha_programada}) cancelada. Motivo: ${motivo_cancelacion}. Por: ${cancelado_por}`,
+        'urgent',
+        {
+          cirugia_id,
+          numero_cirugia,
+          fecha_programada,
+          hospital_nombre,
+          motivo_cambio: motivo_cancelacion
+        },
+        `/internal/agenda/${cirugia_id}`
+      );
+
+      console.log('✅ NotificationService.notifyCirugiaCanceled: Notifications sent');
+    } catch (error) {
+      console.error('❌ NotificationService.notifyCirugiaCanceled: Error:', error);
+    }
+  }
+
   // ======================
   // GESTIÓN DE NOTIFICACIONES
   // ======================
@@ -628,6 +1070,20 @@ export class NotificationService {
       alerta_stock: '⚠️',
       alerta_vencimiento: '⏰',
       asignacion_cirugia: '📋',
+      cambio_agenda: '📅',
+      asignacion_mensajero: '🚚',
+      cambio_estado_envio: '📍',
+      retraso_envio: '⏱️',
+      error_logistico: '❌',
+      solicitud_urgente: '🚨',
+      cambio_estado_hoja_gasto: '💰',
+      aprobacion_pendiente: '✍️',
+      incidente_cirugia: '⚕️',
+      cirugia_cancelada: '🚫',
+      cotizacion_aprobada: '✅',
+      cotizacion_rechazada: '❌',
+      cotizacion_proxima_vencer: '⏰',
+      cotizacion_vencida: '⏱️',
       sistema: 'ℹ️'
     };
     return icons[type] || 'ℹ️';

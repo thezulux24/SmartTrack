@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormArray, Validators } 
 import { QRCodeModule } from 'angularx-qrcode';
 import { KitService } from '../../../../shared/services/kit.service';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
+import { NotificationService } from '../../../../shared/services/notification.service';
 import { KitCirugia, KitProducto } from '../../../../shared/models/kit.model';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
@@ -17,6 +18,7 @@ interface ProductoPreparacion {
   cantidad_solicitada: number;
   cantidad_preparada: number;
   stock_disponible: number;
+  cantidad_minima: number; // Agregado
   lote: string;
   fecha_vencimiento: string;
   ubicacion_seleccionada: string;
@@ -38,6 +40,7 @@ export class KitPreparacionComponent implements OnInit {
   private fb = inject(FormBuilder);
   private kitService = inject(KitService);
   private supabase = inject(SupabaseService);
+  private notificationService = inject(NotificationService);
 
   kitId = signal<string>('');
   kit = signal<KitCirugia | null>(null);
@@ -101,6 +104,7 @@ export class KitPreparacionComponent implements OnInit {
               codigo,
               nombre,
               categoria,
+              cantidad_minima,
               inventario(
                 id,
                 cantidad,
@@ -153,6 +157,7 @@ export class KitPreparacionComponent implements OnInit {
           cantidad_solicitada: kp.cantidad_solicitada,
           cantidad_preparada: kp.cantidad_preparada || 0,
           stock_disponible: stockTotal,
+          cantidad_minima: kp.producto.cantidad_minima || 0,
           lote: kp.lote || '',
           fecha_vencimiento: kp.fecha_vencimiento || '',
           ubicacion_seleccionada: inventariosDisponibles[0]?.ubicacion || '',
@@ -304,6 +309,26 @@ export class KitPreparacionComponent implements OnInit {
       .eq('id', inventarioSeleccionado.id);
 
     if (invError) throw invError;
+
+    // 📢 Notificar si el stock queda crítico después de preparar el kit
+    if (nuevaCantidad <= producto.cantidad_minima) {
+      console.log('⚠️ Stock crítico detectado después de preparar kit:', {
+        producto: producto.nombre,
+        nuevaCantidad,
+        cantidad_minima: producto.cantidad_minima
+      });
+      
+      const logisticaIds = await this.getLogisticaUsers();
+      if (logisticaIds.length > 0) {
+        await this.notificationService.notifyLowStock(
+          logisticaIds,
+          producto.producto_id,
+          producto.nombre,
+          nuevaCantidad,
+          producto.cantidad_minima
+        );
+      }
+    }
   }
 
   async generarQR(): Promise<string> {
@@ -356,6 +381,27 @@ export class KitPreparacionComponent implements OnInit {
 
   volverAListado() {
     this.router.navigate(['/internal/logistica/kits-pendientes']);
+  }
+
+  // Helper para obtener usuarios de logística
+  private async getLogisticaUsers(): Promise<string[]> {
+    try {
+      const { data, error } = await this.supabase.client
+        .from('profiles')
+        .select('id')
+        .eq('role', 'logistica')
+        .eq('is_active', true);
+
+      if (error) {
+        console.error('❌ Error fetching logistica users:', error);
+        return [];
+      }
+
+      return (data || []).map((user: any) => user.id);
+    } catch (error) {
+      console.error('❌ Exception getting logistica users:', error);
+      return [];
+    }
   }
 
   obtenerColorAlerta(producto: ProductoPreparacion): string {

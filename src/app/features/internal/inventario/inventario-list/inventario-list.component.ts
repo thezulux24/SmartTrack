@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SupabaseService, Producto, Inventario, MovimientoInventario } from '../../../../shared/data-access/supabase.service';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-inventario-list',
@@ -13,6 +14,7 @@ import { SupabaseService, Producto, Inventario, MovimientoInventario } from '../
 export default class InventarioListComponent implements OnInit {
 
   private _supabaseService = inject(SupabaseService);
+  private _notificationService = inject(NotificationService);
 
   // Signals para el estado
   loading = signal(false);
@@ -216,10 +218,32 @@ export default class InventarioListComponent implements OnInit {
         }
 
         inventarioId = inventario.id;
+        const nuevaCantidad = inventario.cantidad - this.cantidad;
+        
         await this._supabaseService.updateInventario(
           inventarioId,
-          inventario.cantidad - this.cantidad
+          nuevaCantidad
         );
+
+        // 📢 Notificar si el stock queda crítico después del movimiento
+        if (nuevaCantidad <= (producto.cantidad_minima || 0)) {
+          console.log('⚠️ Stock crítico detectado después de salida:', {
+            producto: producto.nombre,
+            nuevaCantidad,
+            cantidad_minima: producto.cantidad_minima
+          });
+          
+          const logisticaIds = await this.getLogisticaUsers();
+          if (logisticaIds.length > 0) {
+            await this._notificationService.notifyLowStock(
+              logisticaIds,
+              producto.id,
+              producto.nombre,
+              nuevaCantidad,
+              producto.cantidad_minima || 0
+            );
+          }
+        }
       }
 
       // Registrar movimiento
@@ -243,7 +267,26 @@ export default class InventarioListComponent implements OnInit {
     }
   }
 
+  // Helper para obtener usuarios de logística
+  private async getLogisticaUsers(): Promise<string[]> {
+    try {
+      const { data, error } = await this._supabaseService.client
+        .from('profiles')
+        .select('id')
+        .eq('role', 'logistica')
+        .eq('is_active', true);
 
+      if (error) {
+        console.error('❌ Error fetching logistica users:', error);
+        return [];
+      }
+
+      return (data || []).map((user: any) => user.id);
+    } catch (error) {
+      console.error('❌ Exception getting logistica users:', error);
+      return [];
+    }
+  }
 
   getStockColor(producto: any): string {
     if (producto.stock_total === 0) return 'text-red-600';

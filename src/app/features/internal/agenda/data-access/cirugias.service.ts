@@ -3,6 +3,7 @@ import { Observable, from, map, catchError, throwError, switchMap } from 'rxjs';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
 import { Cirugia, CirugiaCreate } from './models';
 import { TrazabilidadService } from '../../../../shared/services/trazabilidad.service';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ import { TrazabilidadService } from '../../../../shared/services/trazabilidad.se
 export class CirugiasService {
   constructor(
     private supabase: SupabaseService,
-    private trazabilidadService: TrazabilidadService
+    private trazabilidadService: TrazabilidadService,
+    private notificationService: NotificationService
   ) {}
 
   getCirugias(): Observable<Cirugia[]> {
@@ -200,11 +202,10 @@ export class CirugiasService {
       updated_at: new Date().toISOString()
     };
 
+    // Primero obtener datos actuales para detectar cambios
     return from(
       this.supabase.client
         .from('cirugias')
-        .update(updateData)
-        .eq('id', id)
         .select(`
           *,
           tecnico_asignado:profiles!cirugias_tecnico_asignado_id_fkey(
@@ -217,23 +218,110 @@ export class CirugiasService {
             nombre,
             ciudad
           ),
-          tipo_cirugia_data:tipos_cirugia!cirugias_tipo_cirugia_id_fkey(
+          comercial:profiles!cirugias_comercial_id_fkey(
             id,
-            nombre
+            full_name
           )
         `)
+        .eq('id', id)
         .single()
     ).pipe(
-      map(response => {
-        if (response.error) {
-          console.error('Error updating cirugia:', response.error);
-          throw new Error(response.error.message || 'Error al actualizar cirugía');
+      switchMap(currentResponse => {
+        if (currentResponse.error) {
+          throw new Error('Error al obtener datos actuales');
         }
-        return response.data;
-      }),
-      catchError(error => {
-        console.error('Service error updating cirugia:', error);
-        return throwError(() => error);
+
+        const datosAnteriores = currentResponse.data;
+        let hubo_cambio_importante = false;
+        let cambios_detalle: string[] = [];
+        let is_urgent = false;
+
+        // Detectar cambios importantes
+        if (updates.fecha_programada && updates.fecha_programada !== datosAnteriores.fecha_programada) {
+          hubo_cambio_importante = true;
+          const fechaAnterior = new Date(datosAnteriores.fecha_programada).toLocaleDateString();
+          const fechaNueva = new Date(updates.fecha_programada).toLocaleDateString();
+          cambios_detalle.push(`Fecha cambió de ${fechaAnterior} a ${fechaNueva}`);
+          
+          // Es urgente si la cirugía es en menos de 48 horas
+          const horasHastaCirugia = (new Date(updates.fecha_programada).getTime() - Date.now()) / (1000 * 60 * 60);
+          if (horasHastaCirugia < 48) is_urgent = true;
+        }
+
+        if (updates.hora_inicio && updates.hora_inicio !== datosAnteriores.hora_inicio) {
+          hubo_cambio_importante = true;
+          cambios_detalle.push(`Hora cambió de ${datosAnteriores.hora_inicio || 'no definida'} a ${updates.hora_inicio}`);
+        }
+
+        if (updates.tecnico_asignado_id !== undefined && updates.tecnico_asignado_id !== datosAnteriores.tecnico_asignado_id) {
+          hubo_cambio_importante = true;
+          const anteriorNombre = datosAnteriores.tecnico_asignado?.full_name || 'Sin asignar';
+          cambios_detalle.push(`Técnico cambió de ${anteriorNombre}`);
+          is_urgent = true; // Cambio de técnico siempre es urgente
+        }
+
+        if (updates.hospital_id && updates.hospital_id !== datosAnteriores.hospital_id) {
+          hubo_cambio_importante = true;
+          cambios_detalle.push('Hospital cambió');
+          is_urgent = true;
+        }
+
+        // Actualizar la cirugía
+        return from(
+          this.supabase.client
+            .from('cirugias')
+            .update(updateData)
+            .eq('id', id)
+            .select(`
+              *,
+              tecnico_asignado:profiles!cirugias_tecnico_asignado_id_fkey(
+                id,
+                full_name,
+                email
+              ),
+              hospital_data:hospitales!cirugias_hospital_id_fkey(
+                id,
+                nombre,
+                ciudad
+              ),
+              tipo_cirugia_data:tipos_cirugia!cirugias_tipo_cirugia_id_fkey(
+                id,
+                nombre
+              )
+            `)
+            .single()
+        ).pipe(
+          map(response => {
+            if (response.error) {
+              console.error('Error updating cirugia:', response.error);
+              throw new Error(response.error.message || 'Error al actualizar cirugía');
+            }
+
+            // Enviar notificación si hubo cambios importantes
+            if (hubo_cambio_importante) {
+              const cirugiaActualizada = response.data;
+              
+              this.notificationService.notifyAgendaChange(
+                id,
+                cirugiaActualizada.numero_cirugia,
+                datosAnteriores.comercial_id || datosAnteriores.usuario_creador_id,
+                datosAnteriores.tecnico_asignado_id || null,
+                cirugiaActualizada.tecnico_asignado_id || null,
+                updates.notas || 'Modificación de agenda',
+                cambios_detalle.join(', '),
+                cirugiaActualizada.fecha_programada,
+                cirugiaActualizada.hospital_data?.nombre || 'Hospital',
+                is_urgent
+              ).catch(err => console.error('Error enviando notificación de cambio:', err));
+            }
+
+            return response.data;
+          }),
+          catchError(error => {
+            console.error('Service error updating cirugia:', error);
+            return throwError(() => error);
+          })
+        );
       })
     );
   }
@@ -247,7 +335,15 @@ export class CirugiasService {
         return from(
           this.supabase.client
             .from('cirugias')
-            .select('estado, numero_cirugia')
+            .select(`
+              estado,
+              numero_cirugia,
+              fecha_programada,
+              tecnico_asignado_id,
+              usuario_creador_id,
+              hospital_data:hospitales(nombre),
+              tecnico_asignado:profiles!cirugias_tecnico_asignado_id_fkey(full_name)
+            `)
             .eq('id', id)
             .single()
         ).pipe(
@@ -258,6 +354,7 @@ export class CirugiasService {
 
             const estadoAnterior = currentResponse.data.estado;
             const numeroCirugia = currentResponse.data.numero_cirugia;
+            const datosOriginales = currentResponse.data;
 
             // Actualizamos el estado
             return from(
@@ -274,7 +371,24 @@ export class CirugiasService {
                   throw new Error('Error al actualizar estado');
                 }
 
-                // Registrar en trazabilidad
+                // 📢 Si el estado cambió a 'cancelada', enviar notificación
+                if (estado === 'cancelada' && estadoAnterior !== 'cancelada') {
+                  const hospitalData: any = datosOriginales.hospital_data;
+                  const hospitalNombre = Array.isArray(hospitalData) && hospitalData.length > 0 
+                    ? hospitalData[0]?.nombre 
+                    : (hospitalData?.nombre || 'Hospital');
+                    
+                  this.notificationService.notifyCirugiaCanceled(
+                    id,
+                    numeroCirugia,
+                    comentario || 'Cirugía cancelada',
+                    datosOriginales.fecha_programada,
+                    hospitalNombre,
+                    datosOriginales.tecnico_asignado_id || null,
+                    datosOriginales.usuario_creador_id,
+                    user?.email || 'Sistema'
+                  ).catch(err => console.error('Error enviando notificación de cancelación:', err));
+                }                // Registrar en trazabilidad
                 return this.trazabilidadService.registrarEventoCirugia({
                   cirugia_id: id,
                   accion: 'estado_cambiado',
