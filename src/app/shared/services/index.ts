@@ -7,3 +7,4 @@ export * from './envio.service';
 export * from './chat.service';
 export * from './notification.service';
 export * from './cotizacion.service';
+export * from './pdf.service';

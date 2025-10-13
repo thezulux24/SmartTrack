@@ -217,10 +217,6 @@ export class CirugiasService {
             id,
             nombre,
             ciudad
-          ),
-          comercial:profiles!cirugias_comercial_id_fkey(
-            id,
-            full_name
           )
         `)
         .eq('id', id)
@@ -237,15 +233,21 @@ export class CirugiasService {
         let is_urgent = false;
 
         // Detectar cambios importantes
-        if (updates.fecha_programada && updates.fecha_programada !== datosAnteriores.fecha_programada) {
-          hubo_cambio_importante = true;
-          const fechaAnterior = new Date(datosAnteriores.fecha_programada).toLocaleDateString();
-          const fechaNueva = new Date(updates.fecha_programada).toLocaleDateString();
-          cambios_detalle.push(`Fecha cambió de ${fechaAnterior} a ${fechaNueva}`);
+        if (updates.fecha_programada) {
+          // Normalizar fechas para comparar solo la fecha, no la hora
+          const fechaAnterior = new Date(datosAnteriores.fecha_programada).toISOString().split('T')[0];
+          const fechaNueva = new Date(updates.fecha_programada).toISOString().split('T')[0];
           
-          // Es urgente si la cirugía es en menos de 48 horas
-          const horasHastaCirugia = (new Date(updates.fecha_programada).getTime() - Date.now()) / (1000 * 60 * 60);
-          if (horasHastaCirugia < 48) is_urgent = true;
+          if (fechaAnterior !== fechaNueva) {
+            hubo_cambio_importante = true;
+            const fechaAnteriorFormato = new Date(datosAnteriores.fecha_programada).toLocaleDateString('es-CO');
+            const fechaNuevaFormato = new Date(updates.fecha_programada).toLocaleDateString('es-CO');
+            cambios_detalle.push(`Fecha cambió de ${fechaAnteriorFormato} a ${fechaNuevaFormato}`);
+            
+            // Es urgente si la cirugía es en menos de 48 horas
+            const horasHastaCirugia = (new Date(updates.fecha_programada).getTime() - Date.now()) / (1000 * 60 * 60);
+            if (horasHastaCirugia < 48) is_urgent = true;
+          }
         }
 
         if (updates.hora_inicio && updates.hora_inicio !== datosAnteriores.hora_inicio) {
@@ -304,7 +306,7 @@ export class CirugiasService {
               this.notificationService.notifyAgendaChange(
                 id,
                 cirugiaActualizada.numero_cirugia,
-                datosAnteriores.comercial_id || datosAnteriores.usuario_creador_id,
+                datosAnteriores.usuario_creador_id,
                 datosAnteriores.tecnico_asignado_id || null,
                 cirugiaActualizada.tecnico_asignado_id || null,
                 updates.notas || 'Modificación de agenda',

@@ -29,49 +29,58 @@ export class CotizacionService {
   getCotizaciones(filters?: CotizacionFilters): Observable<Cotizacion[]> {
     return from(
       (async () => {
-        let query = this.supabase.client
-          .from('cotizaciones')
-          .select(`
-            *,
-            cliente:clientes(nombre, apellido, email, telefono, ciudad),
-            tipo_cirugia:tipos_cirugia(nombre, descripcion),
-            hospital:hospitales(nombre, ciudad),
-            comercial:profiles!cotizaciones_created_by_fkey(full_name, email),
-            items:cotizacion_items(
+        try {
+          let query = this.supabase.client
+            .from('cotizaciones')
+            .select(`
               *,
-              producto:productos(codigo, nombre, categoria)
-            )
-          `)
-          .order('created_at', { ascending: false });
+              cliente:clientes(nombre, apellido, email, telefono, ciudad),
+              tipo_cirugia:tipos_cirugia(nombre, descripcion),
+              hospital:hospitales(nombre, ciudad),
+              items:cotizacion_items(
+                *,
+                producto:productos(codigo, nombre, categoria)
+              )
+            `)
+            .order('created_at', { ascending: false });
 
-        // Aplicar filtros
-        if (filters?.estado) {
-          query = query.eq('estado', filters.estado);
-        }
-        if (filters?.cliente_id) {
-          query = query.eq('cliente_id', filters.cliente_id);
-        }
-        if (filters?.created_by) {
-          query = query.eq('created_by', filters.created_by);
-        }
-        if (filters?.fecha_inicio) {
-          query = query.gte('fecha_emision', filters.fecha_inicio);
-        }
-        if (filters?.fecha_fin) {
-          query = query.lte('fecha_emision', filters.fecha_fin);
-        }
-        if (filters?.search) {
-          query = query.or(`numero_cotizacion.ilike.%${filters.search}%`);
-        }
+          // Aplicar filtros
+          if (filters?.estado) {
+            query = query.eq('estado', filters.estado);
+          }
+          if (filters?.cliente_id) {
+            query = query.eq('cliente_id', filters.cliente_id);
+          }
+          if (filters?.created_by) {
+            query = query.eq('created_by', filters.created_by);
+          }
+          if (filters?.fecha_inicio) {
+            query = query.gte('fecha_emision', filters.fecha_inicio);
+          }
+          if (filters?.fecha_fin) {
+            query = query.lte('fecha_emision', filters.fecha_fin);
+          }
+          if (filters?.search) {
+            query = query.or(`numero_cotizacion.ilike.%${filters.search}%`);
+          }
 
-        const { data, error } = await query;
+          const { data, error } = await query;
 
-        if (error) throw error;
-        return data || [];
+          if (error) {
+            console.error('❌ Error obteniendo cotizaciones:', error);
+            throw error;
+          }
+
+          console.log(`✅ ${data?.length || 0} cotizaciones cargadas`);
+          return data || [];
+        } catch (error) {
+          console.error('❌ Error en getCotizaciones:', error);
+          return [];
+        }
       })()
     ).pipe(
       catchError(error => {
-        console.error('Error obteniendo cotizaciones:', error);
+        console.error('❌ Error final en getCotizaciones:', error);
         return of([]);
       })
     );
@@ -115,27 +124,122 @@ export class CotizacionService {
    */
   getCotizacionById(id: string): Observable<Cotizacion | null> {
     return from(
-      this.supabase.client
-        .from('cotizaciones')
-        .select(`
-          *,
-          cliente:clientes(nombre, apellido, email, telefono, ciudad, documento_identidad),
-          tipo_cirugia:tipos_cirugia(nombre, descripcion, duracion_promedio),
-          hospital:hospitales(nombre, ciudad, direccion, telefono),
-          comercial:profiles!cotizaciones_created_by_fkey(full_name, email, phone),
-          items:cotizacion_items(
-            *,
-            producto:productos(codigo, nombre, categoria, precio)
-          )
-        `)
-        .eq('id', id)
-        .single()
+      (async () => {
+        try {
+          // Primero intentamos obtener la cotización básica
+          const { data, error } = await this.supabase.client
+            .from('cotizaciones')
+            .select(`
+              *,
+              cliente:clientes(nombre, apellido, email, telefono, ciudad, documento_numero),
+              tipo_cirugia:tipos_cirugia(nombre, descripcion, duracion_promedio),
+              hospital:hospitales(nombre, ciudad, direccion, telefono),
+              items:cotizacion_items(
+                *,
+                producto:productos(codigo, nombre, categoria, precio)
+              )
+            `)
+            .eq('id', id)
+            .single();
+
+          if (error) {
+            console.error('❌ Error obteniendo cotización:', error);
+            throw error;
+          }
+
+          // Si la cotización tiene created_by, intentamos obtener el usuario
+          if (data && data.created_by) {
+            const { data: comercial } = await this.supabase.client
+              .from('profiles')
+              .select('full_name, email, phone')
+              .eq('id', data.created_by)
+              .single();
+            
+            if (comercial) {
+              (data as any).comercial = comercial;
+            }
+          }
+
+          console.log('✅ Cotización cargada:', data?.numero_cotizacion);
+          return data;
+        } catch (error) {
+          console.error('❌ Error en getCotizacionById:', error);
+          return null;
+        }
+      })()
     ).pipe(
-      map(response => response.data),
       catchError(error => {
-        console.error('Error obteniendo cotización:', error);
+        console.error('❌ Error final en getCotizacionById:', error);
         return of(null);
       })
+    );
+  }
+
+  /**
+   * Alias para getCotizacionById (para compatibilidad con componentes)
+   */
+  getById(id: string): Observable<Cotizacion | null> {
+    return this.getCotizacionById(id);
+  }
+
+  /**
+   * Eliminar una cotización (solo si está en estado borrador)
+   */
+  delete(id: string): Observable<{ exito: boolean; mensaje?: string }> {
+    return from(
+      (async () => {
+        try {
+          const session = await this.supabase.getSession();
+          if (!session?.user?.id) {
+            return { exito: false, mensaje: 'Usuario no autenticado' };
+          }
+
+          // Verificar que la cotización existe y está en borrador
+          const { data: cotizacion, error: fetchError } = await this.supabase.client
+            .from('cotizaciones')
+            .select('estado, numero_cotizacion')
+            .eq('id', id)
+            .single();
+
+          if (fetchError || !cotizacion) {
+            return { exito: false, mensaje: 'Cotización no encontrada' };
+          }
+
+          if (cotizacion.estado !== 'borrador') {
+            return { exito: false, mensaje: 'Solo se pueden eliminar cotizaciones en estado borrador' };
+          }
+
+          // Eliminar items primero (cascade debería hacerlo, pero por si acaso)
+          await this.supabase.client
+            .from('cotizacion_items')
+            .delete()
+            .eq('cotizacion_id', id);
+
+          // Eliminar historial
+          await this.supabase.client
+            .from('cotizacion_historial')
+            .delete()
+            .eq('cotizacion_id', id);
+
+          // Eliminar cotización
+          const { error: deleteError } = await this.supabase.client
+            .from('cotizaciones')
+            .delete()
+            .eq('id', id);
+
+          if (deleteError) {
+            console.error('Error eliminando cotización:', deleteError);
+            return { exito: false, mensaje: 'Error al eliminar la cotización' };
+          }
+
+          console.log(`✅ Cotización ${cotizacion.numero_cotizacion} eliminada exitosamente`);
+          return { exito: true, mensaje: 'Cotización eliminada exitosamente' };
+
+        } catch (error) {
+          console.error('Error en delete:', error);
+          return { exito: false, mensaje: 'Error inesperado al eliminar la cotización' };
+        }
+      })()
     );
   }
 
@@ -156,6 +260,8 @@ export class CotizacionService {
           cliente_id: dto.cliente_id,
           tipo_cirugia_id: dto.tipo_cirugia_id,
           hospital_id: dto.hospital_id,
+          medico_cirujano: dto.medico_cirujano,
+          fecha_programada: dto.fecha_programada,
           fecha_vencimiento: dto.fecha_vencimiento,
           costo_transporte: dto.costo_transporte || 0,
           descuento: dto.descuento || 0,
@@ -235,6 +341,8 @@ export class CotizacionService {
       if (dto.cliente_id !== undefined) updateData.cliente_id = dto.cliente_id;
       if (dto.tipo_cirugia_id !== undefined) updateData.tipo_cirugia_id = dto.tipo_cirugia_id;
       if (dto.hospital_id !== undefined) updateData.hospital_id = dto.hospital_id;
+      if (dto.medico_cirujano !== undefined) updateData.medico_cirujano = dto.medico_cirujano;
+      if (dto.fecha_programada !== undefined) updateData.fecha_programada = dto.fecha_programada;
       if (dto.fecha_vencimiento !== undefined) updateData.fecha_vencimiento = dto.fecha_vencimiento;
       if (dto.costo_transporte !== undefined) updateData.costo_transporte = dto.costo_transporte;
       if (dto.descuento !== undefined) updateData.descuento = dto.descuento;
@@ -296,12 +404,28 @@ export class CotizacionService {
 
   /**
    * Cambiar el estado de una cotización
+   * Acepta un DTO completo o un estado simple con comentario opcional
    */
-  async cambiarEstado(id: string, dto: CambiarEstadoCotizacionDTO): Promise<{ exito: boolean; mensaje?: string }> {
+  async cambiarEstado(
+    id: string, 
+    estadoOrDto: CotizacionEstado | CambiarEstadoCotizacionDTO,
+    comentario?: string
+  ): Promise<{ exito: boolean; mensaje?: string }> {
     try {
       const session = await this.supabase.getSession();
       if (!session?.user?.id) {
         return { exito: false, mensaje: 'Usuario no autenticado' };
+      }
+
+      // Normalizar el parámetro a DTO
+      let dto: CambiarEstadoCotizacionDTO;
+      if (typeof estadoOrDto === 'string') {
+        dto = {
+          estado: estadoOrDto,
+          comentario: comentario || `Estado cambiado a ${estadoOrDto}`
+        };
+      } else {
+        dto = estadoOrDto;
       }
 
       // Obtener cotización actual

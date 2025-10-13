@@ -248,6 +248,7 @@ TÉRMINOS Y CONDICIONES
 Para aceptar esta cotización, favor responder este correo o contactar a nuestro equipo comercial.
 
 IMPLAMEQ S.A.S. - NIT: 900.123.456-7
-Teléfono: +57 (2) 123-4567
+Dirección: Cl. 5b 2 #30-14, 3 de Julio, Cali, Valle del Cauca
+Teléfono: +57 301 7311282
 Email: comercial@implameq.com
 `.trim();

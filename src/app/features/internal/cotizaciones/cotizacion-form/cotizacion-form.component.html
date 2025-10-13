@@ -142,6 +142,33 @@
                 </div>
               </div>
 
+              <!-- Email y Teléfono (para envío de cotización) -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-[#10284C] mb-1">
+                    Email
+                    <span class="text-xs text-gray-500">(para enviar cotización)</span>
+                  </label>
+                  <input type="email" formControlName="email"
+                         placeholder="correo@ejemplo.com"
+                         [readonly]="clienteEncontrado()"
+                         class="w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8]">
+                  @if (form.get('email')?.invalid && form.get('email')?.touched) {
+                    <p class="text-red-500 text-xs mt-1">Email inválido</p>
+                  }
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[#10284C] mb-1">
+                    Teléfono
+                    <span class="text-xs text-gray-500">(opcional)</span>
+                  </label>
+                  <input type="tel" formControlName="telefono"
+                         placeholder="0999999999"
+                         [readonly]="clienteEncontrado()"
+                         class="w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8]">
+                </div>
+              </div>
+
               <!-- Cliente ID hidden -->
               <input type="hidden" formControlName="cliente_id">
             </div>
@@ -439,16 +466,19 @@
 
           <!-- Action Buttons -->
           <div class="flex gap-3 sticky bottom-4">
-            <button type="button" (click)="guardarBorrador()" [disabled]="submitting()"
-                    class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors disabled:opacity-50">
-              Guardar Borrador
+            <button type="button" 
+                    routerLink="/internal/cotizaciones"
+                    class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors">
+              Cancelar
             </button>
             <button type="submit" [disabled]="form.invalid || submitting()"
                     class="flex-1 bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold py-4 px-6 rounded-xl shadow-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               @if (submitting()) {
-                Enviando...
+                Guardando...
+              } @else if (isEditing()) {
+                Actualizar Borrador
               } @else {
-                Enviar al Cliente
+                Crear Cotización
               }
             </button>
           </div>

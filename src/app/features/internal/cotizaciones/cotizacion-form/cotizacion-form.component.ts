@@ -65,6 +65,8 @@ export class CotizacionFormComponent implements OnInit {
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       cliente_id: ['', Validators.required], // Hidden, se llena automáticamente
+      email: ['', [Validators.email]], // Email del cliente (opcional pero recomendado)
+      telefono: [''], // Teléfono del cliente (opcional)
       
       // Información de cirugía (para cuando se apruebe)
       hospital_id: [''],
@@ -182,7 +184,9 @@ export class CotizacionFormComponent implements OnInit {
     this.form.patchValue({
       cliente_id: cliente.id,
       nombre: cliente.nombre,
-      apellido: cliente.apellido
+      apellido: cliente.apellido,
+      email: cliente.email || '',
+      telefono: cliente.telefono || ''
     });
   }
 
@@ -190,7 +194,9 @@ export class CotizacionFormComponent implements OnInit {
     this.form.patchValue({
       cliente_id: '',
       nombre: '',
-      apellido: ''
+      apellido: '',
+      email: '',
+      telefono: ''
     });
   }
 
@@ -416,6 +422,8 @@ export class CotizacionFormComponent implements OnInit {
   }
 
   async onSubmit() {
+    // Este método ahora solo guarda como borrador
+    // El envío se hará desde el componente de detalle
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       alert('Por favor completa todos los campos requeridos');
@@ -427,7 +435,7 @@ export class CotizacionFormComponent implements OnInit {
       return;
     }
 
-    await this.guardar('enviada');
+    await this.guardar('borrador');
   }
 
   private async guardar(estado: 'borrador' | 'enviada') {

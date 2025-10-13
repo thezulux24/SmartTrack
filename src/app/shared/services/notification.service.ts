@@ -518,8 +518,8 @@ export class NotificationService {
         userIds.push(tecnico_anterior_id);
       }
       
-      // Notificar al técnico nuevo si existe
-      if (tecnico_nuevo_id && tecnico_anterior_id !== tecnico_nuevo_id) {
+      // Notificar al técnico nuevo si existe (siempre, sea nuevo o el mismo)
+      if (tecnico_nuevo_id) {
         userIds.push(tecnico_nuevo_id);
       }
 
@@ -528,7 +528,7 @@ export class NotificationService {
 
       await this.notifyUsers(
         userIds.filter((v, i, a) => a.indexOf(v) === i), // Eliminar duplicados
-        'cambio_agenda',
+        'cambio_estado_cirugia',
         `${icon} Cambio en agenda - ${numero_cirugia}`,
         `${cambios_detalle} en ${hospital_nombre}. Motivo: ${motivo_cambio}`,
         priority,

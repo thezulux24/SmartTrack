@@ -55,7 +55,7 @@ CREATE TABLE public.clientes (
   email character varying,
   direccion text,
   ciudad character varying,
-  pais character varying DEFAULT 'Ecuador'::character varying,
+  pais character varying DEFAULT 'Colombia'::character varying,
   observaciones text,
   estado character varying DEFAULT 'activo'::character varying,
   created_by uuid,

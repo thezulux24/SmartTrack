@@ -61,7 +61,7 @@ export class ClientesService {
         const clienteData = {
           ...cliente,
           estado: cliente.estado || 'activo',
-          pais: cliente.pais || 'Ecuador',
+          pais: cliente.pais || 'Colombia',
           created_by: userId,
           updated_by: userId
         };
