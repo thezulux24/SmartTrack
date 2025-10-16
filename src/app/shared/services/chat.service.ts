@@ -118,7 +118,7 @@ export class ChatService {
       // Obtener logística (si existe kit asignado)
       const { data: kits } = await this.supabase.client
         .from('kits_cirugia')
-        .select('preparado_por_id')
+        .select('logistica_id')
         .eq('cirugia_id', mensaje.cirugia_id)
         .limit(1);
 
@@ -137,10 +137,10 @@ export class ChatService {
         console.log('💬 ChatService: Added tecnico to participants', cirugia.tecnico_asignado_id);
       }
 
-      if (kits && kits.length > 0 && kits[0].preparado_por_id) {
-        if (kits[0].preparado_por_id !== session.user.id) {
-          participantIds.add(kits[0].preparado_por_id);
-          console.log('💬 ChatService: Added logistics to participants', kits[0].preparado_por_id);
+      if (kits && kits.length > 0 && kits[0].logistica_id) {
+        if (kits[0].logistica_id !== session.user.id) {
+          participantIds.add(kits[0].logistica_id);
+          console.log('💬 ChatService: Added logistics to participants', kits[0].logistica_id);
         }
       }
 

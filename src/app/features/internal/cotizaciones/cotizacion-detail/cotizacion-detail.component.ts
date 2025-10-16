@@ -10,6 +10,9 @@ import { ClientesService } from '../../clientes/data-acces/clientes.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { AuthService } from '../../../../auth/data-access/auth.service';
 import { SupabaseService } from '../../../../shared/data-access/supabase.service';
+import { KitService } from '../../../../shared/services/kit.service';
+import { CreateKitRequest } from '../../../../shared/models/kit.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-cotizacion-detail',
@@ -25,6 +28,7 @@ export class CotizacionDetailComponent implements OnInit {
   private notificationService = inject(NotificationService);
   private authService = inject(AuthService);
   private supabaseService = inject(SupabaseService);
+  private kitService = inject(KitService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -224,12 +228,28 @@ export class CotizacionDetailComponent implements OnInit {
           // Marcar cotización como convertida
           await this.marcarCotizacionConvertida(cotizacion.id, cirugia.id);
 
+          // Crear kit automáticamente con los productos de la cotización
+          if (cotizacion.items && cotizacion.items.length > 0) {
+            try {
+              console.log('📦 Creando kit automáticamente con productos de cotización...');
+              await this.crearKitDesdeCotizacion(cirugia.id, cotizacion);
+            } catch (kitError: any) {
+              console.error('❌ Error al crear kit automático:', kitError);
+              // No bloqueamos el flujo si falla el kit, se puede crear después
+              alert(`⚠️ Cirugía creada pero hubo un error al crear el kit automáticamente: ${kitError.message}\n\nPuede crear el kit manualmente desde la cirugía.`);
+            }
+          }
+
           // Enviar notificaciones
           await this.enviarNotificacionesCirugia(cirugia, cotizacion);
 
           this.convirtiendoCirugia.set(false);
           
-          alert(`✅ Cirugía ${cirugia.numero_cirugia} creada exitosamente`);
+          const mensajeKit = cotizacion.items && cotizacion.items.length > 0 
+            ? '\n📦 Kit creado automáticamente con los productos de la cotización.' 
+            : '';
+          
+          alert(`✅ Cirugía ${cirugia.numero_cirugia} creada exitosamente${mensajeKit}`);
           
           // Navegar a la cirugía creada
           this.router.navigate(['/internal/agenda/cirugia', cirugia.id]);
@@ -325,6 +345,34 @@ export class CotizacionDetailComponent implements OnInit {
       console.log('✅ Notificaciones de nueva cirugía enviadas');
     } catch (error) {
       console.error('❌ Error al enviar notificaciones:', error);
+    }
+  }
+
+  private async crearKitDesdeCotizacion(cirugiaId: string, cotizacion: Cotizacion): Promise<void> {
+    try {
+      // Mapear los items de la cotización a productos del kit
+      const productosKit = cotizacion.items!.map(item => ({
+        producto_id: item.producto_id || '', // Si no tiene producto_id, usar string vacío (se puede manejar mejor)
+        cantidad_solicitada: item.cantidad,
+        observaciones: item.observaciones
+      })).filter(p => p.producto_id !== ''); // Filtrar items sin producto_id
+
+      if (productosKit.length === 0) {
+        console.log('⚠️ No hay productos con producto_id para crear el kit');
+        return;
+      }
+
+      const kitRequest: CreateKitRequest = {
+        cirugia_id: cirugiaId,
+        productos: productosKit,
+        observaciones: `Kit creado automáticamente desde cotización ${cotizacion.numero_cotizacion}\n\n${cotizacion.observaciones || ''}`
+      };
+
+      const kit = await firstValueFrom(this.kitService.crearKit(kitRequest));
+      console.log('✅ Kit creado automáticamente:', kit.numero_kit);
+    } catch (error) {
+      console.error('❌ Error en crearKitDesdeCotizacion:', error);
+      throw error;
     }
   }
 

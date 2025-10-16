@@ -226,11 +226,11 @@ export default class InventarioListComponent implements OnInit {
         );
 
         // 📢 Notificar si el stock queda crítico después del movimiento
-        if (nuevaCantidad <= (producto.cantidad_minima || 0)) {
+        if (nuevaCantidad <= (producto.stock_minimo || 0)) {
           console.log('⚠️ Stock crítico detectado después de salida:', {
             producto: producto.nombre,
             nuevaCantidad,
-            cantidad_minima: producto.cantidad_minima
+            stock_minimo: producto.stock_minimo
           });
           
           const logisticaIds = await this.getLogisticaUsers();
@@ -240,7 +240,7 @@ export default class InventarioListComponent implements OnInit {
               producto.id,
               producto.nombre,
               nuevaCantidad,
-              producto.cantidad_minima || 0
+              producto.stock_minimo || 0
             );
           }
         }

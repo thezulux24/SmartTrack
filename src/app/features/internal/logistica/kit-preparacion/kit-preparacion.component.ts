@@ -104,7 +104,7 @@ export class KitPreparacionComponent implements OnInit {
               codigo,
               nombre,
               categoria,
-              cantidad_minima,
+              stock_minimo,
               inventario(
                 id,
                 cantidad,
@@ -157,7 +157,7 @@ export class KitPreparacionComponent implements OnInit {
           cantidad_solicitada: kp.cantidad_solicitada,
           cantidad_preparada: kp.cantidad_preparada || 0,
           stock_disponible: stockTotal,
-          cantidad_minima: kp.producto.cantidad_minima || 0,
+          cantidad_minima: kp.producto.stock_minimo || 0,
           lote: kp.lote || '',
           fecha_vencimiento: kp.fecha_vencimiento || '',
           ubicacion_seleccionada: inventariosDisponibles[0]?.ubicacion || '',
