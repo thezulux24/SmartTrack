@@ -229,6 +229,7 @@ export class KitBuilderComponent implements OnInit {
     }
 
     const productoForm = this.fb.group({
+      _uniqueId: [Date.now() + Math.random()], // ID único para tracking
       producto_id: [producto.id, Validators.required],
       cantidad_solicitada: [1, [Validators.required, Validators.min(1)]],
       observaciones: ['']
@@ -237,9 +238,9 @@ export class KitBuilderComponent implements OnInit {
     productosArray.push(productoForm);
     this.productosSeleccionados.update(productos => [...productos, producto]);
     
-    // Limpiar búsqueda
-    this.busquedaProducto = '';
-    this.productosEncontrados.set([]);
+    // NO limpiar búsqueda para que los productos sigan visibles
+    // this.busquedaProducto = '';
+    // this.productosEncontrados.set([]);
   }
 
   removerProducto(index: number) {
@@ -259,6 +260,11 @@ export class KitBuilderComponent implements OnInit {
     return this.productosSeleccionados()[index]?.codigo || '';
   }
 
+  // TrackBy function para productos del FormArray
+  trackByProductoId(index: number, item: any): any {
+    return item.value?._uniqueId || item.value?.producto_id || index;
+  }
+
   async onSubmit() {
     if (!this.form.valid || this.productosFormArray().length === 0) return;
 
@@ -268,16 +274,20 @@ export class KitBuilderComponent implements OnInit {
 
       const formValue = this.form.value;
 
+      // Limpiar _uniqueId antes de enviar
+      const productosLimpios = (formValue.productos as any[]).map(({ _uniqueId, ...producto }) => producto);
+
       if (this.modoEdicion) {
         // Modo edición - actualizar kit existente
-        await this.actualizarKit(formValue);
+        const formValueLimpio = { ...formValue, productos: productosLimpios };
+        await this.actualizarKit(formValueLimpio);
         // Mostrar diálogo de éxito
         this.showSuccessDialog.set(true);
       } else {
         // Modo creación - crear nuevo kit
         const request: CreateKitRequest = {
           cirugia_id: this.cirugiaId,
-          productos: (formValue.productos as any[]) || [],
+          productos: productosLimpios,
           observaciones: formValue.observaciones_generales || undefined
         };
 

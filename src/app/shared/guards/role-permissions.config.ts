@@ -62,8 +62,8 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
       '/internal/chat',              // ✅ Job 4: Coordinación con comercial y soporte
       '/internal/trazabilidad',      // ✅ Job 3: Trazabilidad de movimientos
       '/internal/clientes',          // ✅ Ver datos de clientes para entregas
+      '/internal/hojas-gasto',       // ✅ Ver hojas de gasto para control
       // NO tiene acceso a:
-      // - hojas-gasto (es de comercial/técnico)
       // - tecnico (módulo específico)
       // - limpieza (es de soporte técnico)
     ],

@@ -392,15 +392,18 @@
             </div>
           } @else {
             <div formArrayName="productos" class="space-y-4">
-              @for (productoControl of productosFormArray().controls; track $index) {
-                <div [formGroupName]="$index" class="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition duration-200">
+              @for (productoControl of productosFormArray().controls; track trackByProductoId($index, productoControl); let i = $index) {
+                <div [formGroupName]="i" class="border border-white/10 rounded-xl p-4 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition duration-200">
+                  <!-- Hidden ID for tracking -->
+                  <input type="hidden" formControlName="_uniqueId">
+                  
                   <div class="flex justify-between items-start mb-3">
                     <div class="flex-1">
-                      <p class="font-medium text-white">{{ getProductoNombre($index) }}</p>
-                      <p class="text-sm text-white/60">{{ getProductoCodigo($index) }}</p>
+                      <p class="font-medium text-white">{{ getProductoNombre(i) }}</p>
+                      <p class="text-sm text-white/60">{{ getProductoCodigo(i) }}</p>
                     </div>
                     <button type="button" 
-                            (click)="removerProducto($index)"
+                            (click)="removerProducto(i)"
                             class="text-red-400 hover:text-red-300 p-1 rounded-lg hover:bg-red-500/20 transition duration-200 active:scale-95">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>

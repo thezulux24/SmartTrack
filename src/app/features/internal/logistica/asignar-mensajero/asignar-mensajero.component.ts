@@ -81,17 +81,19 @@ export class AsignarMensajeroComponent implements OnInit {
             this.kitInfo.set(kit);
             
             // Pre-llenar datos del hospital
-            if (kit.cirugia?.hospital) {
-              console.log('Hospital:', kit.cirugia.hospital);
-              this.direccionDestino.set(kit.cirugia.hospital.direccion || '');
+            const hospital = kit.cirugia?.hospitales || kit.cirugia?.hospital;
+            if (hospital) {
+              console.log('Hospital:', hospital);
+              this.direccionDestino.set(hospital.direccion || '');
             }
             
             // Pre-llenar contacto y teléfono del cliente
-            if (kit.cirugia?.cliente) {
-              console.log('Cliente:', kit.cirugia.cliente);
-              const nombreCompleto = `${kit.cirugia.cliente.nombre} ${kit.cirugia.cliente.apellido}`;
+            const cliente = kit.cirugia?.clientes || kit.cirugia?.cliente;
+            if (cliente) {
+              console.log('Cliente:', cliente);
+              const nombreCompleto = `${cliente.nombre} ${cliente.apellido}`;
               this.contactoDestino.set(nombreCompleto);
-              this.telefonoDestino.set(kit.cirugia.cliente.telefono || '');
+              this.telefonoDestino.set(cliente.telefono || '');
             }
             
             console.log('Valores pre-llenados:');

@@ -152,8 +152,8 @@
             </label>
             <input 
               type="text"
-              [(ngModel)]="direccionDestino"
-              (ngModelChange)="direccionDestino.set($event)"
+              [value]="direccionDestino()"
+              (input)="direccionDestino.set(($any($event.target)).value)"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C8D900]"
               placeholder="Dirección del hospital (editable)"
             />
@@ -165,8 +165,8 @@
             </label>
             <input 
               type="text"
-              [(ngModel)]="contactoDestino"
-              (ngModelChange)="contactoDestino.set($event)"
+              [value]="contactoDestino()"
+              (input)="contactoDestino.set(($any($event.target)).value)"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C8D900]"
               placeholder="Nombre del paciente (editable)"
             />
@@ -178,8 +178,8 @@
             </label>
             <input 
               type="tel"
-              [(ngModel)]="telefonoDestino"
-              (ngModelChange)="telefonoDestino.set($event)"
+              [value]="telefonoDestino()"
+              (input)="telefonoDestino.set(($any($event.target)).value)"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C8D900]"
               placeholder="Teléfono de contacto (editable)"
             />
@@ -191,8 +191,8 @@
             </label>
             <input 
               type="date"
-              [(ngModel)]="fechaProgramada"
-              (ngModelChange)="fechaProgramada.set($event)"
+              [value]="fechaProgramada()"
+              (input)="fechaProgramada.set(($any($event.target)).value)"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C8D900]"
             />
           </div>
@@ -200,8 +200,8 @@
           <div class="md:col-span-2">
             <label class="block text-white text-sm mb-2">Observaciones</label>
             <textarea 
-              [(ngModel)]="observaciones"
-              (ngModelChange)="observaciones.set($event)"
+              [value]="observaciones()"
+              (input)="observaciones.set(($any($event.target)).value)"
               rows="3"
               class="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#C8D900]"
               placeholder="Observaciones adicionales sobre el envío..."

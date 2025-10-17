@@ -116,7 +116,7 @@ export default class InternalHomeComponent implements OnInit {
       title: 'Hojas de Gasto',
       description: 'Registro de gastos',
       icon: 'document',
-      roles: ['admin', 'comercial', 'soporte_tecnico']
+      roles: ['admin', 'comercial', 'logistica', 'soporte_tecnico']
     },
     {
       route: '/internal/trazabilidad',
