@@ -182,10 +182,15 @@ export class QrValidacionService {
 
       // 5. Si existe un envío activo, confirmarlo (esto actualiza kit y registra trazabilidad)
       if (envioData) {
-        await this.envioService.confirmarEntrega(envioData.id, {
+        const resultadoEntrega = await this.envioService.confirmarEntrega(envioData.id, {
           nombre_receptor: datos.nombre_receptor,
           documento_receptor: datos.cedula_receptor
         });
+        
+        if (!resultadoEntrega.exito) {
+          console.error('Error confirmando entrega:', resultadoEntrega.mensaje);
+          return { exito: false, mensaje: resultadoEntrega.mensaje || 'Error al confirmar la entrega' };
+        }
       } else {
         // Si no hay envío (caso legacy), actualizar el kit directamente
         const { error: kitUpdateError } = await this.supabase.client
@@ -207,23 +212,36 @@ export class QrValidacionService {
         }
 
         // Registrar en trazabilidad (caso legacy sin envío)
-        await this.supabase.client
+        // NOTA: usuario_id es requerido, usar un ID de sistema o del técnico asignado
+        const { data: kitInfo } = await this.supabase.client
+          .from('kits_cirugia')
+          .select('tecnico_id')
+          .eq('id', datos.kit_id)
+          .single();
+        
+        const { error: trazabilidadError } = await this.supabase.client
           .from('kit_trazabilidad')
           .insert({
             kit_id: datos.kit_id,
             accion: 'Entrega confirmada por cliente',
             estado_anterior: 'en_transito',
             estado_nuevo: 'entregado',
-            usuario_id: null,
+            usuario_id: kitInfo?.tecnico_id || null, // Usar técnico asignado o null
             timestamp: ahora,
             observaciones: `Recibido por: ${datos.nombre_receptor} (${datos.cedula_receptor})`,
             metadata: {
               nombre_receptor: datos.nombre_receptor,
               cedula_receptor: datos.cedula_receptor,
               firma_registrada: true,
-              observaciones_cliente: datos.observaciones
+              observaciones_cliente: datos.observaciones,
+              validacion_publica: true
             }
           });
+          
+        if (trazabilidadError) {
+          console.error('Error registrando trazabilidad:', trazabilidadError);
+          // No fallar la operación, solo loguear el error
+        }
       }
 
       // 6. Actualizar el QR code

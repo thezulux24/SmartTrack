@@ -341,7 +341,7 @@
           Editar Hoja
         </button>
         <button 
-          *ngIf="canComplete()"
+          *ngIf="canApprove()"
           (click)="cambiarEstado('aprobada')"
           class="flex-1 bg-[#0098A8] hover:bg-[#00b8c8] text-white px-4 py-3 rounded-lg font-bold transition-all shadow-xl active:scale-95">
           <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

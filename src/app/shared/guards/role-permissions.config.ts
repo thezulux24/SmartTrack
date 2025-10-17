@@ -30,6 +30,7 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
     role: 'comercial',
     allowedRoutes: [
       '/internal',
+      '/internal/comercial',         // ✅ Dashboard comercial con métricas
       '/internal/agenda',           // ✅ Job 1-2: Programar y visualizar agenda
       '/internal/agenda/crear',
       '/internal/agenda/editar',

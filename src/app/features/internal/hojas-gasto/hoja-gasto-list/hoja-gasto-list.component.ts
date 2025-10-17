@@ -8,6 +8,7 @@ import {
   EstadoHojaGasto,
   ESTADOS_CONFIG
 } from '../data-access/hoja-gasto.model';
+import { SupabaseService } from '../../../../shared/data-access/supabase.service';
 
 @Component({
   selector: 'app-hoja-gasto-list',
@@ -19,11 +20,14 @@ import {
 export class HojaGastoListComponent implements OnInit {
   private router = inject(Router);
   private hojaGastoService = inject(HojaGastoService);
+  private supabaseService = inject(SupabaseService);
 
   // Signals para el estado del componente
   loading = signal(false);
   error = signal<string | null>(null);
   hojasGasto = signal<HojaGasto[]>([]);
+  currentUserRole = signal<string | null>(null);
+  currentUserId = signal<string | null>(null);
   
   // Filtros
   filtroEstado = signal<EstadoHojaGasto | ''>('');
@@ -31,9 +35,33 @@ export class HojaGastoListComponent implements OnInit {
   // Configuraciones para templates
   readonly ESTADOS_CONFIG = ESTADOS_CONFIG;
 
-  ngOnInit() {
+  async ngOnInit() {
     console.log('📋 HojaGastoListComponent iniciando...');
+    await this.loadCurrentUser();
     this.loadHojasGasto();
+  }
+
+  async loadCurrentUser() {
+    try {
+      const session = await this.supabaseService.getSession();
+      if (session?.user?.id) {
+        this.currentUserId.set(session.user.id);
+        
+        // Obtener el rol del usuario
+        const { data: profile } = await this.supabaseService.client
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile) {
+          this.currentUserRole.set(profile.role);
+          console.log('👤 Usuario actual - Rol:', profile.role);
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando usuario actual:', error);
+    }
   }
 
   loadHojasGasto() {
@@ -41,6 +69,12 @@ export class HojaGastoListComponent implements OnInit {
     this.error.set(null);
     
     const filters: HojaGastoFilters = {};
+    
+    // Si es técnico, solo ver sus propias hojas de gasto
+    if (this.currentUserRole() === 'soporte_tecnico' && this.currentUserId()) {
+      filters.tecnico_id = this.currentUserId()!;
+      console.log('🔍 Filtrando hojas de gasto para técnico:', this.currentUserId());
+    }
     
     if (this.filtroEstado()) {
       filters.estado = this.filtroEstado() as EstadoHojaGasto;
@@ -138,5 +172,24 @@ export class HojaGastoListComponent implements OnInit {
         this.error.set('Error al cambiar el estado. Por favor, inténtelo de nuevo.');
       }
     });
+  }
+
+  canEditHoja(hoja: HojaGasto): boolean {
+    const role = this.currentUserRole();
+    const userId = this.currentUserId();
+    
+    if (!role) return false;
+    
+    // Solo puede editar si el estado lo permite
+    const estadoPermiteEdicion = hoja.estado === 'borrador' || hoja.estado === 'revision';
+    if (!estadoPermiteEdicion) return false;
+    
+    // El técnico solo puede editar sus propias hojas de gasto
+    if (role === 'soporte_tecnico') {
+      return hoja.tecnico_id === userId;
+    }
+    
+    // Logística y admin pueden editar cualquier hoja
+    return role === 'logistica' || role === 'admin';
   }
 }

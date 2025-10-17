@@ -38,6 +38,12 @@ export default [
   },
 
   {
+    path: 'comercial',
+    canActivate: [roleBasedGuard], // ✅ Solo Comercial + Admin
+    loadChildren: () => import('../comercial/comercial-routing').then(m => m.COMERCIAL_ROUTES)
+  },
+
+  {
     path: 'logistica',
     canActivate: [roleBasedGuard], // ✅ Solo Logística + Admin
     loadChildren: () => import('../logistica/logistica-routing').then(m => m.LOGISTICA_ROUTES)

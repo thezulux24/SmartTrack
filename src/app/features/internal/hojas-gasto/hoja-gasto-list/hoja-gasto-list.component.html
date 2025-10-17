@@ -201,7 +201,7 @@
                     class="flex-1 bg-[#C8D900] hover:bg-[#d4e820] text-[#10284C] px-3 py-2 rounded-lg text-xs font-medium transition-all active:scale-95">
                     Ver Detalle
                   </button>
-                  @if (hoja.estado === 'borrador' || hoja.estado === 'revision') {
+                  @if (canEditHoja(hoja)) {
                     <button 
                       (click)="editarHoja(hoja.id); $event.stopPropagation()"
                       class="bg-[#0098A8] hover:bg-[#0098A8]/80 text-white px-3 py-2 rounded-lg text-xs font-medium transition-all active:scale-95">

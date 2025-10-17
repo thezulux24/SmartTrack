@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HojaGastoService } from '../data-access/hoja-gasto.service';
 import { HojaGasto, EstadoHojaGasto, CategoriaProducto, ESTADOS_CONFIG, CATEGORIAS_CONFIG } from '../data-access/hoja-gasto.model';
+import { SupabaseService } from '../../../../shared/data-access/supabase.service';
 
 @Component({
   selector: 'app-hoja-gasto-detail',
@@ -15,11 +16,14 @@ export class HojaGastoDetailComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private hojaGastoService = inject(HojaGastoService);
+  private supabaseService = inject(SupabaseService);
 
   // Signals para el estado del componente
   loading = signal(false);
   error = signal<string | null>(null);
   hojaGasto = signal<HojaGasto | null>(null);
+  currentUserRole = signal<string | null>(null);
+  currentUserId = signal<string | null>(null);
 
   // Parámetro de entrada
   hojaId = input<string | null>(null);
@@ -50,8 +54,31 @@ export class HojaGastoDetailComponent implements OnInit {
   readonly ESTADOS_CONFIG = ESTADOS_CONFIG;
   readonly CATEGORIAS_CONFIG = CATEGORIAS_CONFIG;
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.loadCurrentUser();
     this.loadHojaGasto();
+  }
+
+  async loadCurrentUser() {
+    try {
+      const session = await this.supabaseService.getSession();
+      if (session?.user?.id) {
+        this.currentUserId.set(session.user.id);
+        
+        // Obtener el rol del usuario
+        const { data: profile } = await this.supabaseService.client
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile) {
+          this.currentUserRole.set(profile.role);
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando usuario actual:', error);
+    }
   }
 
   async loadHojaGasto() {
@@ -165,16 +192,44 @@ export class HojaGastoDetailComponent implements OnInit {
 
   canEdit(): boolean {
     const hoja = this.hojaGasto();
-    return hoja?.estado === 'borrador' || hoja?.estado === 'revision';
+    const role = this.currentUserRole();
+    const userId = this.currentUserId();
+    
+    if (!hoja || !role) return false;
+    
+    // Solo puede editar si el estado lo permite
+    const estadoPermiteEdicion = hoja.estado === 'borrador' || hoja.estado === 'revision';
+    if (!estadoPermiteEdicion) return false;
+    
+    // El técnico solo puede editar sus propias hojas de gasto
+    if (role === 'soporte_tecnico') {
+      return hoja.tecnico_id === userId;
+    }
+    
+    // Logística y admin pueden editar cualquier hoja
+    return role === 'logistica' || role === 'admin';
+  }
+
+  canApprove(): boolean {
+    const hoja = this.hojaGasto();
+    const role = this.currentUserRole();
+    
+    if (!hoja || !role) return false;
+    
+    // Solo logística y admin pueden aprobar
+    if (role !== 'logistica' && role !== 'admin') return false;
+    
+    // Solo se puede aprobar si está en borrador o revisión
+    return hoja.estado === 'borrador' || hoja.estado === 'revision';
   }
 
   canValidate(): boolean {
     const hoja = this.hojaGasto();
-    return hoja?.estado === 'aprobada';
-  }
-
-  canComplete(): boolean {
-    const hoja = this.hojaGasto();
-    return hoja?.estado === 'borrador' || hoja?.estado === 'revision';
+    const role = this.currentUserRole();
+    
+    if (!hoja || !role) return false;
+    
+    // Solo logística y admin pueden validar
+    return (role === 'logistica' || role === 'admin') && hoja.estado === 'aprobada';
   }
 }

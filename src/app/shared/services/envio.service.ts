@@ -332,15 +332,22 @@ export class EnvioService {
 
       if (updateKitError) throw updateKitError;
 
-      // 4. Registrar en trazabilidad
-      await this.supabase.client
+      // 4. Obtener el técnico asignado al kit para registrar trazabilidad
+      const { data: kitInfo } = await this.supabase.client
+        .from('kits_cirugia')
+        .select('tecnico_id')
+        .eq('id', envio.kit_id)
+        .single();
+
+      // 5. Registrar en trazabilidad (usando técnico_id ya que usuario_id es NOT NULL)
+      const { error: trazabilidadError } = await this.supabase.client
         .from('kit_trazabilidad')
         .insert({
           kit_id: envio.kit_id,
           accion: 'Kit entregado al cliente',
           estado_anterior: 'en_transito',
           estado_nuevo: 'entregado',
-          usuario_id: null, // Cliente público sin sesión
+          usuario_id: kitInfo?.tecnico_id || envio.mensajero_id, // Usar técnico asignado o mensajero
           timestamp: ahora,
           observaciones: `Recibido por: ${datosEntrega.nombre_receptor}${datosEntrega.documento_receptor ? ` - Doc: ${datosEntrega.documento_receptor}` : ''}`,
           metadata: {
@@ -348,11 +355,17 @@ export class EnvioService {
             mensajero_id: envio.mensajero_id,
             receptor: datosEntrega,
             validado_via: 'qr_scan',
-            ubicacion_validacion: 'destino_final'
+            ubicacion_validacion: 'destino_final',
+            validacion_publica: true
           }
         });
 
-      // 5. 📢 Obtener datos del kit para notificación
+      if (trazabilidadError) {
+        console.error('⚠️ Error registrando trazabilidad:', trazabilidadError);
+        // No fallar la operación principal, solo loguear
+      }
+
+      // 6. 📢 Obtener datos del kit para notificación
       const { data: kitData } = await this.supabase.client
         .from('kits_cirugia')
         .select(`
@@ -367,7 +380,7 @@ export class EnvioService {
         .eq('id', envio.kit_id)
         .single();
 
-      // 6. 📢 Enviar notificación de entrega
+      // 7. 📢 Enviar notificación de entrega
       if (kitData && kitData.cirugia) {
         const cirugia: any = Array.isArray(kitData.cirugia) ? kitData.cirugia[0] : kitData.cirugia;
         const hospitalData: any = cirugia?.hospital_data ? (Array.isArray(cirugia.hospital_data) ? cirugia.hospital_data[0] : cirugia.hospital_data) : null;
