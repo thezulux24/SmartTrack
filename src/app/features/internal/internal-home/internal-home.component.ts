@@ -38,6 +38,12 @@ export default class InternalHomeComponent implements OnInit {
   totalUnreadMessages = signal(0);
   userRole = signal<string>('');
   menuItems = signal<MenuItem[]>([]);
+  
+  // KPIs
+  cirugiasHoy = signal(0);
+  stockCritico = signal(0);
+  kitsEnProceso = signal(0);
+  cotizacionesPendientes = signal(0);
 
   // Definición completa del menú con permisos
   private allMenuItems: MenuItem[] = [
@@ -131,10 +137,12 @@ export default class InternalHomeComponent implements OnInit {
     await this.loadUserRole();
     await this.loadUnreadMessagesCount();
     await this.initializeNotifications();
+    await this.loadKPIs();
     
     // Actualizar cada 30 segundos
     setInterval(() => {
       this.loadUnreadMessagesCount();
+      this.loadKPIs();
     }, 30000);
   }
 
@@ -187,6 +195,57 @@ export default class InternalHomeComponent implements OnInit {
       });
     } catch (error) {
       console.error('Error loading unread messages:', error);
+    }
+  }
+
+  async loadKPIs() {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      // 1. Cirugías programadas para hoy
+      const { count: cirugiasCount } = await this._supabaseService.client
+        .from('cirugias')
+        .select('*', { count: 'exact', head: true })
+        .gte('fecha_programada', today.toISOString())
+        .lt('fecha_programada', tomorrow.toISOString())
+        .in('estado', ['programada', 'confirmada', 'en_curso']);
+      
+      this.cirugiasHoy.set(cirugiasCount || 0);
+
+      // 2. Productos con stock crítico (cantidad <= stock_minimo)
+      const { data: stockData } = await this._supabaseService.client
+        .from('inventario')
+        .select('producto_id, cantidad, productos!inner(stock_minimo)')
+        .eq('estado', 'disponible');
+      
+      const stockCriticoCount = stockData?.filter(item => {
+        const stockMinimo = (item.productos as any)?.stock_minimo || 5;
+        return item.cantidad <= stockMinimo;
+      }).length || 0;
+      
+      this.stockCritico.set(stockCriticoCount);
+
+      // 3. Kits en proceso (preparando, listo_envio, en_transito)
+      const { count: kitsCount } = await this._supabaseService.client
+        .from('kits_cirugia')
+        .select('*', { count: 'exact', head: true })
+        .in('estado', ['preparando', 'listo_envio', 'en_transito']);
+      
+      this.kitsEnProceso.set(kitsCount || 0);
+
+      // 4. Cotizaciones pendientes (borrador, enviada)
+      const { count: cotizacionesCount } = await this._supabaseService.client
+        .from('cotizaciones')
+        .select('*', { count: 'exact', head: true })
+        .in('estado', ['borrador', 'enviada']);
+      
+      this.cotizacionesPendientes.set(cotizacionesCount || 0);
+
+    } catch (error) {
+      console.error('Error loading KPIs:', error);
     }
   }
 

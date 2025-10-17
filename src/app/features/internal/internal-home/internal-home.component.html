@@ -36,26 +36,26 @@
           <div class="grid grid-cols-2 gap-5 pb-16">
             <!-- Cirugías Hoy -->
             <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
-              <div class="text-4xl font-bold text-white mb-1">12</div>
+              <div class="text-4xl font-bold text-white mb-1">{{ cirugiasHoy() }}</div>
               <div class="text-white/90 text-sm">Cirugías Hoy</div>
             </div>
 
             <!-- Stock Crítico -->
             <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
-              <div class="text-4xl font-bold text-white mb-1">03</div>
+              <div class="text-4xl font-bold text-white mb-1">{{ stockCritico() }}</div>
               <div class="text-white/90 text-sm">Stock Crítico</div>
             </div>
 
-            <!-- Soporte pendiente -->
+            <!-- Kits en Proceso -->
             <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
-              <div class="text-4xl font-bold text-white mb-1">07</div>
-              <div class="text-white/90 text-sm">Soporte pendiente</div>
+              <div class="text-4xl font-bold text-white mb-1">{{ kitsEnProceso() }}</div>
+              <div class="text-white/90 text-sm">Kits en Proceso</div>
             </div>
 
-            <!-- Facturación -->
+            <!-- Cotizaciones Pendientes -->
             <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
-              <div class="text-4xl font-bold text-white mb-1">85%</div>
-              <div class="text-white/90 text-sm">Facturación</div>
+              <div class="text-4xl font-bold text-white mb-1">{{ cotizacionesPendientes() }}</div>
+              <div class="text-white/90 text-sm">Cotizaciones Pendientes</div>
             </div>
           </div>
         </div>
