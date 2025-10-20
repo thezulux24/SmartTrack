@@ -43,14 +43,14 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
       // - inventario (es de logística)
       // - logistica (módulo específico)
       // - tecnico (módulo específico)
-      // - limpieza (es de soporte técnico)
+      // - limpieza (es de logística - auxiliar logístico)
     ],
     description: 'Gestión comercial, agenda y coordinación'
   },
 
   /**
    * LOGÍSTICA - Control de insumos y entregas
-   * Jobs: Inventarios, rutas, movimientos, coordinación, panel control, alertas
+   * Jobs: Inventarios, rutas, movimientos, coordinación, panel control, alertas, limpieza y esterilización
    */
   logistica: {
     role: 'logistica',
@@ -58,16 +58,16 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
       '/internal',
       '/internal/inventario',        // ✅ Job 1: Monitorear inventarios en tiempo real
       '/internal/logistica',         // ✅ Job 2-3: Rutas, despachos, bitácora digital
+      '/internal/limpieza',          // ✅ Gestión de limpieza y esterilización (Auxiliar Logístico)
       '/internal/agenda',            // ✅ Job 4: Ver solicitudes quirúrgicas
       '/internal/chat',              // ✅ Job 4: Coordinación con comercial y soporte
       '/internal/trazabilidad',      // ✅ Job 3: Trazabilidad de movimientos
       '/internal/clientes',          // ✅ Ver datos de clientes para entregas
       '/internal/hojas-gasto',       // ✅ Ver hojas de gasto para control
       // NO tiene acceso a:
-      // - tecnico (módulo específico)
-      // - limpieza (es de soporte técnico)
+      // - tecnico (módulo específico de soporte técnico)
     ],
-    description: 'Gestión de inventarios, logística y entregas'
+    description: 'Gestión de inventarios, logística, entregas y limpieza'
   },
 
   /**
@@ -82,15 +82,15 @@ export const ROLE_PERMISSIONS: Record<string, RolePermissions> = {
       '/internal/agenda/mi-agenda',  // ✅ Job 1: Ver SU agenda de cirugías asignadas (NO la agenda general)
       '/internal/hojas-gasto',       // ✅ Job 2: Registrar hojas de gasto desde campo
       '/internal/inventario',        // ✅ Job 4: Ver inventario en tiempo real
-      '/internal/limpieza',          // ✅ Gestión de limpieza y esterilización
       '/internal/chat',              // ✅ Job 6: Comunicación asincrónica
       '/internal/trazabilidad',      // ✅ Job 1-3: Trazabilidad de tareas y tiempos
       // NO tiene acceso a:
       // - /internal/agenda (agenda general es solo para comercial y logística)
       // - logistica (módulo específico de logística)
+      // - limpieza (es responsabilidad del auxiliar logístico)
       // - clientes (no necesita gestión comercial)
     ],
-    description: 'Soporte técnico, registros y limpieza'
+    description: 'Soporte técnico en campo y registros quirúrgicos'
   },
 
   /**

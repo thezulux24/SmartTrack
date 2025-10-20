@@ -112,10 +112,10 @@ export default class InternalHomeComponent implements OnInit {
     },
     {
       route: '/internal/limpieza',
-      title: 'Recepción de Limpieza',
-      description: 'Confirmar productos limpios',
+      title: 'Lavado y Esterilización',
+      description: 'Gestión de limpieza de material',
       icon: 'check',
-      roles: ['admin', 'soporte_tecnico']
+      roles: ['admin', 'logistica']
     },
     {
       route: '/internal/hojas-gasto',
