@@ -26,7 +26,7 @@ import { CommonModule } from '@angular/common';
             <div class="flex items-center p-6">
               <div class="flex items-center gap-2">
                 <img 
-                  src="/logo.webp" 
+                  src="logo.webp" 
                   alt="Implameq" 
                   class="h-8 brightness-0 invert" />
               </div>
