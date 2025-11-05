@@ -19,7 +19,7 @@ import { CommonModule } from '@angular/common';
             <!-- Logo -->
             <div class="flex justify-center mb-4">
               <div class="text-center">
-                <img src="https://www.implameq.com/wp-content/uploads/logotipo-impla-300x78.png.webp" 
+                <img src="/logo.webp" 
                      alt="Implameq" class="h-12 mx-auto mb-2 brightness-0 invert">
                 <p class="text-xs text-white/80">Implantes médicos - Quirúrgicos</p>
               </div>
