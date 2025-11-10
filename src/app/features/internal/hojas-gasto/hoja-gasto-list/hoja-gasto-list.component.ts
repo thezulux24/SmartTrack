@@ -36,7 +36,6 @@ export class HojaGastoListComponent implements OnInit {
   readonly ESTADOS_CONFIG = ESTADOS_CONFIG;
 
   async ngOnInit() {
-    console.log('📋 HojaGastoListComponent iniciando...');
     await this.loadCurrentUser();
     this.loadHojasGasto();
   }
@@ -56,7 +55,6 @@ export class HojaGastoListComponent implements OnInit {
         
         if (profile) {
           this.currentUserRole.set(profile.role);
-          console.log('👤 Usuario actual - Rol:', profile.role);
         }
       }
     } catch (error) {
@@ -84,7 +82,6 @@ export class HojaGastoListComponent implements OnInit {
       next: (hojas) => {
         this.hojasGasto.set(hojas);
         this.loading.set(false);
-        console.log('✅ Hojas de gasto cargadas:', hojas.length);
       },
       error: (error: any) => {
         console.error('❌ Error cargando hojas de gasto:', error);

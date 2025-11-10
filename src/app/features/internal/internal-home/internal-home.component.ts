@@ -172,7 +172,7 @@ export default class InternalHomeComponent implements OnInit {
     });
     
     this.menuItems.set(filteredMenu);
-    console.log(`📋 Menú filtrado para rol ${role}:`, filteredMenu.length, 'items');
+
   }
 
   async initializeNotifications() {

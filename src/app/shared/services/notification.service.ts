@@ -100,7 +100,6 @@ export class NotificationService {
       const session = await this.supabase.getSession();
       if (session?.user) {
         this.userId = session.user.id;
-        console.log('🔔 Notification Service: Initializing for user', this.userId);
         await this.loadNotifications();
         this.subscribeToNotifications();
       }
@@ -111,7 +110,6 @@ export class NotificationService {
 
   async initialize(userId: string) {
     this.userId = userId;
-    console.log('🔔 Notification Service: Manual initialization for user', userId);
     await this.loadNotifications();
     this.subscribeToNotifications();
   }
@@ -126,8 +124,6 @@ export class NotificationService {
     }
 
     try {
-      console.log('📥 NotificationService: Loading notifications for', this.userId);
-      
       // Cargar últimas 50 notificaciones
       const { data, error } = await this.supabase.client
         .from('notificaciones')
@@ -142,10 +138,7 @@ export class NotificationService {
       }
       
       if (data) {
-        console.log('✅ NotificationService: Loaded', data.length, 'notifications');
         this.notifications.set(data);
-      } else {
-        console.log('📭 NotificationService: No notifications found');
       }
     } catch (error) {
       console.error('❌ NotificationService: Exception loading notifications:', error);
@@ -163,12 +156,8 @@ export class NotificationService {
 
     // Limpiar canal previo
     if (this.channel) {
-      console.log('🔌 NotificationService: Removing previous channel');
       this.supabase.client.removeChannel(this.channel);
     }
-
-    console.log('🔌 NotificationService: Creating realtime subscription for user:', this.userId);
-    console.log('📡 Channel name:', `notifications:${this.userId}`);
 
     // Crear nuevo canal
     this.channel = this.supabase.client
@@ -182,20 +171,13 @@ export class NotificationService {
           filter: `user_id=eq.${this.userId}`
         },
         (payload) => {
-          console.log('📬 NotificationService: ✨ REALTIME EVENT RECEIVED! ✨');
-          console.log('📬 Payload:', payload);
           const notification = payload.new as Notification;
           this.handleNewNotification(notification);
         }
       )
       .subscribe((status, error) => {
-        console.log('🔌 NotificationService: Subscription status:', status);
         if (error) {
           console.error('❌ NotificationService: Subscription error:', error);
-        }
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ NotificationService: Successfully subscribed to realtime!');
-          console.log('⏳ Waiting for new notifications...');
         }
         if (status === 'CHANNEL_ERROR') {
           console.error('❌ NotificationService: Channel error - Realtime may not be enabled');
@@ -207,21 +189,16 @@ export class NotificationService {
   }
 
   private handleNewNotification(notification: Notification) {
-    console.log('🎉 NotificationService: Handling new notification', notification);
-    
     // Agregar a la lista
     this.notifications.update(notifications => [notification, ...notifications]);
-    console.log('✅ NotificationService: Added to notifications list. Total:', this.notifications().length);
 
     // Mostrar toast si está habilitado
     if (this.config().showToast) {
-      console.log('🍞 NotificationService: Showing toast');
       this.showToast(notification);
     }
 
     // Reproducir sonido
     if (this.config().playSound) {
-      console.log('🔊 NotificationService: Playing sound');
       this.playNotificationSound();
     }
 
@@ -243,14 +220,6 @@ export class NotificationService {
     data?: NotificationData,
     link?: string
   ): Promise<Notification | null> {
-    console.log('🔨 NotificationService.createNotification called:', {
-      userId,
-      type,
-      title,
-      message,
-      priority
-    });
-
     try {
       const notification: Omit<Notification, 'id' | 'created_at'> = {
         user_id: userId,
@@ -265,8 +234,6 @@ export class NotificationService {
         read: false
       };
 
-      console.log('📝 NotificationService: Inserting notification:', notification);
-
       const { data: newNotification, error } = await this.supabase.client
         .from('notificaciones')
         .insert(notification)
@@ -274,14 +241,11 @@ export class NotificationService {
         .single();
 
       if (error) {
-        console.error('❌ NotificationService.createNotification: Supabase error:', error);
         throw error;
       }
 
-      console.log('✅ NotificationService.createNotification: Success!', newNotification);
       return newNotification;
     } catch (error) {
-      console.error('❌ NotificationService.createNotification: Exception:', error);
       return null;
     }
   }
@@ -315,14 +279,6 @@ export class NotificationService {
     remitente_nombre: string,
     mensaje_preview: string
   ) {
-    console.log('📨 NotificationService.notifyNewMessage called with:', {
-      recipientIds,
-      cirugia_id,
-      numero_cirugia,
-      remitente_nombre,
-      mensaje_preview
-    });
-
     try {
       await this.notifyUsers(
         recipientIds,
@@ -333,7 +289,6 @@ export class NotificationService {
         { cirugia_id, remitente_nombre },
         `/internal/chat/${cirugia_id}`
       );
-      console.log('✅ NotificationService.notifyNewMessage: Notifications sent successfully');
     } catch (error) {
       console.error('❌ NotificationService.notifyNewMessage: Error:', error);
     }
@@ -444,12 +399,6 @@ export class NotificationService {
     hospital_nombre: string,
     creador_nombre: string
   ) {
-    console.log('🏥 NotificationService.notifyNewCirugia called:', {
-      tecnico_asignado_id,
-      cirugia_id,
-      numero_cirugia
-    });
-
     try {
       // Preparar datos comunes
       const data = {
@@ -465,7 +414,6 @@ export class NotificationService {
 
       // Notificar al técnico asignado (si existe)
       if (tecnico_asignado_id) {
-        console.log('📨 Notificando a técnico asignado:', tecnico_asignado_id);
         await this.createNotification(
           tecnico_asignado_id,
           'asignacion_cirugia',
@@ -479,7 +427,6 @@ export class NotificationService {
 
       // Notificar a TODA logística
       if (logistica_ids.length > 0) {
-        console.log('📦 Notificando a logística:', logistica_ids);
         await this.notifyUsers(
           logistica_ids,
           'asignacion_cirugia',
@@ -490,8 +437,6 @@ export class NotificationService {
           `/internal/agenda/${cirugia_id}`
         );
       }
-
-      console.log('✅ NotificationService.notifyNewCirugia: Notifications sent successfully');
     } catch (error) {
       console.error('❌ NotificationService.notifyNewCirugia: Error:', error);
     }
@@ -543,8 +488,6 @@ export class NotificationService {
         },
         `/internal/agenda/${cirugia_id}`
       );
-
-      console.log('✅ NotificationService.notifyAgendaChange: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyAgendaChange: Error:', error);
     }
@@ -583,8 +526,6 @@ export class NotificationService {
           `/internal/logistica/envios/${envio_id}`
         );
       }
-
-      console.log('✅ NotificationService.notifyMensajeroAssigned: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyMensajeroAssigned: Error:', error);
     }
@@ -635,7 +576,6 @@ export class NotificationService {
         `/internal/logistica/envios/${envio_id}`
       );
 
-      console.log('✅ NotificationService.notifyDeliveryStatusChange: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyDeliveryStatusChange: Error:', error);
     }
@@ -669,8 +609,6 @@ export class NotificationService {
           `/internal/logistica/envios/${envio_id}`
         );
       }
-
-      console.log('✅ NotificationService.notifyDeliveryDelay: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyDeliveryDelay: Error:', error);
     }
@@ -704,8 +642,6 @@ export class NotificationService {
           `/internal/logistica/envios/${envio_id}`
         );
       }
-
-      console.log('✅ NotificationService.notifyDeliveryError: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyDeliveryError: Error:', error);
     }
@@ -738,8 +674,6 @@ export class NotificationService {
           `/internal/agenda/${cirugia_id}`
         );
       }
-
-      console.log('✅ NotificationService.notifyUrgentRequest: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyUrgentRequest: Error:', error);
     }
@@ -790,8 +724,6 @@ export class NotificationService {
         },
         `/internal/hojas-gasto/${hoja_gasto_id}`
       );
-
-      console.log('✅ NotificationService.notifyHojaGastoStatusChange: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyHojaGastoStatusChange: Error:', error);
     }
@@ -814,7 +746,6 @@ export class NotificationService {
         .eq('is_active', true);
 
       if (error || !aprobadores || aprobadores.length === 0) {
-        console.log('⚠️ No hay aprobadores disponibles');
         return;
       }
 
@@ -838,8 +769,6 @@ export class NotificationService {
         },
         `/internal/hojas-gasto/${hoja_gasto_id}`
       );
-
-      console.log('✅ NotificationService.notifyHojaGastoNeedsApproval: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyHojaGastoNeedsApproval: Error:', error);
     }
@@ -877,8 +806,6 @@ export class NotificationService {
         },
         `/internal/agenda/${cirugia_id}`
       );
-
-      console.log('✅ NotificationService.notifyCirugiaIncident: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyCirugiaIncident: Error:', error);
     }
@@ -918,8 +845,6 @@ export class NotificationService {
         },
         `/internal/agenda/${cirugia_id}`
       );
-
-      console.log('✅ NotificationService.notifyCirugiaCanceled: Notifications sent');
     } catch (error) {
       console.error('❌ NotificationService.notifyCirugiaCanceled: Error:', error);
     }
@@ -1054,7 +979,6 @@ export class NotificationService {
       }
 
       const ids = (data || []).map((user: any) => user.id);
-      console.log('📦 Logistica users found:', ids.length);
       return ids;
     } catch (error) {
       console.error('❌ Exception getting logistica users:', error);

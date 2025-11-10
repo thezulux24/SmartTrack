@@ -342,9 +342,7 @@ export class CotizacionDetailComponent implements OnInit {
         creatorName
       );
       
-      console.log('✅ Notificaciones de nueva cirugía enviadas');
     } catch (error) {
-      console.error('❌ Error al enviar notificaciones:', error);
     }
   }
 

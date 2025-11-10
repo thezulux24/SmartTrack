@@ -252,7 +252,6 @@ export class CirugiaEjecucionComponent implements OnInit {
       
       let hojaGastoCreada = false;
       if (productosUtilizados.length > 0) {
-        console.log('📝 Creando hoja de gasto automática con productos utilizados:', productosUtilizados);
         
         try {
           // Obtener información de precios desde la tabla productos
@@ -290,7 +289,6 @@ export class CirugiaEjecucionComponent implements OnInit {
           await new Promise<void>((resolve, reject) => {
             this.hojaGastoService.createHojaGasto(createHojaGastoRequest).subscribe({
               next: (hojaCreada) => {
-                console.log('✅ Hoja de gasto creada automáticamente:', hojaCreada);
                 hojaGastoCreada = true;
                 resolve();
               },
@@ -304,8 +302,6 @@ export class CirugiaEjecucionComponent implements OnInit {
           console.error('❌ Error crítico al crear hoja de gasto:', hojaGastoError);
           alert('⚠️ Advertencia: La cirugía se completó pero hubo un error al crear la hoja de gasto.\n\nError: ' + (hojaGastoError.message || 'Error desconocido') + '\n\nDeberá crear la hoja de gasto manualmente.');
         }
-      } else {
-        console.log('⚠️ No hay productos utilizados, no se creará hoja de gasto');
       }
 
       // 4. Registrar en trazabilidad

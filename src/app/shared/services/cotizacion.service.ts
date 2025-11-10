@@ -71,7 +71,6 @@ export class CotizacionService {
             throw error;
           }
 
-          console.log(`✅ ${data?.length || 0} cotizaciones cargadas`);
           return data || [];
         } catch (error) {
           console.error('❌ Error en getCotizaciones:', error);
@@ -160,7 +159,6 @@ export class CotizacionService {
             }
           }
 
-          console.log('✅ Cotización cargada:', data?.numero_cotizacion);
           return data;
         } catch (error) {
           console.error('❌ Error en getCotizacionById:', error);
@@ -232,7 +230,6 @@ export class CotizacionService {
             return { exito: false, mensaje: 'Error al eliminar la cotización' };
           }
 
-          console.log(`✅ Cotización ${cotizacion.numero_cotizacion} eliminada exitosamente`);
           return { exito: true, mensaje: 'Cotización eliminada exitosamente' };
 
         } catch (error) {
@@ -318,7 +315,6 @@ export class CotizacionService {
           comentario: 'Cotización creada'
         });
 
-      console.log('✅ Cotización creada exitosamente:', cotizacion.numero_cotizacion);
       return {
         exito: true,
         cotizacion,
@@ -393,7 +389,6 @@ export class CotizacionService {
         }
       }
 
-      console.log('✅ Cotización actualizada exitosamente');
       return { exito: true, mensaje: 'Cotización actualizada exitosamente' };
 
     } catch (error) {
@@ -480,7 +475,6 @@ export class CotizacionService {
       // 📢 Enviar notificaciones según el estado
       await this.enviarNotificacionCambioEstado(cotizacion, estadoAnterior, dto.estado);
 
-      console.log(`✅ Estado de cotización ${cotizacion.numero_cotizacion} cambiado: ${estadoAnterior} → ${dto.estado}`);
       return { exito: true, mensaje: `Estado cambiado a ${dto.estado}` };
 
     } catch (error) {
@@ -565,7 +559,6 @@ export class CotizacionService {
       // 5. 📢 Notificar creación de cirugía desde cotización
       await this.notificarCirugiaCreada(cotizacion, cirugia);
 
-      console.log(`✅ Cotización ${cotizacion.numero_cotizacion} convertida en cirugía ${cirugia.numero_cirugia}`);
       return {
         exito: true,
         cirugia,
@@ -609,7 +602,6 @@ export class CotizacionService {
         return { exito: false, mensaje: 'Error al eliminar la cotización' };
       }
 
-      console.log(`✅ Cotización ${cotizacion.numero_cotizacion} eliminada`);
       return { exito: true, mensaje: 'Cotización eliminada exitosamente' };
 
     } catch (error) {
@@ -759,7 +751,6 @@ export class CotizacionService {
         `/internal/cotizaciones/${cotizacion.id}`
       );
 
-      console.log(`📢 Notificación enviada: Cotización ${estadoNuevo}`);
     } catch (error) {
       console.error('Error enviando notificación de cambio de estado:', error);
     }
@@ -812,7 +803,6 @@ export class CotizacionService {
           });
         }
 
-        console.log(`✅ ${vencidas.length} cotizaciones marcadas como vencidas`);
       }
     } catch (error) {
       console.error('Error verificando cotizaciones vencidas:', error);

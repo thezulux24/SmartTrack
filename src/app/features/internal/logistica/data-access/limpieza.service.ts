@@ -109,8 +109,6 @@ export class LimpiezaService {
         throw new Error('Error al actualizar productos de limpieza');
       }
 
-      console.log('✅ Productos actualizados a devuelto_limpio');
-
       // 2. Obtener los productos para actualizar inventario
       const { data: productos, error: fetchError } = await this.supabase.client
         .from('kit_productos_limpieza')
@@ -125,8 +123,6 @@ export class LimpiezaService {
         throw new Error('Error al obtener productos');
       }
 
-      console.log('📦 Productos obtenidos:', productos.length);
-
       // 3. Actualizar inventario para cada producto
       for (const producto of productos) {
         await this.actualizarInventario({
@@ -138,8 +134,6 @@ export class LimpiezaService {
           fecha_vencimiento: producto.kit_producto?.fecha_vencimiento
         });
       }
-
-      console.log('✅ Inventario actualizado');
 
       // 4. Actualizar estado final a en_inventario
       const { error: finalUpdateError } = await this.supabase.client
@@ -175,12 +169,9 @@ export class LimpiezaService {
 
         if (kitUpdateError) {
           console.error('⚠️ Error actualizando kit:', kitUpdateError);
-        } else {
-          console.log('✅ Kit finalizado');
         }
       }
 
-      console.log('✅ Recepción confirmada exitosamente');
     } catch (error) {
       console.error('❌ Error fatal en confirmación:', error);
       throw error;
@@ -191,7 +182,6 @@ export class LimpiezaService {
    * Actualiza el inventario con los productos recuperados
    */
   private async actualizarInventario(request: ActualizarInventarioRequest): Promise<void> {
-    console.log('📦 Actualizando inventario:', request);
 
     try {
       // 1. Buscar registro de inventario existente
@@ -222,7 +212,6 @@ export class LimpiezaService {
           throw updateError;
         }
 
-        console.log(`✅ Inventario actualizado: +${request.cantidad} unidades`);
       } else {
         // Crear nuevo registro
         const { error: insertError } = await this.supabase.client
@@ -239,7 +228,6 @@ export class LimpiezaService {
           throw insertError;
         }
 
-        console.log(`✅ Nuevo registro de inventario creado: ${request.cantidad} unidades`);
       }
 
       // 2. Crear movimiento de inventario
@@ -260,8 +248,6 @@ export class LimpiezaService {
       if (movimientoError) {
         console.error('⚠️ Error creando movimiento:', movimientoError);
         // No lanzamos error porque el inventario ya se actualizó
-      } else {
-        console.log('✅ Movimiento de inventario registrado');
       }
     } catch (error) {
       console.error('❌ Error actualizando inventario:', error);

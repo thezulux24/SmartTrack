@@ -215,7 +215,6 @@ export class HojaGastoService {
 
   private async insertHojaGasto(request: CreateHojaGastoRequest): Promise<HojaGasto> {
     try {
-      console.log('📝 Creando hoja de gasto con request:', request);
 
       // VALIDAR: Verificar que no exista ya una hoja de gasto para esta cirugía
       const { data: existingHoja, error: checkError } = await this.supabase.client
@@ -235,11 +234,8 @@ export class HojaGastoService {
         throw new Error(`Ya existe una hoja de gasto (${hojaExistente.numero_hoja}) para esta cirugía. No se pueden crear hojas duplicadas.`);
       }
 
-      console.log('✅ No hay hojas de gasto existentes para esta cirugía, continuando...');
-
       // Generar número de hoja
       const numeroHoja = await this.generateNumeroHoja();
-      console.log('🔢 Número de hoja generado:', numeroHoja);
 
       // Calcular totales
       let total_productos = 0;
@@ -298,8 +294,6 @@ export class HojaGastoService {
         console.error('📋 Error details:', JSON.stringify(hojaError, null, 2));
         throw hojaError;
       }
-
-      console.log('✅ Hoja de gasto creada:', hojaData);
 
       // Insertar items
       if (request.items && request.items.length > 0) {

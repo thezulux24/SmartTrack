@@ -41,7 +41,6 @@ export class LogisticaRecepcionLimpiezaComponent implements OnInit {
   });
 
   ngOnInit() {
-    console.log('📦 Componente de Recepción de Limpieza iniciado');
     this.loadData();
   }
 
@@ -53,7 +52,6 @@ export class LogisticaRecepcionLimpiezaComponent implements OnInit {
       next: (kits) => {
         this.kitsEnLimpieza.set(kits);
         this.loading.set(false);
-        console.log('✅ Kits en limpieza cargados:', kits.length);
       },
       error: (err) => {
         console.error('❌ Error cargando kits:', err);
@@ -137,13 +135,10 @@ export class LogisticaRecepcionLimpiezaComponent implements OnInit {
       recibido_por_id: userId
     };
 
-    console.log('📤 Enviando confirmación:', request);
-
     this.limpiezaService.confirmarRecepcion(request).subscribe({
       next: (success) => {
         this.procesando.set(false);
         if (success) {
-          console.log('✅ Recepción confirmada');
           this.showConfirmDialog.set(false);
           this.cerrarDetalle();
           this.loadData(); // Recargar lista

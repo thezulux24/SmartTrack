@@ -96,7 +96,6 @@ export class AgendaCalendarComponent implements OnInit {
     
     this.cirugiasService.getCirugias().subscribe({
       next: (cirugias) => {
-        console.log('✅ Cirugías cargadas para calendario:', cirugias);
         this.cirugias.set(cirugias);
         this.loading.set(false);
       },

@@ -115,34 +115,26 @@ export class CirugiaFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('🚀 CirugiaFormComponent iniciando...');
     this.loadInitialData();
     this.checkEditMode();
   }
 
   // ✅ Hacer el método público para que sea accesible desde el template
   loadInitialData() {
-    console.log('📊 Cargando datos iniciales...');
     this.loading.set(true);
     this.error.set(null);
     
     // ✅ Cargar cada servicio por separado para identificar el problema
-    console.log('🏥 Iniciando carga de hospitales...');
     this.hospitalesService.getHospitales().subscribe({
       next: (hospitales) => {
-        console.log('✅ Hospitales cargados:', hospitales);
         this.hospitales.set(hospitales);
         
-        console.log('⚕️ Iniciando carga de tipos de cirugía...');
         this.tiposCirugiaService.getTiposCirugia().subscribe({
           next: (tipos) => {
-            console.log('✅ Tipos de cirugía cargados:', tipos);
             this.tiposCirugia.set(tipos);
             
-            console.log('👨‍⚕️ Iniciando carga de técnicos...');
             this.tecnicosService.getTecnicos().subscribe({
               next: (tecnicos) => {
-                console.log('✅ Técnicos cargados:', tecnicos);
                 this.tecnicos.set(tecnicos);
                 this.loading.set(false);
               },
@@ -197,11 +189,10 @@ export class CirugiaFormComponent implements OnInit {
   private loadCirugia() {
     if (!this.cirugiaId) return;
     
-    console.log('📋 Cargando cirugía para edición:', this.cirugiaId);
     this.loading.set(true);
     this.cirugiasService.getCirugiaById(this.cirugiaId).subscribe({
       next: (cirugia) => {
-        console.log('✅ Cirugía cargada:', cirugia);
+
         this.populateForm(cirugia);
         this.cirugiaEditada.set(cirugia);
         if (this.cirugiaId) {
@@ -262,11 +253,10 @@ export class CirugiaFormComponent implements OnInit {
     this.clientesService.buscarPorDocumento(documento).subscribe({
       next: (cliente) => {
         if (cliente) {
-          console.log('✅ Cliente encontrado:', cliente);
           this.clienteEncontrado.set(cliente);
           this.llenarCamposCliente(cliente);
         } else {
-          console.log('ℹ️ Cliente no encontrado');
+
           this.clienteEncontrado.set(null);
         }
         this.buscandoCliente.set(false);
@@ -302,13 +292,10 @@ export class CirugiaFormComponent implements OnInit {
     const target = event.target as HTMLSelectElement;
     const tipoCirugiaId = target.value;
     
-    console.log('🔄 Tipo de cirugía seleccionado:', tipoCirugiaId);
     
     const tipoSeleccionado = this.tiposCirugia().find(t => t.id === tipoCirugiaId);
-    console.log('📋 Tipo encontrado:', tipoSeleccionado);
     
     if (tipoSeleccionado?.duracion_promedio) {
-      console.log('⏱️ Actualizando duración estimada:', tipoSeleccionado.duracion_promedio);
       this.cirugiaForm.patchValue({
         duracion_estimada: tipoSeleccionado.duracion_promedio
       });
@@ -316,9 +303,7 @@ export class CirugiaFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('📝 Enviando formulario...');
-    console.log('🔍 Form válido:', this.cirugiaForm.valid);
-    console.log('📊 Form values:', this.cirugiaForm.value);
+
 
     if (this.cirugiaForm.invalid) {
       console.log('⚠️ Formulario inválido, marcando campos...');
@@ -334,11 +319,9 @@ export class CirugiaFormComponent implements OnInit {
     // Primero manejar el cliente
     this.procesarCliente(formData).subscribe({
       next: (cliente: Cliente) => {
-        console.log('✅ Cliente procesado:', cliente);
         this.crearCirugiaConCliente(formData, cliente);
       },
       error: (error: any) => {
-        console.error('❌ Error procesando cliente:', error);
         this.error.set('Error al procesar información del cliente');
         this.loading.set(false);
       }
@@ -386,7 +369,6 @@ export class CirugiaFormComponent implements OnInit {
       notas: formData.notas
     };
 
-    console.log('💾 Datos de cirugía a enviar:', cirugiaData);
 
     if (this.isEditing && this.cirugiaId) {
       this.updateCirugia(cirugiaData as any);
@@ -396,10 +378,8 @@ export class CirugiaFormComponent implements OnInit {
   }
 
   private createCirugia(data: CirugiaCreate) {
-    console.log('➕ Creando nueva cirugía...');
     this.cirugiasService.createCirugia(data).subscribe({
       next: async (cirugia) => {
-        console.log('✅ Cirugía creada exitosamente:', cirugia);
         this.cirugiaCreada.set(cirugia);
         
         // Enviar notificaciones en tiempo real
@@ -441,9 +421,7 @@ export class CirugiaFormComponent implements OnInit {
             creatorName
           );
           
-          console.log('✅ Notificaciones de nueva cirugía enviadas');
         } catch (error) {
-          console.error('❌ Error al enviar notificaciones:', error);
           // No bloqueamos el flujo si falla la notificación
         }
 

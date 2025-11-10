@@ -39,12 +39,10 @@ export class KitsPendientesListComponent implements OnInit {
   async cargarKitsPendientes() {
     try {
       this.loading.set(true);
-      console.log('Cargando kits con estado: solicitado');
       
       // Obtener kits con estado 'solicitado'
       this.kitService.getKitsPorEstado('solicitado').subscribe({
         next: async (kits) => {
-          console.log('Kits recibidos:', kits.length, kits);
           
           // Enriquecer con información de stock
           const kitsConStock = await Promise.all(
@@ -69,7 +67,6 @@ export class KitsPendientesListComponent implements OnInit {
             })
           );
 
-          console.log('Kits con stock procesados:', kitsConStock);
           this.kitsPendientes.set(kitsConStock);
           this.loading.set(false);
         },
@@ -90,7 +87,6 @@ export class KitsPendientesListComponent implements OnInit {
 
     try {
       this.procesando.set(true);
-      console.log('Aprobando kit:', kitId);
 
       // Cambiar estado a 'preparando'
       await firstValueFrom(
@@ -103,7 +99,6 @@ export class KitsPendientesListComponent implements OnInit {
       // Navegar a la pantalla de preparación
       this.router.navigate(['/internal/logistica/kit-preparacion', kitId]);
     } catch (error) {
-      console.error('Error aprobando kit:', error);
       alert('Error al aprobar el kit');
       this.procesando.set(false);
     }

@@ -42,7 +42,6 @@ export class EnviosTransitoListComponent implements OnInit {
 
     this.envioService.getEnviosActivos().subscribe({
       next: (envios) => {
-        console.log('Envíos activos:', envios);
         this.envios.set(envios);
         this.cargando.set(false);
       },

@@ -79,7 +79,6 @@ export class ProductoFormComponent implements OnInit {
   ];
 
   ngOnInit() {
-    console.log('🚀 ProductoFormComponent iniciando...');
     this.checkEditMode();
   }
 
@@ -97,7 +96,6 @@ export class ProductoFormComponent implements OnInit {
 
     this.productosService.getProductoById(id).subscribe({
       next: (producto) => {
-        console.log('✅ Producto cargado para edición:', producto);
         this.productoForm.patchValue(producto);
         this.loading.set(false);
       },
@@ -116,7 +114,6 @@ export class ProductoFormComponent implements OnInit {
     }
 
     const formData = this.productoForm.value;
-    console.log('📝 Enviando datos del producto:', formData);
 
     this.loading.set(true);
     this.error.set(null);
@@ -128,7 +125,6 @@ export class ProductoFormComponent implements OnInit {
 
     operation.subscribe({
       next: (producto) => {
-        console.log('✅ Producto guardado:', producto);
         this.loading.set(false);
         
         if (this.isEditing()) {

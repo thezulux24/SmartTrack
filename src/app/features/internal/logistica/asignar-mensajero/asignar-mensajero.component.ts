@@ -73,9 +73,7 @@ export class AsignarMensajeroComponent implements OnInit {
       // Cargar info del kit
       this.envioService.getKitsListosParaEnvio().subscribe({
         next: (kits) => {
-          console.log('Kits recibidos:', kits);
           const kit = kits.find(k => k.id === this.kitId());
-          console.log('Kit seleccionado:', kit);
           
           if (kit) {
             this.kitInfo.set(kit);
@@ -83,23 +81,17 @@ export class AsignarMensajeroComponent implements OnInit {
             // Pre-llenar datos del hospital
             const hospital = kit.cirugia?.hospitales || kit.cirugia?.hospital;
             if (hospital) {
-              console.log('Hospital:', hospital);
               this.direccionDestino.set(hospital.direccion || '');
             }
             
             // Pre-llenar contacto y teléfono del cliente
             const cliente = kit.cirugia?.clientes || kit.cirugia?.cliente;
             if (cliente) {
-              console.log('Cliente:', cliente);
               const nombreCompleto = `${cliente.nombre} ${cliente.apellido}`;
               this.contactoDestino.set(nombreCompleto);
               this.telefonoDestino.set(cliente.telefono || '');
             }
-            
-            console.log('Valores pre-llenados:');
-            console.log('- Dirección:', this.direccionDestino());
-            console.log('- Contacto:', this.contactoDestino());
-            console.log('- Teléfono:', this.telefonoDestino());
+
           } else {
             console.error('Kit no encontrado con ID:', this.kitId());
           }

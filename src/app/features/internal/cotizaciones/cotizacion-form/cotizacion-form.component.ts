@@ -167,7 +167,6 @@ export class CotizacionFormComponent implements OnInit {
           this.clienteEncontrado.set(cliente);
           this.llenarCamposCliente(cliente);
         } else {
-          console.log('ℹ️ Cliente no encontrado');
           this.clienteEncontrado.set(null);
         }
         this.buscandoCliente.set(false);

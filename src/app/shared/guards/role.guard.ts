@@ -105,7 +105,6 @@ export const roleBasedGuard: CanActivateFn = async (route, state) => {
     const hasPermission = hasRoutePermission(profile.role, currentRoute);
 
     if (hasPermission) {
-      console.log(`✅ roleBasedGuard: ${profile.role} tiene acceso a ${currentRoute}`);
       return true;
     }
 

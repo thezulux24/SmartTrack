@@ -86,15 +86,11 @@ export class ChatService {
    */
   private async notifyParticipants(mensaje: MensajeCirugia) {
     try {
-      console.log('💬 ChatService: notifyParticipants called for message', mensaje.id);
-      
       const session = await this.supabase.getSession();
       if (!session?.user?.id) {
         console.warn('⚠️ ChatService: No session, skipping notifications');
         return;
       }
-
-      console.log('💬 ChatService: Current user is', session.user.id);
 
       // Obtener info de la cirugía y participantes
       const { data: cirugia } = await this.supabase.client
@@ -113,8 +109,6 @@ export class ChatService {
         return;
       }
 
-      console.log('💬 ChatService: Cirugia info', cirugia);
-
       // Obtener logística (si existe kit asignado)
       const { data: kits } = await this.supabase.client
         .from('kits_cirugia')
@@ -122,29 +116,22 @@ export class ChatService {
         .eq('cirugia_id', mensaje.cirugia_id)
         .limit(1);
 
-      console.log('💬 ChatService: Kits info', kits);
-
       // Recopilar IDs de participantes (excluyendo al remitente)
       const participantIds = new Set<string>();
       
       if (cirugia.usuario_creador_id && cirugia.usuario_creador_id !== session.user.id) {
         participantIds.add(cirugia.usuario_creador_id);
-        console.log('💬 ChatService: Added creator to participants', cirugia.usuario_creador_id);
       }
       
       if (cirugia.tecnico_asignado_id && cirugia.tecnico_asignado_id !== session.user.id) {
         participantIds.add(cirugia.tecnico_asignado_id);
-        console.log('💬 ChatService: Added tecnico to participants', cirugia.tecnico_asignado_id);
       }
 
       if (kits && kits.length > 0 && kits[0].logistica_id) {
         if (kits[0].logistica_id !== session.user.id) {
           participantIds.add(kits[0].logistica_id);
-          console.log('💬 ChatService: Added logistics to participants', kits[0].logistica_id);
         }
       }
-
-      console.log('💬 ChatService: Total participants to notify:', participantIds.size);
 
       // Enviar notificaciones
       if (participantIds.size > 0) {
@@ -155,13 +142,6 @@ export class ChatService {
             ? '📍 Compartió ubicación' 
             : '📎 Envió un archivo';
 
-        console.log('💬 ChatService: Calling notifyNewMessage with:', {
-          participantIds: Array.from(participantIds),
-          cirugia: cirugia.numero_cirugia,
-          remitente,
-          preview
-        });
-
         await this.notificationService.notifyNewMessage(
           Array.from(participantIds),
           mensaje.cirugia_id,
@@ -169,10 +149,6 @@ export class ChatService {
           remitente,
           preview
         );
-        
-        console.log('✅ ChatService: Notifications sent successfully');
-      } else {
-        console.log('ℹ️ ChatService: No participants to notify (you are the only one)');
       }
     } catch (error) {
       console.error('❌ ChatService: Error notifying participants:', error);
@@ -444,13 +420,10 @@ export class ChatService {
    * Suscribirse a mensajes en tiempo real
    */
   suscribirMensajes(cirugiaId: string, callback: (mensaje: MensajeCirugia) => void): void {
-    console.log('💬 ChatService: Subscribing to messages for cirugia', cirugiaId);
-    
     // Desuscribir canal existente si hay
     this.desuscribirMensajes(cirugiaId);
 
     const channelName = `chat_${cirugiaId}`;
-    console.log('📡 ChatService: Creating channel:', channelName);
 
     const channel = this.supabase.client
       .channel(channelName)
@@ -463,12 +436,8 @@ export class ChatService {
           filter: `cirugia_id=eq.${cirugiaId}`
         },
         async (payload) => {
-          console.log('📬 ChatService: ✨ NEW MESSAGE RECEIVED VIA REALTIME! ✨');
-          console.log('📬 Payload:', payload);
-          
           // Obtener info completa del mensaje con relaciones
           const messageId = (payload.new as any)['id'];
-          console.log('📬 Fetching full message data for ID:', messageId);
           
           const { data, error } = await this.supabase.client
             .from('mensajes_cirugia')
@@ -485,22 +454,13 @@ export class ChatService {
           }
 
           if (data) {
-            console.log('✅ ChatService: Message data fetched:', data);
-            console.log('📤 ChatService: Calling callback with message');
             callback(data as MensajeCirugia);
-          } else {
-            console.warn('⚠️ ChatService: No data returned for message', messageId);
           }
         }
       )
       .subscribe((status, error) => {
-        console.log('🔌 ChatService: Subscription status:', status);
         if (error) {
           console.error('❌ ChatService: Subscription error:', error);
-        }
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ ChatService: Successfully subscribed to chat messages!');
-          console.log('⏳ Waiting for new messages in cirugia', cirugiaId);
         }
         if (status === 'CHANNEL_ERROR') {
           console.error('❌ ChatService: Channel error - Check if Realtime is enabled for mensajes_cirugia');
@@ -511,7 +471,6 @@ export class ChatService {
       });
 
     this.activeChannels.set(cirugiaId, channel);
-    console.log('💾 ChatService: Channel stored in activeChannels');
   }
 
   /**

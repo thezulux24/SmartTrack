@@ -46,7 +46,6 @@ export class CirugiaDetailComponent implements OnInit {
   };
 
   ngOnInit() {
-    console.log('🚀 CirugiaDetailComponent iniciando...');
     this.loadCirugia();
   }
 
@@ -60,17 +59,14 @@ export class CirugiaDetailComponent implements OnInit {
         if (!id) {
           throw new Error('ID de cirugía no encontrado');
         }
-        console.log('📋 Cargando cirugía con ID:', id);
         return this.cirugiasService.getCirugiaById(id);
       })
     ).subscribe({
       next: (cirugia) => {
-        console.log('✅ Cirugía cargada:', cirugia);
         this.cirugia.set(cirugia);
         this.loading.set(false);
       },
       error: (err) => {
-        console.error('❌ Error loading cirugia:', err);
         this.error.set('Error al cargar la cirugía: ' + (err?.message || err));
         this.loading.set(false);
       }

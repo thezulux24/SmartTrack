@@ -312,11 +312,6 @@ export class KitPreparacionComponent implements OnInit {
 
     // 📢 Notificar si el stock queda crítico después de preparar el kit
     if (nuevaCantidad <= producto.cantidad_minima) {
-      console.log('⚠️ Stock crítico detectado después de preparar kit:', {
-        producto: producto.nombre,
-        nuevaCantidad,
-        cantidad_minima: producto.cantidad_minima
-      });
       
       const logisticaIds = await this.getLogisticaUsers();
       if (logisticaIds.length > 0) {
