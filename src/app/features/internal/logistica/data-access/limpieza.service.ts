@@ -90,7 +90,6 @@ export class LimpiezaService {
   }
 
   private async confirmarRecepcionAsync(request: ConfirmarRecepcionRequest): Promise<void> {
-    console.log('🔄 Iniciando confirmación de recepción:', request);
 
     try {
       // 1. Actualizar estado de productos en kit_productos_limpieza

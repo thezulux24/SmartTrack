@@ -73,7 +73,6 @@ export class TecnicoDashboardComponent implements OnInit {
         return;
       }
 
-      console.log('Usuario actual ID:', currentUserId);
 
       const { data: profile, error: profileError } = await this.supabase.client
         .from('profiles')
@@ -90,7 +89,6 @@ export class TecnicoDashboardComponent implements OnInit {
       if (profile) {
         this.tecnicoId.set(profile.id);
         this.tecnicoNombre.set(profile.full_name || 'Técnico');
-        console.log('Técnico cargado:', profile);
       }
     } catch (error) {
       console.error('Error cargando datos del técnico:', error);
@@ -110,7 +108,6 @@ export class TecnicoDashboardComponent implements OnInit {
         return;
       }
 
-      console.log('Cargando kits para técnico:', tecnicoId);
 
       // Obtener kits donde el técnico está asignado a la cirugía
       const { data: kitsData, error: kitsError } = await this.supabase.client
@@ -148,7 +145,6 @@ export class TecnicoDashboardComponent implements OnInit {
         throw kitsError;
       }
 
-      console.log('Kits obtenidos:', kitsData);
 
       // Filtrar kits donde cirugias.tecnico_asignado_id coincide con el técnico actual
       const kitsFiltrados = (kitsData || []).filter((kit: any) => {
@@ -156,7 +152,6 @@ export class TecnicoDashboardComponent implements OnInit {
         return cirugia && cirugia.tecnico_asignado_id === tecnicoId;
       });
 
-      console.log('Kits filtrados para este técnico:', kitsFiltrados);
 
       // Contar productos por kit
       const kitsConProductos = await Promise.all(
@@ -195,7 +190,6 @@ export class TecnicoDashboardComponent implements OnInit {
         })
       );
 
-      console.log('Kits con productos:', kitsConProductos);
 
       // Separar por estado
       const pendientes = kitsConProductos.filter(k => k.estado === 'entregado');

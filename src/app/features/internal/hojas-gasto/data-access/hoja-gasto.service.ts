@@ -263,7 +263,6 @@ export class HojaGastoService {
         });
       }
 
-      console.log('💰 Totales calculados:', { total_productos, total_transporte, total_otros, total_general });
 
       // Preparar datos para insertar - SIN total_alojamiento
       const hojaGastoData = {
@@ -279,8 +278,6 @@ export class HojaGastoService {
         observaciones: request.observaciones || null
       };
 
-      console.log('📤 Datos EXACTOS a insertar (SIN alojamiento):', hojaGastoData);
-      console.log('🔍 Verificando que NO existe total_alojamiento:', Object.keys(hojaGastoData));
 
       // Insertar hoja de gasto
       const { data: hojaData, error: hojaError } = await this.supabase.client
@@ -290,8 +287,6 @@ export class HojaGastoService {
         .single();
 
       if (hojaError) {
-        console.error('❌ Error inserting hoja gasto:', hojaError);
-        console.error('📋 Error details:', JSON.stringify(hojaError, null, 2));
         throw hojaError;
       }
 
@@ -376,8 +371,7 @@ export class HojaGastoService {
         updateData.total_general = total_general;
       }
 
-      console.log('📤 Update data EXACTOS (SIN alojamiento):', updateData);
-      console.log('🔍 Verificando keys de update:', Object.keys(updateData));
+
 
       const { error: hojaError } = await this.supabase.client
         .from('hojas_gasto')

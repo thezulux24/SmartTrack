@@ -57,11 +57,9 @@ export class TecnicoProcesamDevolucionComponent {
   totalARecuperar = computed(() => 
     this.productos().reduce((sum, p) => sum + p.cantidad_a_recuperar, 0)
   );
-  totalDirectoInventario = computed(() =>
-    this.productos().filter(p => !p.es_desechable && !p.requiere_limpieza).length
-  );
-  totalRequiereLimpieza = computed(() =>
-    this.productos().filter(p => !p.es_desechable && p.requiere_limpieza).length
+  // ✅ TODO va a limpieza (reutilizables)
+  totalALimpieza = computed(() =>
+    this.productos().filter(p => !p.es_desechable && p.cantidad_a_recuperar > 0).length
   );
 
   Math = Math;
@@ -139,14 +137,12 @@ export class TecnicoProcesamDevolucionComponent {
       // Mapear productos con valores iniciales
       const productosDevolucion: ProductoDevolucion[] = (productosData || []).map((kp: any) => {
         const producto = (kp.productos as any);
+        const cantidadEnviada = kp.cantidad_enviada || 0;
         const cantidadUtilizada = kp.cantidad_utilizada || 0;
-        const cantidadDisponible = (kp.cantidad_enviada || 0) - cantidadUtilizada;
-        const fueUtilizado = cantidadUtilizada > 0;
+        const cantidadDisponible = cantidadEnviada - cantidadUtilizada;
         
-        // LÓGICA CORREGIDA:
-        // - Si fue utilizado → cantidad_a_recuperar = cantidad_utilizada (para enviar a limpieza)
-        // - Si NO fue utilizado → cantidad_a_recuperar = cantidad_disponible (para devolver directo)
-        const cantidadARecuperar = fueUtilizado ? cantidadUtilizada : cantidadDisponible;
+        // ✅ TODO lo enviado se puede recuperar (utilizado + no utilizado)
+        const cantidadARecuperar = cantidadEnviada;
         
         return {
           id: kp.id,
@@ -157,8 +153,8 @@ export class TecnicoProcesamDevolucionComponent {
           cantidad_utilizada: cantidadUtilizada,
           cantidad_disponible: cantidadDisponible,
           es_desechable: false, // Por defecto no es desechable
-          requiere_limpieza: fueUtilizado, // Si fue utilizado, requiere limpieza
-          cantidad_a_recuperar: cantidadARecuperar, // ✅ Corregido: utilizada si fue usado, disponible si no
+          requiere_limpieza: true, // ✅ TODO requiere limpieza
+          cantidad_a_recuperar: cantidadARecuperar,
           notas: ''
         };
       });
@@ -218,11 +214,9 @@ export class TecnicoProcesamDevolucionComponent {
       `Total productos: ${this.totalProductos()}\n` +
       `Desechables: ${this.totalDesechables()}\n` +
       `Reutilizables: ${this.totalReutilizables()}\n` +
-      `  → Directo a inventario (no utilizados): ${this.totalDirectoInventario()}\n` +
-      `  → Requieren limpieza (utilizados): ${this.totalRequiereLimpieza()}\n` +
+      `  → A limpieza: ${this.totalALimpieza()}\n` +
       `Cantidad total a recuperar: ${this.totalARecuperar()}\n\n` +
-      `Los productos no utilizados regresarán directamente al inventario.\n` +
-      `Los productos utilizados pasarán por limpieza y esterilización.`
+      `Todos los productos reutilizables serán enviados a limpieza y esterilización.`
     );
 
     if (!confirmacion) return;
@@ -234,12 +228,9 @@ export class TecnicoProcesamDevolucionComponent {
       const supabase = this.supabaseService.supabaseClient;
       const userId = (await supabase.auth.getUser()).data.user?.id;
 
-      // Separar productos por flujo
-      const productosDirectoInventario = this.productos().filter(
-        p => !p.es_desechable && !p.requiere_limpieza && p.cantidad_a_recuperar > 0
-      );
+      // ✅ Todos los productos reutilizables van a limpieza
       const productosALimpieza = this.productos().filter(
-        p => !p.es_desechable && p.requiere_limpieza && p.cantidad_a_recuperar > 0
+        p => !p.es_desechable && p.cantidad_a_recuperar > 0
       );
 
       // 1. Actualizar kit_productos con información de recuperación
@@ -256,62 +247,7 @@ export class TecnicoProcesamDevolucionComponent {
         if (updateError) console.error('Error actualizando producto:', updateError);
       }
 
-      // 2. FLUJO A: Productos NO utilizados → Directo a inventario
-      for (const producto of productosDirectoInventario) {
-        // Buscar inventario existente
-        const { data: inventarioExistente, error: searchError } = await supabase
-          .from('inventario')
-          .select('id, cantidad')
-          .eq('producto_id', producto.producto_id)
-          .eq('ubicacion', 'BODEGA_PRINCIPAL')
-          .eq('estado', 'disponible')
-          .maybeSingle();
-
-        if (searchError) {
-          console.error('Error buscando inventario:', searchError);
-          continue;
-        }
-
-        if (inventarioExistente) {
-          // Actualizar inventario existente
-          const { error: updateError } = await supabase
-            .from('inventario')
-            .update({
-              cantidad: inventarioExistente.cantidad + producto.cantidad_a_recuperar,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', inventarioExistente.id);
-
-          if (updateError) console.error('Error actualizando inventario:', updateError);
-        } else {
-          // Crear nuevo registro de inventario
-          const { error: insertError } = await supabase
-            .from('inventario')
-            .insert({
-              producto_id: producto.producto_id,
-              cantidad: producto.cantidad_a_recuperar,
-              ubicacion: 'BODEGA_PRINCIPAL',
-              estado: 'disponible'
-            });
-
-          if (insertError) console.error('Error creando inventario:', insertError);
-        }
-
-        // Registrar movimiento de inventario
-        await supabase
-          .from('movimientos_inventario')
-          .insert({
-            producto_id: producto.producto_id,
-            tipo: 'entrada',
-            cantidad: producto.cantidad_a_recuperar,
-            motivo: `Devolución directa de kit ${this.kit()?.numero_kit} (producto no utilizado)`,
-            usuario_id: userId,
-            referencia: this.kitId(),
-            ubicacion_destino: 'BODEGA_PRINCIPAL'
-          });
-      }
-
-      // 3. FLUJO B: Productos utilizados → Crear registros en kit_productos_limpieza
+      // 2. Todos los productos reutilizables → Crear registros en kit_productos_limpieza
       for (const producto of productosALimpieza) {
         const { error: limpiezaError } = await supabase
           .from('kit_productos_limpieza')
@@ -323,7 +259,7 @@ export class TecnicoProcesamDevolucionComponent {
             cantidad_aprobada: 0,
             es_desechable: false,
             estado_limpieza: 'pendiente',
-            estado: 'enviado_limpieza', // ✅ Nuevo campo para flujo de recepción logística
+            estado: 'enviado_limpieza',
             notas: producto.notas,
             procesado_por: userId,
             fecha_inicio_proceso: new Date().toISOString()
@@ -332,17 +268,13 @@ export class TecnicoProcesamDevolucionComponent {
         if (limpiezaError) console.error('Error creando registro limpieza:', limpiezaError);
       }
 
-      // 4. Determinar estado del kit
+      // 3. Determinar estado del kit
       let nuevoEstado = 'finalizado';
       let fechaFinalizacion = null;
 
       if (productosALimpieza.length > 0) {
-        // Si hay productos que requieren limpieza, kit va a 'en_limpieza'
+        // Si hay productos a limpieza, kit va a 'en_limpieza'
         nuevoEstado = 'en_limpieza';
-      } else if (productosDirectoInventario.length > 0) {
-        // Si solo hay productos directo a inventario, kit se finaliza
-        nuevoEstado = 'finalizado';
-        fechaFinalizacion = new Date().toISOString();
       } else {
         // Si solo hay desechables, kit se finaliza
         nuevoEstado = 'finalizado';
@@ -367,7 +299,7 @@ export class TecnicoProcesamDevolucionComponent {
 
       if (kitError) throw kitError;
 
-      // 5. Registrar en trazabilidad
+      // 4. Registrar en trazabilidad
       const { error: trazError } = await supabase
         .from('cirugia_trazabilidad')
         .insert({
@@ -376,13 +308,12 @@ export class TecnicoProcesamDevolucionComponent {
           estado_anterior: 'devuelto',
           estado_nuevo: nuevoEstado,
           usuario_id: userId,
-          observaciones: `Devolución procesada: ${this.totalReutilizables()} productos reutilizables, ${this.totalDesechables()} desechables. Total a recuperar: ${this.totalARecuperar()}. Directo a inventario: ${productosDirectoInventario.length}, A limpieza: ${productosALimpieza.length}`,
+          observaciones: `Devolución procesada: ${this.totalReutilizables()} productos reutilizables, ${this.totalDesechables()} desechables. Total a recuperar: ${this.totalARecuperar()}. Todos los reutilizables enviados a limpieza: ${productosALimpieza.length}`,
           metadata: {
             kit_id: this.kitId(),
             total_productos: this.totalProductos(),
             total_desechables: this.totalDesechables(),
             total_reutilizables: this.totalReutilizables(),
-            total_directo_inventario: productosDirectoInventario.length,
             total_a_limpieza: productosALimpieza.length,
             cantidad_a_recuperar: this.totalARecuperar(),
             productos: this.productos().map(p => ({
@@ -400,12 +331,8 @@ export class TecnicoProcesamDevolucionComponent {
       // Mensaje de éxito personalizado
       let mensaje = '✅ Devolución procesada exitosamente\n\n';
       
-      if (productosDirectoInventario.length > 0) {
-        mensaje += `✓ ${productosDirectoInventario.length} producto(s) no utilizado(s) devuelto(s) directamente al inventario\n`;
-      }
-      
       if (productosALimpieza.length > 0) {
-        mensaje += `✓ ${productosALimpieza.length} producto(s) utilizado(s) enviado(s) a limpieza y esterilización\n`;
+        mensaje += `✓ ${productosALimpieza.length} producto(s) enviado(s) a limpieza y esterilización\n`;
       }
       
       if (this.totalDesechables() > 0) {

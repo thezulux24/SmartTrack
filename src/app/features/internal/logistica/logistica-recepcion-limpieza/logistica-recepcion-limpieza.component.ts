@@ -124,7 +124,6 @@ export class LogisticaRecepcionLimpiezaComponent implements OnInit {
     }
 
     const userId = user.id;
-    console.log('👤 Usuario identificado:', userId);
 
     this.procesando.set(true);
 
