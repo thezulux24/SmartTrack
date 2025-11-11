@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { QrValidacionService } from './qr-validacion.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-qr-validacion',
@@ -36,6 +37,7 @@ export class QrValidacionComponent implements OnInit {
   private route: ActivatedRoute = inject(ActivatedRoute);
   private router: Router = inject(Router);
   private qrService: QrValidacionService = inject(QrValidacionService);
+  private notificationService: NotificationService = inject(NotificationService);
 
   ngOnInit() {
     const codigo = this.route.snapshot.paramMap.get('codigo');
@@ -81,6 +83,11 @@ export class QrValidacionComponent implements OnInit {
       this.ctx = canvas.getContext('2d');
       
       if (this.ctx) {
+        // Limpiar con fondo blanco para contraste
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Configurar trazo negro
         this.ctx.strokeStyle = '#000000'; // Negro sólido para mejor visibilidad
         this.ctx.lineWidth = 3; // Más grueso para mejor visibilidad en móvil
         this.ctx.lineCap = 'round';
@@ -160,7 +167,9 @@ export class QrValidacionComponent implements OnInit {
   limpiarFirma() {
     if (this.ctx && this.firmaCanvas) {
       const canvas = this.firmaCanvas.nativeElement;
-      this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Limpiar con fondo blanco
+      this.ctx.fillStyle = '#FFFFFF';
+      this.ctx.fillRect(0, 0, canvas.width, canvas.height);
       this.firmaDataUrl.set('');
     }
   }
@@ -199,6 +208,9 @@ export class QrValidacionComponent implements OnInit {
 
       if (resultado.exito) {
         this.exitoso.set(true);
+        
+        // Enviar notificaciones a los responsables
+        await this.enviarNotificacionesEntrega();
       } else {
         this.error.set(resultado.mensaje || 'Error al registrar la recepción');
       }
@@ -208,6 +220,63 @@ export class QrValidacionComponent implements OnInit {
       this.error.set('Error al procesar la solicitud. Intente nuevamente.');
     } finally {
       this.procesando.set(false);
+    }
+  }
+
+  /**
+   * Envía notificaciones a los responsables del kit sobre la entrega
+   */
+  private async enviarNotificacionesEntrega() {
+    try {
+      const kit = this.kit();
+      if (!kit?.cirugia) return;
+
+      const cirugia = kit.cirugia;
+      const usuariosANotificar: string[] = [];
+
+      // Agregar técnico asignado
+      if (cirugia.tecnico_id) {
+        usuariosANotificar.push(cirugia.tecnico_id);
+      }
+
+      // Agregar comercial asignado
+      if (cirugia.comercial_id) {
+        usuariosANotificar.push(cirugia.comercial_id);
+      }
+
+      // Agregar logística asignada
+      if (cirugia.logistica_id) {
+        usuariosANotificar.push(cirugia.logistica_id);
+      }
+
+      // Enviar notificaciones
+      if (usuariosANotificar.length > 0) {
+        const clienteNombre = cirugia.cliente 
+          ? `${cirugia.cliente.nombre} ${cirugia.cliente.apellido}`.trim()
+          : 'Cliente';
+        
+        const mensaje = `El kit ${kit.numero_kit || ''} ha sido entregado y confirmado por ${this.nombreReceptor()} (${this.cedulaReceptor()}) para la cirugía ${cirugia.numero_cirugia || ''} del cliente ${clienteNombre}`;
+
+        await this.notificationService.notifyUsers(
+          usuariosANotificar,
+          'cambio_estado_kit',
+          'Kit Entregado y Confirmado',
+          mensaje,
+          'high',
+          {
+            kit_id: kit.id,
+            cirugia_id: cirugia.id,
+            numero_kit: kit.numero_kit,
+            estado: 'entregado',
+            receptor: this.nombreReceptor(),
+            documento_receptor: this.cedulaReceptor()
+          },
+          `/internal/logistica/kit-detail/${kit.id}`
+        );
+      }
+    } catch (error) {
+      console.error('Error enviando notificaciones de entrega:', error);
+      // No fallar la operación principal si falla la notificación
     }
   }
 

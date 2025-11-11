@@ -465,11 +465,12 @@ export class KitService {
           cirugia:cirugias(
             *,
             hospital:hospitales(*),
-            tipo_cirugia:tipos_cirugia(*)
+            tipo_cirugia:tipos_cirugia(*),
+            cliente:clientes(*)
           ),
-          comercial:profiles!comercial_id(*),
-          tecnico:profiles!tecnico_id(*),
-          logistica:profiles!logistica_id(*)
+          comercial:profiles!kits_cirugia_comercial_id_fkey(id, full_name, email, role),
+          tecnico:profiles!kits_cirugia_tecnico_id_fkey(id, full_name, email, role),
+          logistica:profiles!kits_cirugia_logistica_id_fkey(id, full_name, email, role)
         `)
         .eq('id', kitId)
         .single()

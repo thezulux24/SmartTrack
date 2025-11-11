@@ -147,22 +147,6 @@
             </div>
           }
 
-          <!-- Responsables -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span class="font-medium text-white/70">Comercial:</span>
-              <p class="text-white">{{ kit()?.comercial?.nombre || 'No asignado' }}</p>
-            </div>
-            <div>
-              <span class="font-medium text-white/70">Técnico:</span>
-              <p class="text-white">{{ kit()?.tecnico?.nombre || 'No asignado' }}</p>
-            </div>
-            <div>
-              <span class="font-medium text-white/70">Logística:</span>
-              <p class="text-white">{{ kit()?.logistica?.nombre || 'No asignado' }}</p>
-            </div>
-          </div>
-
           <!-- Observaciones -->
           @if (kit()?.observaciones) {
             <div class="mt-4 p-4 bg-[#0098A8]/30 backdrop-blur-sm rounded-lg border border-white/10">
@@ -216,59 +200,6 @@
                       {{ producto.observaciones }}
                     </div>
                   }
-                </div>
-              }
-            </div>
-          }
-        </div>
-
-        <!-- Trazabilidad -->
-        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
-          <h3 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
-            <div class="w-8 h-8 bg-[#0098A8] rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <span>Historial de Actividad</span>
-          </h3>
-          
-          @if (trazabilidad().length === 0) {
-            <div class="text-center py-8">
-              <svg class="w-12 h-12 text-[#C8D900]/50 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <p class="text-white/70">No hay actividad registrada</p>
-            </div>
-          } @else {
-            <div class="trazabilidad-timeline space-y-4">
-              @for (evento of trazabilidad(); track evento.id) {
-                <div class="flex items-start space-x-3 border-l-2 border-[#C8D900]/30 pl-4 py-2">
-                  <div class="w-8 h-8 bg-[#C8D900] rounded-full flex items-center justify-center flex-shrink-0 text-[#10284C] font-bold text-sm">
-                    {{ getAccionIcon(evento.accion) }}
-                  </div>
-                  <div class="flex-1">
-                    <div class="flex justify-between items-start">
-                      <div>
-                        <h4 class="font-medium text-white">{{ evento.accion | titlecase }}</h4>
-                        <p class="text-sm text-white/70">{{ evento.observaciones }}</p>
-                        @if (evento.ubicacion) {
-                          <p class="text-xs text-[#0098A8] mt-1">📍 {{ evento.ubicacion }}</p>
-                        }
-                      </div>
-                      <div class="text-right text-xs text-white/60">
-                        <div>{{ formatearFecha(evento.timestamp) }}</div>
-                        @if (evento.usuario) {
-                          <div class="text-[#C8D900]">{{ evento.usuario.nombre }}</div>
-                        }
-                      </div>
-                    </div>
-                    @if (evento.observaciones) {
-                      <div class="mt-2 text-sm text-white/80 bg-[#10284C]/50 p-2 rounded border border-white/10">
-                        {{ evento.observaciones }}
-                      </div>
-                    }
-                  </div>
                 </div>
               }
             </div>

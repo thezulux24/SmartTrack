@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { KitService } from '../../../../shared/services/kit.service';
-import { KitCirugia, KitProducto, KitTrazabilidad } from '../../../../shared/models/kit.model';
+import { KitCirugia, KitProducto } from '../../../../shared/models/kit.model';
 
 @Component({
   selector: 'app-kit-detail',
@@ -22,7 +22,6 @@ export class KitDetailComponent implements OnInit {
   error = signal<string | null>(null);
   kit = signal<KitCirugia | null>(null);
   productos = signal<KitProducto[]>([]);
-  trazabilidad = signal<KitTrazabilidad[]>([]);
 
   // Propiedades
   kitId = '';
@@ -45,8 +44,7 @@ export class KitDetailComponent implements OnInit {
       // Cargar datos del kit
       await Promise.all([
         this.cargarKit(),
-        this.cargarProductos(),
-        this.cargarTrazabilidad()
+        this.cargarProductos()
       ]);
 
     } catch (error: any) {
@@ -78,17 +76,6 @@ export class KitDetailComponent implements OnInit {
       console.error('Error cargando productos del kit:', error);
       // No lanzar error aquí para que no bloquee la carga del resto de datos
       this.productos.set([]);
-    }
-  }
-
-  private async cargarTrazabilidad() {
-    try {
-      const trazabilidad = await firstValueFrom(this.kitService.getTrazabilidadKit(this.kitId));
-      this.trazabilidad.set(trazabilidad || []);
-    } catch (error: any) {
-      console.error('Error cargando trazabilidad del kit:', error);
-      // No lanzar error aquí para que no bloquee la carga del resto de datos
-      this.trazabilidad.set([]);
     }
   }
 
@@ -151,18 +138,6 @@ export class KitDetailComponent implements OnInit {
       case 'entregado': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
       case 'devuelto': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-    }
-  }
-
-  getAccionIcon(accion: string): string {
-    switch (accion) {
-      case 'creado': return '🆕';
-      case 'preparado': return '📦';
-      case 'entregado': return '✅';
-      case 'devuelto': return '↩️';
-      case 'qr_generado': return '📱';
-      case 'qr_escaneado': return '🔍';
-      default: return '📝';
     }
   }
 
