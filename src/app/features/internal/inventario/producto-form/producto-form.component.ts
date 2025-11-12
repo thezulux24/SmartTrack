@@ -42,7 +42,7 @@ export class ProductoFormComponent implements OnInit {
     stock_minimo: [1, [Validators.required, Validators.min(0)]],
     unidad_medida: ['unidad', Validators.required],
     proveedor: [''],
-    ubicacion_principal: ['bodega_central'], // ✅ Cambiar default
+    ubicacion_principal: ['sede_principal'], // ✅ Ubicación por defecto
     notas: ['']
   });
 
@@ -56,15 +56,6 @@ export class ProductoFormComponent implements OnInit {
     { value: 'consumibles', label: 'Consumibles' },
     { value: 'equipos', label: 'Equipos Médicos' },
     { value: 'medicamentos', label: 'Medicamentos' }
-  ];
-
-  ubicacionesOptions = [
-    { value: 'bodega', label: 'Bodega Principal' },
-    { value: 'quirofano_1', label: 'Quirófano 1' },
-    { value: 'quirofano_2', label: 'Quirófano 2' },
-    { value: 'quirofano_3', label: 'Quirófano 3' },
-    { value: 'emergencia', label: 'Emergencia' },
-    { value: 'esterilizacion', label: 'Esterilización' }
   ];
 
   unidadesMedidaOptions = [
@@ -179,7 +170,7 @@ export class ProductoFormComponent implements OnInit {
       stock_minimo: 1,
       unidad_medida: 'unidad',
       proveedor: '',
-      ubicacion_principal: 'bodega_central',
+      ubicacion_principal: 'sede_principal',
       notas: ''
     });
     this.success.set(null);

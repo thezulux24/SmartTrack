@@ -392,54 +392,22 @@ export class ProductosService {
     return ['implantes', 'instrumentos', 'consumibles', 'equipos', 'medicamentos'];
   }
 
-  // ✅ Actualizar ubicaciones con sedes reales
+  // ✅ Ubicaciones simplificadas
   getUbicaciones(): string[] {
     return [
-      'sede_principal_norte',
-      'sede_principal_sur', 
-      'sede_secundaria_este',
-      'sede_secundaria_oeste',
-      'bodega_central',
-      'bodega_norte',
-      'bodega_sur',
-      'quirofano_sede_norte_1',
-      'quirofano_sede_norte_2',
-      'quirofano_sede_sur_1',
-      'quirofano_sede_sur_2',
-      'emergencia_norte',
-      'emergencia_sur',
-      'esterilizacion_central'
+      'sede_principal',
+      'bodega',
+      'sede_secundaria'
     ];
   }
 
   // ✅ Obtener ubicaciones con categorías organizadas
   getUbicacionesOrganizadas() {
     return {
-      sedes_principales: [
-        { value: 'sede_principal_norte', label: 'Sede Principal Norte' },
-        { value: 'sede_principal_sur', label: 'Sede Principal Sur' }
-      ],
-      sedes_secundarias: [
-        { value: 'sede_secundaria_este', label: 'Sede Secundaria Este' },
-        { value: 'sede_secundaria_oeste', label: 'Sede Secundaria Oeste' }
-      ],
-      bodegas: [
-        { value: 'bodega_central', label: 'Bodega Central' },
-        { value: 'bodega_norte', label: 'Bodega Norte' },
-        { value: 'bodega_sur', label: 'Bodega Sur' }
-      ],
-      quirofanos: [
-        { value: 'quirofano_sede_norte_1', label: 'Quirófano Norte 1' },
-        { value: 'quirofano_sede_norte_2', label: 'Quirófano Norte 2' },
-        { value: 'quirofano_sede_sur_1', label: 'Quirófano Sur 1' },
-        { value: 'quirofano_sede_sur_2', label: 'Quirófano Sur 2' }
-      ],
-      emergencias: [
-        { value: 'emergencia_norte', label: 'Emergencia Norte' },
-        { value: 'emergencia_sur', label: 'Emergencia Sur' }
-      ],
-      especiales: [
-        { value: 'esterilizacion_central', label: 'Esterilización Central' }
+      ubicaciones: [
+        { value: 'sede_principal', label: 'Sede Principal' },
+        { value: 'bodega', label: 'Bodega' },
+        { value: 'sede_secundaria', label: 'Sede Secundaria' }
       ]
     };
   }

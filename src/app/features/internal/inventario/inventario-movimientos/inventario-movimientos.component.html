@@ -186,41 +186,9 @@
                         class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
                   <option value="">Todas las ubicaciones</option>
                   
-                  <optgroup label="Sedes Principales" class="bg-[#10284C]">
-                    @for (ubicacion of ubicacionesOrganizadas.sedes_principales; track ubicacion.value) {
-                      <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Sedes Secundarias" class="bg-[#10284C]">
-                    @for (ubicacion of ubicacionesOrganizadas.sedes_secundarias; track ubicacion.value) {
-                      <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Bodegas" class="bg-[#10284C]">
-                    @for (ubicacion of ubicacionesOrganizadas.bodegas; track ubicacion.value) {
-                      <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Quirófanos" class="bg-[#10284C]">
-                    @for (ubicacion of ubicacionesOrganizadas.quirofanos; track ubicacion.value) {
-                      <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Emergencias" class="bg-[#10284C]">
-                    @for (ubicacion of ubicacionesOrganizadas.emergencias; track ubicacion.value) {
-                      <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Especiales" class="bg-[#10284C]">
-                    @for (ubicacion of ubicacionesOrganizadas.especiales; track ubicacion.value) {
-                      <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
+                  @for (ubicacion of ubicacionesOrganizadas.ubicaciones; track ubicacion.value) {
+                    <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
+                  }
                 </select>
               </div>
 

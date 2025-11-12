@@ -276,41 +276,9 @@
                 <select formControlName="ubicacion_principal"
                         class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
                   
-                  <optgroup label="Sedes Principales">
-                    @for (ubicacion of ubicacionesOrganizadas.sedes_principales; track ubicacion.value) {
-                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Sedes Secundarias">
-                    @for (ubicacion of ubicacionesOrganizadas.sedes_secundarias; track ubicacion.value) {
-                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Bodegas">
-                    @for (ubicacion of ubicacionesOrganizadas.bodegas; track ubicacion.value) {
-                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Quirófanos">
-                    @for (ubicacion of ubicacionesOrganizadas.quirofanos; track ubicacion.value) {
-                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Emergencias">
-                    @for (ubicacion of ubicacionesOrganizadas.emergencias; track ubicacion.value) {
-                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
-
-                  <optgroup label="Áreas Especiales">
-                    @for (ubicacion of ubicacionesOrganizadas.especiales; track ubicacion.value) {
-                      <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
-                    }
-                  </optgroup>
+                  @for (ubicacion of ubicacionesOrganizadas.ubicaciones; track ubicacion.value) {
+                    <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                  }
                 </select>
                 <p class="text-xs text-[#10284C]/60 mt-1">
                   Ubicación donde se almacenará principalmente este producto.
