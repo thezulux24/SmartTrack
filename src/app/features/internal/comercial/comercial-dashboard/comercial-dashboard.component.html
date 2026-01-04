@@ -1,0 +1,575 @@
+<!-- Contenedor principal con fondo navy de IMPLAMEQ -->
+<div class="min-h-screen bg-[#10284C] relative overflow-hidden">
+  <!-- Fondo con formas SVG geométricas -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0098A8;stop-opacity:0.1" />
+          <stop offset="100%" style="stop-color:#C8D900;stop-opacity:0.05" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Hexágonos -->
+      <polygon points="100,50 125,65 125,95 100,110 75,95 75,65" fill="#0098A8" opacity="0.08" />
+      <polygon points="300,120 330,140 330,180 300,200 270,180 270,140" fill="#C8D900" opacity="0.06" />
+      
+      <!-- Círculos -->
+      <circle cx="80%" cy="15%" r="120" fill="#0098A8" opacity="0.07" />
+      <circle cx="15%" cy="80%" r="90" fill="#C8D900" opacity="0.08" />
+      <circle cx="90%" cy="75%" r="60" fill="#0098A8" opacity="0.09" />
+      <circle cx="50%" cy="50%" r="40" fill="url(#grad1)" opacity="0.1" />
+      
+      <!-- Triángulos -->
+      <polygon points="85%,10% 95%,30% 75%,30%" fill="#C8D900" opacity="0.07" />
+      <polygon points="10%,85% 20%,95% 5%,95%" fill="#0098A8" opacity="0.08" />
+      
+      <!-- Rombos -->
+      <rect x="60%" y="20%" width="80" height="80" fill="#0098A8" opacity="0.06" transform="rotate(45 65% 25%)" />
+      <rect x="25%" y="60%" width="60" height="60" fill="#C8D900" opacity="0.07" transform="rotate(45 28% 63%)" />
+    </svg>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 bg-gradient-to-br from-[#10284C]/95 to-[#10284C]/60 backdrop-blur-md border-b border-white/10 shadow-2xl">
+    <div class="px-4 py-4">
+      <!-- Top bar con logo -->
+      <div class="flex justify-between items-center mb-3">
+  <img src="logo.webp" 
+             alt="Implameq" class="h-8 brightness-0 invert">
+        <button (click)="volver()"
+                class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-3 py-2 rounded-lg font-medium transition-all backdrop-blur-sm active:scale-95 text-sm">
+          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Volver
+        </button>
+      </div>
+      
+      <!-- Título y saludo -->
+      <div class="text-center">
+        <h1 class="text-3xl font-bold mb-1 text-white">Dashboard Comercial</h1>
+        <p class="text-[#C8D900] text-sm">Bienvenido, {{ nombreUsuario() }}</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  <div *ngIf="loading()" class="relative z-10 px-4 py-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 text-center">
+        <div class="flex justify-center mb-4">
+          <div class="w-12 h-12 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <p class="text-sm text-white/90 mt-4">Cargando métricas...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!loading() && error()" class="relative z-10 px-4 py-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="bg-red-500/20 backdrop-blur-md border border-red-400/30 rounded-2xl shadow-xl p-6 text-center">
+        <div class="text-red-300">
+          <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+            </path>
+          </svg>
+          <p class="text-sm text-red-200">{{ error() }}</p>
+        </div>
+        <button type="button" (click)="cargarMetricas()"
+                class="mt-4 bg-red-500/30 hover:bg-red-500/50 text-white border border-red-400/30 font-medium rounded-lg text-sm px-5 py-2.5 transition-all backdrop-blur-sm active:scale-95">
+          Reintentar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main *ngIf="!loading() && !error()" class="relative z-10 px-4 py-6">
+    <div class="max-w-7xl mx-auto space-y-6">
+      
+      <!-- Frase motivacional -->
+      <div class="bg-gradient-to-r from-[#0098A8]/30 to-[#C8D900]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <svg class="w-12 h-12 text-[#C8D900]" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-xl font-semibold text-white mb-2 italic">"{{ fraseDelDia().texto }}"</p>
+            <p class="text-sm text-white/70">— {{ fraseDelDia().autor }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acelerómetro de Facturaciones (Estilo Auto) -->
+      <div class="bg-[#10284C]/60 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+        <div class="text-center mb-4">
+          <h3 class="text-lg font-semibold text-white flex items-center justify-center gap-2">
+            <svg class="w-5 h-5 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+            Acelerómetro de Facturación
+          </h3>
+          <p class="text-sm text-white/60 mt-1">Meta del mes: 10 hojas facturadas</p>
+        </div>
+
+        <!-- Gauge semicircular estilo auto -->
+        <div class="relative w-full max-w-md mx-auto" style="height: 200px;">
+          <!-- SVG del gauge -->
+          <svg viewBox="0 0 200 120" class="w-full h-full">
+            <defs>
+              <!-- Gradientes para las zonas -->
+              <linearGradient id="redZone" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#ef4444;stop-opacity:0.3" />
+                <stop offset="100%" style="stop-color:#ef4444;stop-opacity:0.5" />
+              </linearGradient>
+              <linearGradient id="yellowZone" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#facc15;stop-opacity:0.3" />
+                <stop offset="100%" style="stop-color:#facc15;stop-opacity:0.5" />
+              </linearGradient>
+              <linearGradient id="limeZone" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#C8D900;stop-opacity:0.3" />
+                <stop offset="100%" style="stop-color:#C8D900;stop-opacity:0.5" />
+              </linearGradient>
+              <linearGradient id="greenZone" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.3" />
+                <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.5" />
+              </linearGradient>
+              
+              <!-- Sombra para la aguja -->
+              <filter id="needleShadow">
+                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.3"/>
+              </filter>
+            </defs>
+            
+            <!-- Fondo del gauge -->
+            <path d="M 20 100 A 80 80 0 0 1 180 100" 
+                  fill="none" 
+                  stroke="rgba(255,255,255,0.1)" 
+                  stroke-width="20" 
+                  stroke-linecap="round"/>
+            
+            <!-- Zona Roja (0-40%) -->
+            <path d="M 20 100 A 80 80 0 0 1 70 37" 
+                  fill="none" 
+                  stroke="url(#redZone)" 
+                  stroke-width="20" 
+                  stroke-linecap="round"/>
+            
+            <!-- Zona Amarilla (40-70%) -->
+            <path d="M 70 37 A 80 80 0 0 1 130 37" 
+                  fill="none" 
+                  stroke="url(#yellowZone)" 
+                  stroke-width="20" 
+                  stroke-linecap="round"/>
+            
+            <!-- Zona Lima (70-100%) -->
+            <path d="M 130 37 A 80 80 0 0 1 165 60" 
+                  fill="none" 
+                  stroke="url(#limeZone)" 
+                  stroke-width="20" 
+                  stroke-linecap="round"/>
+            
+            <!-- Zona Verde (100%+) -->
+            <path d="M 165 60 A 80 80 0 0 1 180 100" 
+                  fill="none" 
+                  stroke="url(#greenZone)" 
+                  stroke-width="20" 
+                  stroke-linecap="round"/>
+            
+            <!-- Marcadores de valores -->
+            <g class="text-white text-xs font-semibold">
+              <!-- 0 -->
+              <circle cx="20" cy="100" r="2" fill="white" opacity="0.5"/>
+              <text x="15" y="115" font-size="10" fill="white" opacity="0.7">0</text>
+              
+              <!-- 4 -->
+              <circle cx="70" cy="37" r="2" fill="white" opacity="0.5"/>
+              <text x="65" y="30" font-size="10" fill="white" opacity="0.7">4</text>
+              
+              <!-- 7 -->
+              <circle cx="130" cy="37" r="2" fill="white" opacity="0.5"/>
+              <text x="125" y="30" font-size="10" fill="white" opacity="0.7">7</text>
+              
+              <!-- 10 (META) -->
+              <circle cx="180" cy="100" r="3" fill="#C8D900"/>
+              <text x="175" y="115" font-size="10" fill="#C8D900" font-weight="bold">10</text>
+            </g>
+            
+            <!-- Centro del gauge -->
+            <circle cx="100" cy="100" r="8" fill="#10284C" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+            
+            <!-- Aguja (rotación dinámica) -->
+            <g [attr.transform]="'rotate(' + getNeedleRotation() + ' 100 100)'" 
+               style="transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);">
+              <!-- Sombra de la aguja -->
+              <path d="M 100 100 L 98 40 L 100 35 L 102 40 Z" 
+                    fill="black" 
+                    opacity="0.2" 
+                    transform="translate(2, 2)"/>
+              <!-- Aguja principal -->
+              <path d="M 100 100 L 98 40 L 100 35 L 102 40 Z" 
+                    [attr.fill]="getNeedleColor()" 
+                    filter="url(#needleShadow)"/>
+              <!-- Punta de la aguja -->
+              <circle cx="100" cy="35" r="3" [attr.fill]="getNeedleColor()"/>
+              <!-- Centro de la aguja -->
+              <circle cx="100" cy="100" r="6" [attr.fill]="getNeedleColor()"/>
+              <circle cx="100" cy="100" r="4" fill="#10284C"/>
+            </g>
+          </svg>
+          
+          <!-- Display digital en el centro -->
+          <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-center">
+            <div class="bg-[#10284C]/90 backdrop-blur-sm border border-white/20 rounded-lg px-6 py-3">
+              <div class="text-4xl font-bold" 
+                   [ngClass]="{
+                     'text-red-400': metricas().hojasFacturadasMesActual < 4,
+                     'text-yellow-400': metricas().hojasFacturadasMesActual >= 4 && metricas().hojasFacturadasMesActual < 7,
+                     'text-[#C8D900]': metricas().hojasFacturadasMesActual >= 7 && metricas().hojasFacturadasMesActual < 10,
+                     'text-green-400': metricas().hojasFacturadasMesActual >= 10
+                   }">
+                {{ metricas().hojasFacturadasMesActual }}
+              </div>
+              <div class="text-xs text-white/60 uppercase tracking-wider">Facturaciones</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado y mensaje motivacional -->
+        <div class="mt-6 p-4 rounded-lg border"
+             [ngClass]="{
+               'bg-red-500/10 border-red-500/30': metricas().hojasFacturadasMesActual < 4,
+               'bg-yellow-500/10 border-yellow-500/30': metricas().hojasFacturadasMesActual >= 4 && metricas().hojasFacturadasMesActual < 7,
+               'bg-[#C8D900]/10 border-[#C8D900]/30': metricas().hojasFacturadasMesActual >= 7 && metricas().hojasFacturadasMesActual < 10,
+               'bg-green-500/10 border-green-500/30': metricas().hojasFacturadasMesActual >= 10
+             }">
+          <div class="flex items-center gap-3">
+            <!-- Icono según estado -->
+            <div class="flex-shrink-0">
+              @if (metricas().hojasFacturadasMesActual >= 10) {
+                <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              } @else if (metricas().hojasFacturadasMesActual >= 7) {
+                <svg class="w-8 h-8 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              } @else if (metricas().hojasFacturadasMesActual >= 4) {
+                <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3l-6.928-12c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+              } @else {
+                <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              }
+            </div>
+            <!-- Mensaje -->
+            <div class="flex-1">
+              <p class="text-base font-semibold"
+                 [ngClass]="{
+                   'text-red-300': metricas().hojasFacturadasMesActual < 4,
+                   'text-yellow-300': metricas().hojasFacturadasMesActual >= 4 && metricas().hojasFacturadasMesActual < 7,
+                   'text-[#C8D900]': metricas().hojasFacturadasMesActual >= 7 && metricas().hojasFacturadasMesActual < 10,
+                   'text-green-300': metricas().hojasFacturadasMesActual >= 10
+                 }">
+                @if (metricas().hojasFacturadasMesActual >= 10) {
+                  ¡Meta cumplida! 🎉 Has superado las expectativas este mes.
+                } @else if (metricas().hojasFacturadasMesActual >= 7) {
+                  ¡Excelente ritmo! Solo faltan {{ 10 - metricas().hojasFacturadasMesActual }} facturaciones.
+                } @else if (metricas().hojasFacturadasMesActual >= 4) {
+                  Buen progreso. Te faltan {{ 10 - metricas().hojasFacturadasMesActual }} facturaciones.
+                } @else {
+                  ¡Acelera! Necesitas {{ 10 - metricas().hojasFacturadasMesActual }} facturaciones más.
+                }
+              </p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex-1 bg-[#10284C]/50 rounded-full h-2">
+                  <div class="h-2 rounded-full transition-all duration-1000"
+                       [style.width.%]="(metricas().hojasFacturadasMesActual / 10) * 100"
+                       [ngClass]="{
+                         'bg-red-400': metricas().hojasFacturadasMesActual < 4,
+                         'bg-yellow-400': metricas().hojasFacturadasMesActual >= 4 && metricas().hojasFacturadasMesActual < 7,
+                         'bg-[#C8D900]': metricas().hojasFacturadasMesActual >= 7 && metricas().hojasFacturadasMesActual < 10,
+                         'bg-green-400': metricas().hojasFacturadasMesActual >= 10
+                       }">
+                  </div>
+                </div>
+                <span class="text-sm font-bold"
+                      [ngClass]="{
+                        'text-red-300': metricas().hojasFacturadasMesActual < 4,
+                        'text-yellow-300': metricas().hojasFacturadasMesActual >= 4 && metricas().hojasFacturadasMesActual < 7,
+                        'text-[#C8D900]': metricas().hojasFacturadasMesActual >= 7 && metricas().hojasFacturadasMesActual < 10,
+                        'text-green-300': metricas().hojasFacturadasMesActual >= 10
+                      }">
+                  {{ formatPorcentaje((metricas().hojasFacturadasMesActual / 10) * 100) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas principales en grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Total Cotizaciones -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 hover:bg-[#0098A8]/30 transition-all cursor-pointer"
+             (click)="navegarCotizaciones()">
+          <div class="flex justify-between items-start mb-3">
+            <div class="p-3 bg-blue-500/20 rounded-xl">
+              <svg class="w-6 h-6 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            @if (metricas().cotizacionesMesActual > 0) {
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-500/20 text-green-300">
+                +{{ calcularTendencia(metricas().cotizacionesMesActual, metricas().cotizacionesMesAnterior).valor.toFixed(0) }}%
+              </span>
+            }
+          </div>
+          <p class="text-sm text-white/70 mb-1">Total Cotizaciones</p>
+          <p class="text-3xl font-bold text-white">{{ metricas().totalCotizaciones }}</p>
+          <p class="text-xs text-white/60 mt-2">
+            {{ metricas().cotizacionesMesActual }} este mes
+          </p>
+        </div>
+
+        <!-- Tasa de Conversión -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+          <div class="flex justify-between items-start mb-3">
+            <div class="p-3 bg-green-500/20 rounded-xl">
+              <svg class="w-6 h-6 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
+            <span class="px-2 py-1 text-xs font-semibold rounded-full" 
+                  [ngClass]="metricas().tasaConversion >= 70 ? 'bg-green-500/20 text-green-300' : 
+                              metricas().tasaConversion >= 50 ? 'bg-yellow-500/20 text-yellow-300' : 
+                              'bg-red-500/20 text-red-300'">
+              {{ metricas().tasaConversion >= 70 ? '🔥 Excelente' : 
+                 metricas().tasaConversion >= 50 ? '👍 Bueno' : '📈 Mejorar' }}
+            </span>
+          </div>
+          <p class="text-sm text-white/70 mb-1">Tasa de Conversión</p>
+          <p class="text-3xl font-bold text-white">{{ formatPorcentaje(metricas().tasaConversion) }}</p>
+          <p class="text-xs text-white/60 mt-2">
+            {{ metricas().cotizacionesAprobadas }} aprobadas / {{ metricas().totalCotizaciones }} enviadas
+          </p>
+        </div>
+
+        <!-- Total Facturado -->
+        <div class="bg-[#C8D900]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 hover:bg-[#C8D900]/30 transition-all cursor-pointer"
+             (click)="navegarHojasGasto()">
+          <div class="flex justify-between items-start mb-3">
+            <div class="p-3 bg-yellow-500/20 rounded-xl">
+              <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            @if (metricas().facturacionMesActual > 0) {
+              <span class="px-2 py-1 text-xs font-semibold rounded-full" 
+                    [ngClass]="calcularTendencia(metricas().facturacionMesActual, metricas().facturacionMesAnterior).esPositivo ? 
+                               'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'">
+                {{ calcularTendencia(metricas().facturacionMesActual, metricas().facturacionMesAnterior).esPositivo ? '+' : '-' }}{{ calcularTendencia(metricas().facturacionMesActual, metricas().facturacionMesAnterior).valor.toFixed(0) }}%
+              </span>
+            }
+          </div>
+          <p class="text-sm text-white/70 mb-1">Total Facturado</p>
+          <p class="text-2xl font-bold text-white">{{ formatMoneda(metricas().totalFacturado) }}</p>
+          <p class="text-xs text-white/60 mt-2">
+            {{ metricas().hojasFacturadas }} hojas facturadas
+          </p>
+        </div>
+
+        <!-- Cirugías Activas -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 hover:bg-[#0098A8]/30 transition-all cursor-pointer"
+             (click)="navegarAgenda()">
+          <div class="flex justify-between items-start mb-3">
+            <div class="p-3 bg-purple-500/20 rounded-xl">
+              <svg class="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+              </svg>
+            </div>
+            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-500/20 text-blue-300">
+              {{ metricas().cirugiasPendientes }} pendientes
+            </span>
+          </div>
+          <p class="text-sm text-white/70 mb-1">Total Cirugías</p>
+          <p class="text-3xl font-bold text-white">{{ metricas().totalCirugias }}</p>
+          <p class="text-xs text-white/60 mt-2">
+            {{ metricas().cirugiasCompletadas }} completadas
+          </p>
+        </div>
+      </div>
+
+      <!-- Detalles de Cotizaciones -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Estado de Cotizaciones -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            Estado de Cotizaciones
+          </h3>
+          
+          <div class="space-y-3">
+            <!-- Aprobadas -->
+            <div class="flex items-center justify-between p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                <span class="text-sm font-medium text-white">Aprobadas</span>
+              </div>
+              <span class="text-lg font-bold text-green-300">{{ metricas().cotizacionesAprobadas }}</span>
+            </div>
+            
+            <!-- Pendientes -->
+            <div class="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <span class="text-sm font-medium text-white">Pendientes</span>
+              </div>
+              <span class="text-lg font-bold text-yellow-300">{{ metricas().cotizacionesPendientes }}</span>
+            </div>
+            
+            <!-- Rechazadas -->
+            <div class="flex items-center justify-between p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                <span class="text-sm font-medium text-white">Rechazadas</span>
+              </div>
+              <span class="text-lg font-bold text-red-300">{{ metricas().cotizacionesRechazadas }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facturación (Hojas de Gasto) -->
+        <div class="bg-[#C8D900]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            Estado de Facturación
+          </h3>
+          
+          <div class="space-y-4">
+            <!-- Total Hojas de Gasto -->
+            <div class="p-4 bg-[#10284C]/50 rounded-lg border border-white/10">
+              <p class="text-sm text-white/70 mb-1">Total Hojas de Gasto</p>
+              <p class="text-2xl font-bold text-white">{{ metricas().totalHojasGasto }}</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+              <!-- Facturadas (Aprobadas) -->
+              <div class="p-3 bg-green-500/10 rounded-lg border border-green-500/20 text-center">
+                <p class="text-xs text-white/70 mb-1">Facturadas</p>
+                <p class="text-xl font-bold text-green-300">{{ metricas().hojasFacturadas }}</p>
+              </div>
+              
+              <!-- Pendientes -->
+              <div class="p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20 text-center">
+                <p class="text-xs text-white/70 mb-1">Pendientes</p>
+                <p class="text-xl font-bold text-yellow-300">{{ metricas().hojasPendientes }}</p>
+              </div>
+            </div>
+
+            <!-- Promedio por hoja -->
+            @if (metricas().hojasFacturadas > 0) {
+              <div class="p-3 bg-[#0098A8]/20 rounded-lg border border-[#0098A8]/30">
+                <p class="text-xs text-white/70 mb-1">Promedio por Hoja</p>
+                <p class="text-lg font-bold text-[#0098A8]">
+                  {{ formatMoneda(metricas().totalFacturado / metricas().hojasFacturadas) }}
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Accesos Rápidos -->
+      <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Accesos Rápidos
+        </h3>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Cotizaciones -->
+          <button (click)="navegarCotizaciones()"
+                  class="p-4 bg-[#10284C]/50 hover:bg-[#10284C]/70 rounded-xl border border-white/10 hover:border-[#C8D900]/50 transition-all active:scale-95 text-center group">
+            <svg class="w-8 h-8 mx-auto mb-2 text-blue-300 group-hover:text-[#C8D900] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-sm font-medium text-white">Cotizaciones</p>
+          </button>
+
+          <!-- Hojas de Gasto -->
+          <button (click)="navegarHojasGasto()"
+                  class="p-4 bg-[#10284C]/50 hover:bg-[#10284C]/70 rounded-xl border border-white/10 hover:border-[#C8D900]/50 transition-all active:scale-95 text-center group">
+            <svg class="w-8 h-8 mx-auto mb-2 text-yellow-300 group-hover:text-[#C8D900] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-sm font-medium text-white">Facturación</p>
+          </button>
+
+          <!-- Clientes -->
+          <button (click)="navegarClientes()"
+                  class="p-4 bg-[#10284C]/50 hover:bg-[#10284C]/70 rounded-xl border border-white/10 hover:border-[#C8D900]/50 transition-all active:scale-95 text-center group">
+            <svg class="w-8 h-8 mx-auto mb-2 text-green-300 group-hover:text-[#C8D900] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <p class="text-sm font-medium text-white">Clientes</p>
+          </button>
+
+          <!-- Agenda -->
+          <button (click)="navegarAgenda()"
+                  class="p-4 bg-[#10284C]/50 hover:bg-[#10284C]/70 rounded-xl border border-white/10 hover:border-[#C8D900]/50 transition-all active:scale-95 text-center group">
+            <svg class="w-8 h-8 mx-auto mb-2 text-purple-300 group-hover:text-[#C8D900] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-sm font-medium text-white">Agenda</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Información de Clientes -->
+      <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          Clientes
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 bg-[#10284C]/50 rounded-lg border border-white/10 text-center">
+            <p class="text-sm text-white/70 mb-2">Total Clientes</p>
+            <p class="text-3xl font-bold text-white">{{ metricas().totalClientes }}</p>
+          </div>
+          
+          <div class="p-4 bg-green-500/10 rounded-lg border border-green-500/20 text-center">
+            <p class="text-sm text-white/70 mb-2">Clientes Activos</p>
+            <p class="text-3xl font-bold text-green-300">{{ metricas().clientesActivos }}</p>
+          </div>
+          
+          <div class="p-4 bg-[#C8D900]/20 rounded-lg border border-[#C8D900]/30 text-center">
+            <p class="text-sm text-white/70 mb-2">Tasa Retención</p>
+            <p class="text-3xl font-bold text-[#C8D900]">
+              {{ metricas().totalClientes > 0 ? formatPorcentaje((metricas().clientesActivos / metricas().totalClientes) * 100) : '0%' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

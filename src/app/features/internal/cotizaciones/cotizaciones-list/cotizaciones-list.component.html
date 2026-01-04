@@ -1,0 +1,208 @@
+<div class="min-h-screen bg-white">
+  <!-- Loading state -->
+  <div *ngIf="loading()" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="animate-pulse space-y-4">
+        <div class="h-4 bg-gray-200 rounded w-64 mx-auto"></div>
+        <div class="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
+      </div>
+      <p class="text-sm text-gray-500 mt-4">Cargando cotizaciones...</p>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div *ngIf="!loading()">
+    <div class="relative">
+      <!-- Diagonal navy background -->
+      <div class="absolute top-0 left-0 w-full bg-[#10284C]" 
+           style="height: 720px; clip-path: polygon(0 0, 100% 0, 100% 60%, 0 90%);"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <!-- Top bar -->
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <img src="logo.webp" 
+                   alt="Implameq" 
+                   class="h-8 brightness-0 invert">
+            </div>
+            <div class="flex items-center space-x-3">
+              <button [routerLink]="['/internal']"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#C8D900] mb-2">Cotizaciones</h1>
+            <p class="text-white/90 text-sm">Gestiona cotizaciones enviadas a clientes</p>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ stats().total.toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Total</div>
+            </div>
+
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ stats().borradores.toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Borradores</div>
+            </div>
+
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ stats().enviadas.toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Enviadas</div>
+            </div>
+
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ stats().aprobadas.toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Aprobadas</div>
+            </div>
+          </div>
+
+          <!-- Nueva Cotización Button -->
+          <button [routerLink]="['nueva']"
+                  class="w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold py-4 rounded-2xl shadow-lg transition-colors">
+            + Nueva Cotización
+          </button>
+
+          <!-- Filtros Section -->
+          <div class="bg-[#0098A8] rounded-2xl p-5 mt-6 shadow-lg">
+            <h3 class="text-[#10284C] font-bold text-lg mb-4">Filtros</h3>
+            <div class="space-y-4">
+              <!-- Search -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Buscar</label>
+                <div class="relative">
+                  <input type="text"
+                         [(ngModel)]="busqueda"
+                         placeholder="Número, cliente..."
+                         class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Estado -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Estado</label>
+                <select [(ngModel)]="filtroEstado"
+                        class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <option value="todos">Todos los estados</option>
+                  <option value="borrador">Borrador</option>
+                  <option value="enviada">Enviada</option>
+                  <option value="aprobada">Aprobada</option>
+                  <option value="rechazada">Rechazada</option>
+                  <option value="vencida">Vencida</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Cotizaciones -->
+    <div class="px-4 pb-8">
+      <div class="max-w-4xl mx-auto">
+        @if (cotizacionesFiltradas().length === 0) {
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-8 text-center">
+            <div class="text-[#0098A8] mb-4">
+              <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <p class="text-[#10284C] text-lg font-semibold">No hay cotizaciones</p>
+            <p class="text-gray-600 text-sm mt-1">Crea tu primera cotización para comenzar</p>
+          </div>
+        } @else {
+          <div class="space-y-4">
+            @for (cotizacion of cotizacionesFiltradas(); track cotizacion.id) {
+              <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl hover:shadow-2xl hover:border-[#C8D900]/50 transition-all">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-3">
+                      <h3 class="text-[#10284C] font-bold text-lg">{{ cotizacion.numero_cotizacion }}</h3>
+                      <span [ngClass]="{
+                        'bg-gray-500/20 text-gray-700 border border-gray-500/30': cotizacion.estado === 'borrador',
+                        'bg-blue-500/20 text-blue-700 border border-blue-500/30': cotizacion.estado === 'enviada',
+                        'bg-green-500/20 text-green-700 border border-green-500/30': cotizacion.estado === 'aprobada',
+                        'bg-red-500/20 text-red-700 border border-red-500/30': cotizacion.estado === 'rechazada',
+                        'bg-orange-500/20 text-orange-700 border border-orange-500/30': cotizacion.estado === 'vencida',
+                        'bg-gray-700/20 text-gray-900 border border-gray-700/30': cotizacion.estado === 'cancelada'
+                      }" class="px-3 py-1 rounded-lg text-xs font-semibold uppercase">
+                        {{ getEstadoLabel(cotizacion.estado) }}
+                      </span>
+                      
+                      @if (cotizacion.estado === 'enviada' && diasHastaVencimiento(cotizacion.fecha_vencimiento) <= 3) {
+                        <span class="bg-red-500/20 text-red-700 border border-red-500/30 px-3 py-1 rounded-lg text-xs font-semibold">
+                          ⏰ Vence en {{ diasHastaVencimiento(cotizacion.fecha_vencimiento) }} días
+                        </span>
+                      }
+                    </div>
+
+                    <div class="space-y-1">
+                      <p class="text-[#10284C] font-semibold">{{ getClienteNombre(cotizacion) }}</p>
+                      @if (cotizacion.cliente?.ciudad) {
+                        <p class="text-gray-600 text-sm">{{ cotizacion.cliente?.ciudad }}</p>
+                      }
+                      <p class="text-gray-600 text-sm">
+                        Emisión: {{ formatFecha(cotizacion.fecha_emision) }} | Vence: {{ formatFecha(cotizacion.fecha_vencimiento) }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="text-right ml-4">
+                    <p class="text-[#C8D900] text-2xl font-bold">{{ formatMoneda(cotizacion.total) }}</p>
+                  </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="flex gap-2 mt-4 pt-4 border-t border-white/10">
+                  <button (click)="verDetalle(cotizacion.id)"
+                          class="flex-1 bg-[#10284C] hover:bg-[#10284C]/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    Ver Detalle
+                  </button>
+                  
+                  @if (cotizacion.estado === 'borrador') {
+                    <button (click)="editar(cotizacion.id)"
+                            class="flex-1 bg-[#0098A8] hover:bg-[#0098A8]/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                      Editar
+                    </button>
+                    <button (click)="eliminar(cotizacion.id)"
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

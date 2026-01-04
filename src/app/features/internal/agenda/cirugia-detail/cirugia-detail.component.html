@@ -1,0 +1,349 @@
+<section class="min-h-screen bg-white relative">
+  <!-- Background image with overlay -->
+  <div class="fixed inset-0 z-0">
+    <img src="/02.jpg" alt="Background" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-white/98"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white/50 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-20">
+    <div class="max-w-2xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <img src="logo.webp" 
+               alt="Implameq" class="h-8 w-auto">
+          <p class="text-xs text-[#0098A8] mt-1">Implantes médicos - Quirúrgicos</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="h-10 w-10 rounded-lg bg-[#10284C] hover:bg-[#10284C]/90 flex items-center justify-center">
+            <svg class="h-5 w-5 text-[#CBDD00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+            </svg>
+          </button>
+          <button class="h-10 w-10 rounded-lg bg-[#CBDD00] hover:bg-[#CBDD00]/90 flex items-center justify-center">
+            <svg class="h-5 w-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <main class="relative z-10 px-6 py-8">
+      <div class="max-w-2xl mx-auto">
+        <div class="bg-white/70 backdrop-blur-sm rounded-xl border-2 border-[#0098A8] p-6 text-center">
+          <div class="animate-pulse space-y-3">
+            <div class="flex justify-center">
+              <svg class="animate-spin h-10 w-10 text-[#0098A8]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <p class="text-xs text-[#10284C] font-medium">Cargando información...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  } @else if (error()) {
+    <!-- Error state -->
+    <main class="relative z-10 px-6 py-8">
+      <div class="max-w-2xl mx-auto">
+        <div class="bg-white/70 backdrop-blur-sm rounded-xl border-2 border-[#0098A8] p-6 text-center">
+          <div class="text-red-600">
+            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+              </path>
+            </svg>
+            <p class="text-xs mb-4">{{ error() }}</p>
+          </div>
+          <div class="space-y-2">
+            <button (click)="recargarDatos()"
+                    class="w-full bg-[#10284C] hover:bg-[#0a1a30] text-[#C8D900] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200">
+              Reintentar
+            </button>
+            <button (click)="volverAtras()"
+                    class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-lg text-sm font-semibold transition duration-200">
+              Volver a la Lista
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  } @else if (cirugia()) {
+    <!-- Main content -->
+    <main class="relative z-10 px-6 py-8">
+      <div class="max-w-2xl mx-auto space-y-6">
+        
+        <!-- Title Section -->
+        <div class="text-center">
+          <h1 class="text-3xl font-bold mb-4 text-[#10284C]">{{ cirugia()!.numero_cirugia }}</h1>
+          <div class="flex items-center justify-center gap-2 mb-6">
+            <span [class]="getPrioridadInfo(cirugia()!.prioridad).color" 
+                  class="px-3 py-1 rounded-full text-xs font-medium">
+              {{ getPrioridadInfo(cirugia()!.prioridad).label }}
+            </span>
+            <span [class]="getEstadoInfo(cirugia()!.estado).color" 
+                  class="px-3 py-1 rounded-full text-xs font-medium">
+              {{ getEstadoInfo(cirugia()!.estado).label }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="bg-white/70 backdrop-blur-sm rounded-xl border-2 border-[#0098A8] p-6 space-y-6">
+          
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <button (click)="editarCirugia()"
+                    class="w-full bg-[#10284C] hover:bg-[#0a1a30] text-[#C8D900] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200">
+              Editar
+            </button>
+            <button (click)="cambiarEstado()"
+                    [disabled]="cirugia()!.estado === 'completada' || cirugia()!.estado === 'cancelada'"
+                    class="w-full bg-[#10284C] hover:bg-[#0a1a30] disabled:bg-gray-400 disabled:cursor-not-allowed text-[#C8D900] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200">
+              Cambiar Estado
+            </button>
+          </div>
+
+          <div class="h-0.5 bg-[#CBDD00]"></div>
+
+          <!-- Información del Cliente -->
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-[#0098A8] flex items-center justify-center flex-shrink-0">
+                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-semibold text-[#10284C]">Información del Cliente</h2>
+            </div>
+            <div class="space-y-0">
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Nombre completo</p>
+                <p class="text-xs text-gray-500 text-right">{{ getClienteNombre() }}</p>
+              </div>
+              @if (getClienteDocumento()) {
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Documento</p>
+                  <p class="text-xs text-gray-500 text-right">{{ getClienteDocumento() }}</p>
+                </div>
+              }
+              @if (getClienteTelefono()) {
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Teléfono</p>
+                  <p class="text-xs text-gray-500 text-right">{{ getClienteTelefono() }}</p>
+                </div>
+              }
+              @if (getClienteEmail()) {
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Email</p>
+                  <p class="text-xs text-gray-500 text-right break-all">{{ getClienteEmail() }}</p>
+                </div>
+              }
+              @if (getClienteCiudad()) {
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Ciudad</p>
+                  <p class="text-xs text-gray-500 text-right">{{ getClienteCiudad() }}</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="h-0.5 bg-[#CBDD00]"></div>
+
+          <!-- Información de la Cirugía -->
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-[#0098A8] flex items-center justify-center flex-shrink-0">
+                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-semibold text-[#10284C]">Información de la Cirugía</h2>
+            </div>
+            <div class="space-y-0">
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Hospital/Clínica</p>
+                <p class="text-xs text-gray-500 text-right">{{ cirugia()!.hospital_data?.nombre || 'No especificado' }}</p>
+              </div>
+              @if (cirugia()!.hospital_data?.direccion) {
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Dirección</p>
+                  <p class="text-xs text-gray-500 text-right">{{ cirugia()!.hospital_data?.direccion }}</p>
+                </div>
+              }
+              @if (cirugia()!.hospital_data?.telefono) {
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Teléfono Hospital</p>
+                  <p class="text-xs text-gray-500 text-right">{{ cirugia()!.hospital_data?.telefono }}</p>
+                </div>
+              }
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Tipo de Cirugía</p>
+                <p class="text-xs text-gray-500 text-right">{{ cirugia()!.tipo_cirugia_data?.nombre || 'No especificado' }}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Médico Cirujano</p>
+                <p class="text-xs text-gray-500 text-right">{{ cirugia()!.medico_cirujano }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-0.5 bg-[#CBDD00]"></div>
+
+          <!-- Programación -->
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-[#0098A8] flex items-center justify-center flex-shrink-0">
+                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-semibold text-[#10284C]">Programación</h2>
+            </div>
+            <div class="space-y-0">
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Fecha Programada</p>
+                <p class="text-xs text-gray-500 text-right">{{ formatFecha(cirugia()!.fecha_programada) }}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Hora de Inicio</p>
+                <p class="text-xs text-gray-500 text-right">{{ formatHora(cirugia()!.hora_inicio) }}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Duración Estimada</p>
+                <p class="text-xs text-gray-500 text-right">{{ formatDuracion(cirugia()!.duracion_estimada) }}</p>
+              </div>
+            </div>
+          </div>
+
+          @if (cirugia()!.tecnico_asignado) {
+            <div class="h-0.5 bg-[#CBDD00]"></div>
+
+            <!-- Técnico Asignado -->
+            <div>
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-[#0098A8] flex items-center justify-center flex-shrink-0">
+                  <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                </div>
+                <h2 class="text-lg font-semibold text-[#10284C]">Técnico Asignado</h2>
+              </div>
+              <div class="space-y-0">
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Nombre</p>
+                  <p class="text-xs text-gray-500 text-right break-words">{{ cirugia()!.tecnico_asignado!.full_name }}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                  <p class="text-xs text-[#10284C]">Email</p>
+                  <p class="text-xs text-gray-500 text-right break-all">{{ cirugia()!.tecnico_asignado!.email }}</p>
+                </div>
+                @if (cirugia()!.tecnico_asignado!.area) {
+                  <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                    <p class="text-xs text-[#10284C]">Área</p>
+                    <p class="text-xs text-gray-500 text-right break-words">{{ cirugia()!.tecnico_asignado!.area }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="h-0.5 bg-[#CBDD00]"></div>
+
+          <!-- Información del Sistema -->
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-[#0098A8] flex items-center justify-center flex-shrink-0">
+                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-semibold text-[#10284C]">Información del Sistema</h2>
+            </div>
+            <div class="space-y-0">
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Número de Cirugía</p>
+                <p class="text-xs text-gray-500 text-right font-mono">{{ cirugia()!.numero_cirugia }}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Contacto</p>
+                <p class="text-xs text-gray-500 text-right">Implameq</p>
+              </div>
+              <div class="grid grid-cols-2 gap-x-4 py-2 border-b border-[#0098A8]/20">
+                <p class="text-xs text-[#10284C]">Última Actualización</p>
+                <p class="text-xs text-gray-500 text-right">{{ formatFechaCorta(cirugia()!.updated_at) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="h-0.5 bg-[#CBDD00]"></div>
+
+          <!-- Action Buttons Bottom -->
+          <div class="space-y-3 pt-2">
+            <button (click)="compartirCirugia()"
+                    class="w-full bg-[#10284C] hover:bg-[#0a1a30] text-[#C8D900] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200 flex items-center justify-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+              </svg>
+              <span>Compartir</span>
+            </button>
+            <button (click)="imprimirDetalle()"
+                    class="w-full bg-[#10284C] hover:bg-[#0a1a30] text-[#C8D900] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200 flex items-center justify-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+              </svg>
+              <span>Imprimir</span>
+            </button>
+            <button (click)="confirmarEliminar()"
+                    class="w-full bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200 flex items-center justify-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              <span>Eliminar</span>
+            </button>
+            <button (click)="volverAtras()"
+                    class="w-full bg-[#10284C] hover:bg-[#0a1a30] text-[#C8D900] px-4 py-3 rounded-lg text-sm font-semibold transition duration-200 flex items-center justify-center gap-2">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              <span>Volver</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  }
+
+  <!-- Estado Dialog -->
+  <app-estado-dialog
+    [isOpen]="showEstadoDialog()"
+    [currentStatus]="cirugia()?.estado || ''"
+    (close)="closeEstadoDialog()"
+    (statusChange)="onEstadoChange($event)">
+  </app-estado-dialog>
+
+  <!-- Confirm Delete Dialog -->
+  <app-confirm-dialog
+    [isOpen]="showConfirmDeleteDialog()"
+    [title]="'¿Eliminar cirugía?'"
+    [message]="'¿Está seguro que desea eliminar la cirugía ' + getNumeroCirugia() + '? Esta acción no se puede deshacer.'"
+    [confirmText]="'Eliminar'"
+    [cancelText]="'Cancelar'"
+    [confirmButtonClass]="'bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C]'"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()">
+  </app-confirm-dialog>
+
+  <!-- Success Delete Dialog -->
+  <app-success-dialog
+    [isOpen]="showSuccessDeleteDialog()"
+    [title]="'Eliminación\nexitosa'"
+    (close)="onSuccessDeleteClose()">
+  </app-success-dialog>
+</section>

@@ -1,0 +1,252 @@
+﻿<div class="min-h-screen relative overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-[#10284C]">
+      <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10%" cy="15%" r="120" fill="#0098A8" opacity="0.1"/>
+        <circle cx="85%" cy="25%" r="180" fill="#C8D900" opacity="0.08"/>
+        <circle cx="50%" cy="80%" r="150" fill="#0098A8" opacity="0.12"/>
+        <rect x="60%" y="5%" width="200" height="200" fill="#0098A8" opacity="0.06" transform="rotate(45 70 15)"/>
+        <rect x="15%" y="65%" width="160" height="160" fill="#C8D900" opacity="0.08" transform="rotate(30 20 70)"/>
+        <line x1="0%" y1="30%" x2="100%" y2="35%" stroke="#0098A8" stroke-width="2" opacity="0.1"/>
+        <line x1="0%" y1="60%" x2="100%" y2="55%" stroke="#C8D900" stroke-width="2" opacity="0.08"/>
+        <polygon points="90,10 95,25 85,25" fill="#0098A8" opacity="0.1" transform="scale(8)"/>
+        <polygon points="5,85 12,95 2,98" fill="#C8D900" opacity="0.09" transform="scale(10)"/>
+      </svg>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#10284C]/50 via-[#10284C]/80 to-[#10284C]/95"></div>
+  </div>
+
+  <main class="relative z-10 px-4 py-6">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+  <img src="logo.webp" alt="Implameq" class="h-10 w-auto brightness-0 invert">
+        <a routerLink="/internal/logistica/kits-pendientes" class="px-4 py-2 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-colors font-medium flex items-center gap-2 active:scale-95">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span class="hidden sm:inline">Volver</span>
+        </a>
+      </div>
+
+      <div class="text-center">
+        <h1 class="text-3xl sm:text-4xl font-bold text-[#C8D900] mb-2">Preparacion de Kit</h1>
+        <p class="text-white/80 text-sm">Proceso de picking y alistamiento</p>
+      </div>
+
+      @if (loading()) {
+        <div class="flex justify-center items-center py-20">
+          <div class="w-16 h-16 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }
+
+      @if (mostrarQR()) {
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-[#10284C] border-2 border-[#C8D900] rounded-2xl p-8 max-w-md w-full">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-[#C8D900] rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-[#C8D900] mb-2">Kit Preparado!</h2>
+              <p class="text-white/70 mb-6">El kit esta listo para despacho</p>
+              <div class="bg-[#ffffff] p-6 rounded-xl mb-6">
+                <div class="text-center">
+                  <!-- QR Code Real -->
+                  <qrcode 
+                    [qrdata]="qrUrl()" 
+                    [width]="256" 
+                    [errorCorrectionLevel]="'M'"
+                    [elementType]="'canvas'"
+                    [cssClass]="'mx-auto'">
+                  </qrcode>
+                  <p class="text-xs text-gray-600 mt-3 font-mono break-all">{{ qrCode() }}</p>
+                  <p class="text-xs text-gray-500 mt-1">Escanea este código para validar la entrega</p>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <button (click)="imprimirQR()" class="w-full px-6 py-3 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-all font-bold flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                  </svg>
+                  Imprimir QR
+                </button>
+                <button (click)="volverAListado()" class="w-full px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-all font-bold border border-white/20">
+                  Volver al Listado
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (!loading() && kit()) {
+        <!-- Banner Modo Vista -->
+        @if (modoVista()) {
+          <div class="bg-green-500/20 backdrop-blur-md rounded-2xl border border-green-400/30 p-4 shadow-xl">
+            <div class="flex items-center gap-3">
+              <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="text-green-300 font-bold">Kit Preparado - Modo Solo Lectura</p>
+                <p class="text-green-200/70 text-sm">Este kit ya fue completamente preparado y esta listo para envio</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mostrar QR en modo vista -->
+          @if (qrUrl()) {
+            <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+              <h2 class="text-xl font-bold text-[#C8D900] mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                </svg>
+                Código QR de Validación
+              </h2>
+              <div class="flex flex-col lg:flex-row items-center gap-6">
+                <div class="bg-[#ffffff] p-6 rounded-xl">
+                  <qrcode 
+                    [qrdata]="qrUrl()" 
+                    [width]="256" 
+                    [errorCorrectionLevel]="'M'"
+                    [elementType]="'canvas'">
+                  </qrcode>
+                </div>
+                <div class="flex-1 space-y-3">
+                  <p class="text-white/80">Este código QR permite al cliente validar la recepción del kit sin necesidad de iniciar sesión.</p>
+                  <div class="bg-[#10284C]/50 p-4 rounded-lg">
+                    <p class="text-white/60 text-xs mb-1">Código:</p>
+                    <p class="text-white font-mono text-sm break-all">{{ qrCode() }}</p>
+                  </div>
+                  <div class="bg-[#10284C]/50 p-4 rounded-lg">
+                    <p class="text-white/60 text-xs mb-1">URL de validación:</p>
+                    <p class="text-[#C8D900] font-mono text-xs break-all">{{ qrUrl() }}</p>
+                  </div>
+                  <button (click)="imprimirQR()" class="px-4 py-2 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-all font-bold flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                    </svg>
+                    Imprimir QR
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        }
+
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <p class="text-white/60 text-xs mb-1">Kit #</p>
+              <p class="text-white font-bold">{{ kit()?.numero_kit }}</p>
+            </div>
+            <div>
+              <p class="text-white/60 text-xs mb-1">Cirugia</p>
+              <p class="text-white font-bold">{{ kit()?.cirugia?.numero_cirugia }}</p>
+            </div>
+            <div>
+              <p class="text-white/60 text-xs mb-1">Hospital</p>
+              <p class="text-white font-bold">{{ kit()?.cirugia?.hospital?.nombre }}</p>
+            </div>
+            <div>
+              <p class="text-white/60 text-xs mb-1">Fecha Cirugia</p>
+              <p class="text-white font-bold">{{ kit()?.cirugia?.fecha_programada | date:'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
+          <div class="mt-6 pt-6 border-t border-white/10 flex items-center justify-center gap-8">
+            <div class="text-center">
+              <p class="text-3xl font-bold text-[#C8D900]">{{ productosCompletos() }}/{{ totalProductos() }}</p>
+              <p class="text-white/60 text-xs mt-1">Productos Completos</p>
+            </div>
+            @if (tieneAlertas()) {
+              <div class="text-center">
+                <p class="text-3xl font-bold text-orange-400"></p>
+                <p class="text-white/60 text-xs mt-1">Alertas Activas</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          @for (producto of productos(); track producto.id) {
+            <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex-1">
+                  <h3 class="text-lg font-bold text-white mb-1">{{ producto.nombre }}</h3>
+                  <p class="text-white/60 text-sm">Codigo: {{ producto.codigo }}</p>
+                  <div class="mt-2">
+                    <span
+                      class="text-xs px-3 py-1 rounded-full"
+                      [ngClass]="{
+                        'bg-red-500/20 text-red-300': producto.alerta_stock,
+                        'bg-orange-500/20 text-orange-300': producto.alerta_vencimiento && !producto.alerta_stock,
+                        'bg-green-500/20 text-green-300': !producto.alerta_stock && !producto.alerta_vencimiento
+                      }">
+                      {{ obtenerMensajeAlerta(producto) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-white/60 text-xs">Solicitado</p>
+                  <p class="text-2xl font-bold text-[#C8D900]">{{ producto.cantidad_solicitada }}</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-white/80 text-sm mb-2">Cantidad a Preparar *</label>
+                  <input type="number" [(ngModel)]="producto.cantidad_preparada" (ngModelChange)="validarCantidad(producto)" min="0" [max]="producto.stock_disponible" [disabled]="modoVista()" class="w-full px-4 py-2 bg-[#10284C]/50 border border-white/20 rounded-lg text-white focus:outline-none focus:border-[#C8D900] disabled:opacity-50 disabled:cursor-not-allowed">
+                  <p class="text-white/40 text-xs mt-1">Disponible: {{ producto.stock_disponible }}</p>
+                </div>
+                <div>
+                  <label class="block text-white/80 text-sm mb-2">Ubicacion</label>
+                  <select [(ngModel)]="producto.ubicacion_seleccionada" [disabled]="modoVista()" class="w-full px-4 py-2 bg-[#10284C]/50 border border-white/20 rounded-lg text-white focus:outline-none focus:border-[#C8D900] disabled:opacity-50 disabled:cursor-not-allowed">
+                    @for (inv of producto.inventarios; track inv.id) {
+                      <option [value]="inv.ubicacion">{{ inv.ubicacion }} ({{ inv.cantidad }} unidades)</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-white/80 text-sm mb-2">Lote</label>
+                  <input type="text" [(ngModel)]="producto.lote" placeholder="Ej: LOTE-2025-001" [disabled]="modoVista()" class="w-full px-4 py-2 bg-[#10284C]/50 border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#C8D900] disabled:opacity-50 disabled:cursor-not-allowed">
+                </div>
+                <div>
+                  <label class="block text-white/80 text-sm mb-2">Vencimiento</label>
+                  <input type="date" [(ngModel)]="producto.fecha_vencimiento" [disabled]="modoVista()" class="w-full px-4 py-2 bg-[#10284C]/50 border border-white/20 rounded-lg text-white focus:outline-none focus:border-[#C8D900] disabled:opacity-50 disabled:cursor-not-allowed">
+                </div>
+              </div>
+              <div class="mt-4">
+                <label class="block text-white/80 text-sm mb-2">Observaciones</label>
+                <textarea [(ngModel)]="producto.observaciones" rows="2" placeholder="Notas sobre este producto..." [disabled]="modoVista()" class="w-full px-4 py-2 bg-[#10284C]/50 border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#C8D900] resize-none disabled:opacity-50 disabled:cursor-not-allowed"></textarea>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+          <label class="block text-white font-bold mb-3">Observaciones Generales del Kit</label>
+          <textarea [formControl]="preparacionForm.controls.observaciones" rows="3" placeholder="Notas adicionales sobre la preparacion del kit..." [disabled]="modoVista()" class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#C8D900] resize-none disabled:opacity-50 disabled:cursor-not-allowed"></textarea>
+        </div>
+
+        <!-- Botón solo visible en modo edición -->
+        @if (!modoVista()) {
+          <div class="flex justify-center pt-6">
+            <button (click)="finalizarPreparacion()" [disabled]="procesando()" class="px-12 py-4 bg-[#C8D900] text-[#10284C] rounded-xl hover:bg-[#d4e820] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-2xl font-bold text-lg flex items-center gap-3 active:scale-95">
+              @if (procesando()) {
+                <div class="w-5 h-5 border-3 border-[#10284C] border-t-transparent rounded-full animate-spin"></div>
+                <span>Procesando...</span>
+              } @else {
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Finalizar Preparacion</span>
+              }
+            </button>
+          </div>
+        }
+      }
+
+      <div class="h-6"></div>
+    </div>
+  </main>
+</div>

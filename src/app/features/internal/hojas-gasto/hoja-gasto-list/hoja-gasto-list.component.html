@@ -1,0 +1,237 @@
+<div class="min-h-screen relative overflow-hidden">
+  <!-- Background con SVG de formas geométricas variadas -->
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-[#10284C]">
+      <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <!-- Hexágonos -->
+        <polygon points="100,20 120,30 120,50 100,60 80,50 80,30" fill="#0098A8" opacity="0.1" transform="scale(1.5)"/>
+        <polygon points="750,100 770,110 770,130 750,140 730,130 730,110" fill="#C8D900" opacity="0.09"/>
+        
+        <!-- Círculos de diferentes tamaños -->
+        <circle cx="15%" cy="20%" r="100" fill="#0098A8" opacity="0.12"/>
+        <circle cx="80%" cy="15%" r="140" fill="#C8D900" opacity="0.08"/>
+        <circle cx="50%" cy="75%" r="120" fill="#0098A8" opacity="0.1"/>
+        <circle cx="25%" cy="85%" r="80" fill="#C8D900" opacity="0.11"/>
+        
+        <!-- Triángulos -->
+        <polygon points="300,50 350,150 250,150" fill="#0098A8" opacity="0.08"/>
+        <polygon points="1100,400 1150,500 1050,500" fill="#C8D900" opacity="0.07"/>
+        
+        <!-- Cuadrados rotados (rombos) -->
+        <rect x="65%" y="40%" width="140" height="140" fill="#0098A8" opacity="0.09" transform="rotate(45 70 45)"/>
+        <rect x="10%" y="55%" width="100" height="100" fill="#C8D900" opacity="0.08" transform="rotate(30 15 60)"/>
+        
+        <!-- Líneas decorativas cruzadas -->
+        <line x1="0%" y1="25%" x2="100%" y2="30%" stroke="#0098A8" stroke-width="3" opacity="0.1"/>
+        <line x1="0%" y1="65%" x2="100%" y2="60%" stroke="#C8D900" stroke-width="2" opacity="0.09"/>
+        <line x1="20%" y1="0%" x2="25%" y2="100%" stroke="#0098A8" stroke-width="2" opacity="0.08"/>
+        <line x1="75%" y1="0%" x2="80%" y2="100%" stroke="#C8D900" stroke-width="2" opacity="0.07"/>
+        
+        <!-- Estrellas/Polígonos complejos -->
+        <polygon points="600,150 610,170 630,175 610,180 600,200 590,180 570,175 590,170" fill="#0098A8" opacity="0.1"/>
+        <polygon points="200,450 210,470 230,475 210,480 200,500 190,480 170,475 190,470" fill="#C8D900" opacity="0.09"/>
+        
+        <!-- Medias lunas/Arcos -->
+        <path d="M 900 200 Q 920 220 900 240" stroke="#0098A8" stroke-width="15" fill="none" opacity="0.08"/>
+        <path d="M 150 600 Q 170 620 150 640" stroke="#C8D900" stroke-width="12" fill="none" opacity="0.09"/>
+      </svg>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-br from-[#10284C]/60 via-[#10284C]/85 to-[#10284C]/95"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="relative z-10 px-4 py-6">
+    <div class="max-w-4xl mx-auto space-y-6">
+      
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+  <img src="logo.webp" 
+             alt="Implameq" 
+             class="h-10 w-auto brightness-0 invert">
+        <div class="flex items-center gap-2">
+          <button 
+            (click)="nuevaHoja()"
+            class="px-4 py-2 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-colors font-medium flex items-center gap-2 active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span class="hidden sm:inline">Nueva</span>
+          </button>
+          <button 
+            (click)="volver()"
+            class="px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors font-medium flex items-center gap-2 backdrop-blur-sm active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span class="hidden sm:inline">Volver</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Título -->
+      <div class="text-center">
+        <h1 class="text-3xl sm:text-4xl font-bold text-[#C8D900] mb-2">Hojas de Gasto</h1>
+        <p class="text-white/80 text-sm">Registro de gastos quirúrgicos por técnicos</p>
+      </div>
+
+      <!-- Loading state -->
+      @if (loading()) {
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+          <div class="flex justify-center items-center h-64">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#C8D900]"></div>
+          </div>
+          <p class="text-sm text-white/70 mt-4 text-center">Cargando hojas de gasto...</p>
+        </div>
+      }
+
+      <!-- Error state -->
+      @if (!loading() && error()) {
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl text-center">
+          <svg class="w-12 h-12 mx-auto mb-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+            </path>
+          </svg>
+          <p class="text-sm text-white mb-4">{{ error() }}</p>
+          <button type="button" (click)="loadHojasGasto()"
+                  class="px-6 py-2 bg-red-500/20 text-red-300 border border-red-400/40 rounded-lg hover:bg-red-500/30 transition-all font-semibold active:scale-95">
+            Reintentar
+          </button>
+        </div>
+      }
+
+      <!-- Filtros rápidos -->
+      @if (!loading() && !error()) {
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-4 shadow-xl">
+          <h3 class="text-sm font-medium text-white mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+            </svg>
+            Filtros
+          </h3>
+          
+          <div class="space-y-3">
+            <!-- Filtro por estado -->
+            <div>
+              <label class="block text-xs text-white/70 mb-1">Estado</label>
+              <select 
+                (change)="onFiltroEstadoChange($any($event.target).value)"
+                [value]="filtroEstado()"
+                class="w-full px-3 py-2 text-sm bg-[#10284C]/50 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-[#C8D900] focus:border-transparent backdrop-blur-sm">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="en_proceso">En Proceso</option>
+                <option value="completada">Completada</option>
+                <option value="validada">Validada</option>
+                <option value="facturada">Facturada</option>
+              </select>
+            </div>
+            
+            <!-- Botón limpiar filtros -->
+            <button 
+              (click)="clearFiltros()"
+              class="w-full text-xs text-white/70 hover:text-white transition-colors">
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Lista de hojas de gasto -->
+      @if (!loading() && !error()) {
+        <div class="space-y-4">
+          @for (hoja of hojasGasto(); track hoja.id) {
+            <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl 
+                        hover:bg-[#0098A8]/25 transition-all duration-200 cursor-pointer"
+                 (click)="verDetalle(hoja.id)">
+          
+              <!-- Header de la hoja -->
+              <div class="p-4 border-b border-white/20">
+                <div class="flex justify-between items-start gap-3">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <h3 class="text-lg font-semibold text-white">{{ hoja.numero_hoja }}</h3>
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                            [ngClass]="getEstadoInfo(hoja.estado).color">
+                        {{ getEstadoInfo(hoja.estado).label }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-white/80">{{ getClienteNombre(hoja) }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-lg font-bold text-[#C8D900]">{{ formatMoneda(hoja.total_general) }}</p>
+                    <p class="text-xs text-white/70">Total</p>
+                  </div>
+                </div>
+              </div>
+          
+              <!-- Detalles de la hoja -->
+              <div class="p-4">
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <p class="text-xs text-white/70">Técnico</p>
+                    <p class="text-sm font-medium text-white">{{ getTecnicoNombre(hoja) }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-white/70">Fecha Cirugía</p>
+                    <p class="text-sm font-medium text-white">{{ formatFecha(hoja.fecha_cirugia) }}</p>
+                  </div>
+                </div>
+                
+                <!-- Resumen de totales -->
+                <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/20">
+                  <div class="text-center">
+                    <p class="text-xs text-white/70">Productos</p>
+                    <p class="text-sm font-semibold text-blue-300">{{ formatMoneda(hoja.total_productos) }}</p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-xs text-white/70">Transporte</p>
+                    <p class="text-sm font-semibold text-green-300">{{ formatMoneda(hoja.total_transporte) }}</p>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-xs text-white/70">Otros</p>
+                    <p class="text-sm font-semibold text-gray-300">{{ formatMoneda(hoja.total_otros) }}</p>
+                  </div>
+                </div>
+            
+                <!-- Acciones rápidas -->
+                <div class="mt-4 flex gap-2">
+                  <button 
+                    (click)="verDetalle(hoja.id); $event.stopPropagation()"
+                    class="flex-1 bg-[#C8D900] hover:bg-[#d4e820] text-[#10284C] px-3 py-2 rounded-lg text-xs font-medium transition-all active:scale-95">
+                    Ver Detalle
+                  </button>
+                  @if (canEditHoja(hoja)) {
+                    <button 
+                      (click)="editarHoja(hoja.id); $event.stopPropagation()"
+                      class="bg-[#0098A8] hover:bg-[#0098A8]/80 text-white px-3 py-2 rounded-lg text-xs font-medium transition-all active:scale-95">
+                      Editar
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+          
+          @if (hojasGasto().length === 0) {
+            <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-8 text-center shadow-xl">
+              <svg class="w-12 h-12 text-[#C8D900]/50 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6.586A2 2 0 0117.414 13L16 14.414V17a2 2 0 01-2 2H6a2 2 0 01-2-2v-2.586L2.586 13A2 2 0 012 11.414V5z" clip-rule="evenodd"/>
+              </svg>
+              <p class="text-white/70 mb-4">No hay hojas de gasto disponibles</p>
+              <button 
+                (click)="nuevaHoja()"
+                class="bg-[#C8D900] hover:bg-[#d4e820] text-[#10284C] px-6 py-3 rounded-xl font-bold transition-all shadow-xl active:scale-95">
+                Crear primera hoja de gasto
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Bottom spacing -->
+      <div class="h-6"></div>
+    </div>
+  </main>
+</div>

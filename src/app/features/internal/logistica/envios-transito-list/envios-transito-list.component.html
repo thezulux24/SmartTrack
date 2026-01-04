@@ -1,0 +1,258 @@
+<div class="min-h-screen relative overflow-hidden">
+  <!-- Background con SVG Implameq -->
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-[#10284C]">
+      <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10%" cy="15%" r="120" fill="#0098A8" opacity="0.1"/>
+        <circle cx="85%" cy="25%" r="180" fill="#C8D900" opacity="0.08"/>
+        <circle cx="50%" cy="80%" r="150" fill="#0098A8" opacity="0.12"/>
+        <rect x="60%" y="5%" width="200" height="200" fill="#0098A8" opacity="0.06" transform="rotate(45 70 15)"/>
+        <rect x="15%" y="65%" width="160" height="160" fill="#C8D900" opacity="0.08" transform="rotate(30 20 70)"/>
+      </svg>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#10284C]/50 via-[#10284C]/80 to-[#10284C]/95"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="relative z-10 px-4 py-6">
+    <div class="max-w-6xl mx-auto space-y-6">
+      
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+  <img src="logo.webp" 
+             alt="Implameq" 
+             class="h-10 w-auto brightness-0 invert">
+        <button
+          (click)="volver()"
+          class="px-4 py-2 bg-[#C8D900] text-[#10284C] rounded-lg hover:bg-[#d4e820] transition-colors font-medium flex items-center gap-2 active:scale-95">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span class="hidden sm:inline">Volver</span>
+        </button>
+      </div>
+
+      <!-- Titulo y filtros -->
+      <div class="text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">
+          Envíos en Tránsito
+        </h1>
+        <p class="text-gray-300 text-lg">Monitoreo de kits en proceso de entrega</p>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex justify-center gap-3 flex-wrap">
+        <button 
+          (click)="filtroEstado.set('todos')"
+          [class]="filtroEstado() === 'todos' 
+            ? 'bg-[#C8D900] text-[#10284C]' 
+            : 'bg-white/10 text-white hover:bg-white/20'"
+          class="px-4 py-2 rounded-lg font-medium transition-all">
+          Todos
+        </button>
+        <button 
+          (click)="filtroEstado.set('programado')"
+          [class]="filtroEstado() === 'programado' 
+            ? 'bg-[#C8D900] text-[#10284C]' 
+            : 'bg-white/10 text-white hover:bg-white/20'"
+          class="px-4 py-2 rounded-lg font-medium transition-all">
+          Programados
+        </button>
+        <button 
+          (click)="filtroEstado.set('en_transito')"
+          [class]="filtroEstado() === 'en_transito' 
+            ? 'bg-[#C8D900] text-[#10284C]' 
+            : 'bg-white/10 text-white hover:bg-white/20'"
+          class="px-4 py-2 rounded-lg font-medium transition-all">
+          En Tránsito
+        </button>
+      </div>
+
+      <!-- Mensajes -->
+      @if (error()) {
+        <div class="bg-red-500/20 border border-red-500 text-red-100 p-4 rounded-lg text-center">
+          {{ error() }}
+        </div>
+      }
+
+      <!-- Loading -->
+      @if (cargando()) {
+        <div class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#C8D900] border-t-transparent"></div>
+          <p class="text-white mt-4">Cargando envíos...</p>
+        </div>
+      }
+
+      <!-- Lista de envíos -->
+      @if (!cargando() && enviosFiltrados().length === 0) {
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-12 text-center">
+          <div class="text-6xl mb-4">📭</div>
+          <h3 class="text-2xl font-bold text-white mb-2">No hay envíos activos</h3>
+          <p class="text-gray-300">Los envíos programados y en tránsito aparecerán aquí</p>
+        </div>
+      }
+
+      @if (!cargando() && enviosFiltrados().length > 0) {
+        <div class="grid grid-cols-1 gap-6">
+          @for (envio of enviosFiltrados(); track envio.id) {
+            <div class="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 hover:border-[#0098A8] transition-all">
+              
+              <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
+                <div class="flex items-center gap-4">
+                  <!-- Estado badge -->
+                  <span [class]="getEstadoBadgeClass(envio.estado)" class="px-3 py-1 rounded-full text-sm font-medium border">
+                    {{ getEstadoTexto(envio.estado) }}
+                  </span>
+                  
+                  <!-- Kit info -->
+                  <div>
+                    <h3 class="text-xl font-bold text-white">
+                      Kit {{ envio.kit?.numero_kit || 'N/A' }}
+                    </h3>
+                    <p class="text-gray-300 text-sm">
+                      Cirugía: {{ envio.kit?.cirugia?.numero_cirugia || 'N/A' }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex gap-2">
+                  <!-- Botón ver QR -->
+                  <button
+                    (click)="verQR(envio)"
+                    class="px-4 py-2 bg-gradient-to-r from-[#C8D900] to-[#d4e820] text-[#10284C] rounded-lg hover:shadow-lg hover:shadow-[#C8D900]/50 transition-all font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                    </svg>
+                    Ver QR
+                  </button>
+
+                  <!-- Botón iniciar envío (solo si está programado) -->
+                  @if (envio.estado === 'programado') {
+                    <button
+                      (click)="iniciarEnvio(envio)"
+                      class="px-4 py-2 bg-gradient-to-r from-[#0098A8] to-[#00b8c8] text-white rounded-lg hover:shadow-lg hover:shadow-[#0098A8]/50 transition-all font-medium">
+                      Iniciar Envío
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Grid de información -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                
+                <!-- Mensajero -->
+                <div class="bg-white/5 rounded-lg p-4">
+                  <p class="text-gray-400 text-sm mb-1">Mensajero</p>
+                  <p class="text-white font-medium">{{ envio.mensajero?.nombre || 'N/A' }}</p>
+                  <p class="text-gray-300 text-sm">{{ envio.mensajero?.telefono || '' }}</p>
+                  @if (envio.mensajero?.placa) {
+                    <p class="text-[#C8D900] text-sm font-mono">{{ envio.mensajero?.placa }}</p>
+                  }
+                </div>
+
+                <!-- Destino -->
+                <div class="bg-white/5 rounded-lg p-4">
+                  <p class="text-gray-400 text-sm mb-1">Destino</p>
+                  <p class="text-white font-medium">{{ envio.kit?.cirugia?.hospital?.nombre || 'N/A' }}</p>
+                  <p class="text-gray-300 text-sm">{{ envio.direccion_destino }}</p>
+                </div>
+
+                <!-- Contacto -->
+                <div class="bg-white/5 rounded-lg p-4">
+                  <p class="text-gray-400 text-sm mb-1">Contacto</p>
+                  <p class="text-white font-medium">{{ envio.contacto_destino || 'N/A' }}</p>
+                  <p class="text-gray-300 text-sm">{{ envio.telefono_destino || '' }}</p>
+                </div>
+
+                <!-- Fecha programada -->
+                <div class="bg-white/5 rounded-lg p-4">
+                  <p class="text-gray-400 text-sm mb-1">Fecha Programada</p>
+                  <p class="text-white font-medium">{{ formatearFecha(envio.fecha_programada) }}</p>
+                </div>
+
+                <!-- Hora salida -->
+                <div class="bg-white/5 rounded-lg p-4">
+                  <p class="text-gray-400 text-sm mb-1">Hora de Salida</p>
+                  <p class="text-white font-medium">
+                    {{ envio.hora_salida ? formatearHora(envio.hora_salida) : 'Pendiente' }}
+                  </p>
+                </div>
+
+                <!-- Hora llegada -->
+                <div class="bg-white/5 rounded-lg p-4">
+                  <p class="text-gray-400 text-sm mb-1">Hora de Llegada</p>
+                  <p class="text-white font-medium">
+                    {{ envio.hora_llegada ? formatearHora(envio.hora_llegada) : 'Pendiente' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Observaciones -->
+              @if (envio.observaciones) {
+                <div class="mt-4 bg-white/5 rounded-lg p-4">
+                  <p class="text-gray-400 text-sm mb-1">Observaciones</p>
+                  <p class="text-gray-300">{{ envio.observaciones }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- Modal para mostrar QR -->
+  @if (mostrarQR()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+         (click)="cerrarQR()">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all"
+           (click)="$event.stopPropagation()">
+        
+        <!-- Header del modal -->
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-[#10284C]">Código QR del Kit</h3>
+          <button 
+            (click)="cerrarQR()"
+            class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- QR Code -->
+        <div class="bg-white p-6 rounded-xl border-4 border-[#0098A8] mb-4 flex justify-center">
+          <qrcode 
+            [qrdata]="urlQR()"
+            [width]="256"
+            [errorCorrectionLevel]="'M'"
+            [elementType]="'canvas'">
+          </qrcode>
+        </div>
+
+        <!-- Info -->
+        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+          <p class="text-sm text-gray-600 mb-2">Código:</p>
+          <p class="text-lg font-mono font-bold text-[#10284C] break-all">{{ codigoQR() }}</p>
+          <p class="text-sm text-gray-600 mt-3 mb-1">URL de validación:</p>
+          <p class="text-xs text-gray-500 break-all">{{ urlQR() }}</p>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-3">
+          <button 
+            (click)="descargarQR()"
+            class="flex-1 px-4 py-3 bg-gradient-to-r from-[#C8D900] to-[#d4e820] text-[#10284C] rounded-lg hover:shadow-lg transition-all font-semibold">
+            Descargar QR
+          </button>
+          <button 
+            (click)="cerrarQR()"
+            class="flex-1 px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all font-semibold">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

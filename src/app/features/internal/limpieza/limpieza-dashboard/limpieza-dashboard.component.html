@@ -1,0 +1,326 @@
+<div class="min-h-screen relative overflow-hidden">
+  <!-- Background con SVG de formas geométricas -->
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-[#10284C]">
+      <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <!-- Círculos de diferentes tamaños -->
+        <circle cx="15%" cy="20%" r="100" fill="#0098A8" opacity="0.12"/>
+        <circle cx="80%" cy="15%" r="140" fill="#C8D900" opacity="0.08"/>
+        <circle cx="50%" cy="75%" r="120" fill="#0098A8" opacity="0.1"/>
+        <circle cx="25%" cy="85%" r="80" fill="#C8D900" opacity="0.11"/>
+        
+        <!-- Hexágonos -->
+        <polygon points="100,20 120,30 120,50 100,60 80,50 80,30" fill="#0098A8" opacity="0.1" transform="scale(1.5)"/>
+        <polygon points="750,100 770,110 770,130 750,140 730,130 730,110" fill="#C8D900" opacity="0.09"/>
+        
+        <!-- Líneas decorativas -->
+        <line x1="0%" y1="25%" x2="100%" y2="30%" stroke="#0098A8" stroke-width="3" opacity="0.1"/>
+        <line x1="0%" y1="65%" x2="100%" y2="60%" stroke="#C8D900" stroke-width="2" opacity="0.09"/>
+      </svg>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-br from-[#10284C]/60 via-[#10284C]/85 to-[#10284C]/95"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="relative z-10 px-4 py-6">
+    <div class="max-w-7xl mx-auto space-y-6">
+      
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+  <img src="logo.webp" 
+             alt="Implameq" 
+             class="h-10 w-auto brightness-0 invert">
+        <button 
+          (click)="regresar()"
+          class="px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/20 transition-colors font-medium flex items-center gap-2 backdrop-blur-sm active:scale-95">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Volver</span>
+        </button>
+      </div>
+
+      <!-- Título -->
+      <div class="text-center">
+        <h1 class="text-3xl sm:text-4xl font-bold text-[#C8D900] mb-2"> Limpieza y Esterilización</h1>
+        <p class="text-white/80 text-sm">Gestión del proceso de limpieza de kits quirúrgicos</p>
+      </div>
+
+      <!-- Loading State -->
+      @if (cargando()) {
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-12 shadow-xl">
+          <div class="flex flex-col items-center justify-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-4 border-[#C8D900] border-t-transparent mb-4"></div>
+            <p class="text-white text-lg font-medium">Cargando kits en limpieza...</p>
+          </div>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (error() && !cargando()) {
+        <div class="bg-red-500/20 backdrop-blur-md rounded-2xl border border-red-500/50 p-8 shadow-xl">
+          <div class="text-center">
+            <svg class="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-xl font-bold text-red-300 mb-2">Error al cargar datos</h3>
+            <p class="text-white/90">{{ error() }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- Main Content -->
+      @if (!cargando() && !error()) {
+        <!-- KPIs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl hover:border-[#C8D900] transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-white/80 text-sm font-medium">Total Kits</h3>
+              <div class="p-3 bg-purple-500/20 rounded-lg">
+                <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+              </div>
+            </div>
+            <div class="text-white text-4xl font-bold">{{ totalKits() }}</div>
+          </div>
+
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl hover:border-[#C8D900] transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-white/80 text-sm font-medium">Pendientes</h3>
+              <div class="p-3 bg-yellow-500/20 rounded-lg">
+                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="text-white text-4xl font-bold">{{ totalProductosPendientes() }}</div>
+          </div>
+
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl hover:border-[#C8D900] transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-white/80 text-sm font-medium">En Proceso</h3>
+              <div class="p-3 bg-blue-500/20 rounded-lg">
+                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+              </div>
+            </div>
+            <div class="text-white text-4xl font-bold">{{ totalProductosEnProceso() }}</div>
+          </div>
+
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl hover:border-[#C8D900] transition-all">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-white/80 text-sm font-medium">Esterilizados</h3>
+              <div class="p-3 bg-green-500/20 rounded-lg">
+                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            </div>
+            <div class="text-white text-4xl font-bold">{{ totalProductosEsterilizados() }}</div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        @if (kitsEnLimpieza().length === 0) {
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-12 shadow-xl text-center">
+            <svg class="w-24 h-24 text-[#C8D900] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-2xl font-bold text-white mb-2">No hay kits en limpieza</h3>
+            <p class="text-white/70">Cuando se procesen devoluciones, los kits aparecerán aquí</p>
+          </div>
+        }
+
+        <!-- Kits List -->
+        @if (kitsEnLimpieza().length > 0) {
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            @for (kit of kitsEnLimpieza(); track kit.id) {
+              <div class="bg-[#0098A8]/20 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-xl hover:border-[#C8D900] hover:shadow-2xl transition-all cursor-pointer"
+                   (click)="seleccionarKit(kit)">
+                
+                <!-- Kit Header -->
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 class="text-xl font-bold text-[#C8D900]">{{ kit.numero_kit }}</h3>
+                    <p class="text-white/70 text-sm">{{ kit.fecha_inicio_limpieza | date: 'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+                  <div class="bg-purple-500/20 border border-purple-400 rounded-lg px-3 py-1">
+                    <span class="text-purple-300 font-medium text-sm">🧼 EN LIMPIEZA</span>
+                  </div>
+                </div>
+
+                <!-- Kit Info -->
+                <div class="space-y-2 mb-4">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#0098A8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <p class="text-white text-sm">{{ kit.hospital?.nombre || 'N/A' }}</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-[#0098A8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <p class="text-white text-sm">{{ kit.medico_cirujano || 'N/A' }}</p>
+                  </div>
+                </div>
+
+                <!-- Products Summary -->
+                <div class="flex items-center justify-between pt-4 border-t border-white/20">
+                  <span class="text-white/70 text-sm">{{ kit.productos_count }} productos reutilizables</span>
+                  <button class="text-[#C8D900] hover:text-[#d4e820] font-medium text-sm transition-colors flex items-center gap-1">
+                    Ver detalles
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  </main>
+
+  <!-- Modal de Detalles del Kit -->
+  @if (kitSeleccionado()) {
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50"
+         (click)="cerrarDetalle()">
+      <div class="bg-[#10284C] border-2 border-[#C8D900] rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+           (click)="$event.stopPropagation()">
+        
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-[#0098A8] to-[#10284C] p-6 border-b-2 border-[#C8D900]">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold text-[#C8D900] mb-1">{{ kitSeleccionado()?.numero_kit }}</h2>
+              <p class="text-white/90">🧼 Proceso de Limpieza y Esterilización</p>
+            </div>
+            <button 
+              (click)="cerrarDetalle()"
+              class="text-white hover:text-[#C8D900] transition-colors p-2 hover:bg-white/10 rounded-lg">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Content -->
+        <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] bg-gradient-to-br from-[#10284C] to-[#0d1f3a]">
+          
+          <!-- Kit Info -->
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-xl border border-white/20 p-5 mb-6 shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <div class="text-[#C8D900] text-xs font-semibold mb-1 uppercase">Hospital</div>
+                <div class="text-white font-medium">{{ kitSeleccionado()?.hospital?.nombre || 'N/A' }}</div>
+              </div>
+              <div>
+                <div class="text-[#C8D900] text-xs font-semibold mb-1 uppercase">Médico</div>
+                <div class="text-white font-medium">{{ kitSeleccionado()?.medico_cirujano || 'N/A' }}</div>
+              </div>
+              <div>
+                <div class="text-[#C8D900] text-xs font-semibold mb-1 uppercase">Inicio Limpieza</div>
+                <div class="text-white font-medium">{{ kitSeleccionado()?.fecha_inicio_limpieza | date: 'dd/MM/yyyy HH:mm' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Table -->
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-[#C8D900] mb-4 flex items-center gap-2">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              Productos Reutilizables
+            </h3>
+            
+            @for (producto of kitSeleccionado()?.productos || []; track producto.id) {
+              <div class="bg-[#0098A8]/20 backdrop-blur-md border border-white/20 rounded-xl p-5 shadow-lg hover:border-[#C8D900] transition-all">
+                
+                <!-- Product Header -->
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex-1">
+                    <h4 class="text-white font-bold">{{ producto.producto_nombre }}</h4>
+                    <p class="text-gray-400 text-sm">{{ producto.producto_codigo }}</p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="text-center">
+                      <div class="text-gray-400 text-xs">A Recuperar</div>
+                      <div class="text-[#C8D900] font-bold text-lg">{{ producto.cantidad_a_recuperar }}</div>
+                    </div>
+                    <div [class]="'px-3 py-1 rounded-lg text-sm font-medium ' + getEstadoColor(producto.estado_limpieza) + '/20 border ' + getEstadoColor(producto.estado_limpieza)">
+                      {{ getEstadoTexto(producto.estado_limpieza) }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Notas -->
+                @if (producto.notas) {
+                  <div class="bg-yellow-500/10 border border-yellow-500/30 rounded p-2 mb-3">
+                    <p class="text-yellow-200 text-sm"><strong>Notas:</strong> {{ producto.notas }}</p>
+                  </div>
+                }
+
+                <!-- Observaciones de Limpieza -->
+                <div class="mb-3">
+                  <label class="text-gray-300 text-sm mb-1 block">Observaciones de Limpieza:</label>
+                  <div class="flex gap-2">
+                    <input
+                      type="text"
+                      [(ngModel)]="producto.observaciones_limpieza"
+                      placeholder="Registrar observaciones del proceso..."
+                      class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#C8D900]">
+                    <button
+                      (click)="guardarObservaciones(producto)"
+                      class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors">
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-2">
+                  @if (producto.estado_limpieza === 'pendiente') {
+                    <button
+                      (click)="cambiarEstadoProducto(producto, 'en_proceso')"
+                      [disabled]="procesando()"
+                      class="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      Iniciar Proceso
+                    </button>
+                  }
+                  @if (producto.estado_limpieza === 'en_proceso') {
+                    <button
+                      (click)="cambiarEstadoProducto(producto, 'esterilizado')"
+                      [disabled]="procesando()"
+                      class="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      Marcar como Esterilizado
+                    </button>
+                  }
+                  @if (producto.estado_limpieza === 'esterilizado') {
+                    <div class="flex-1 px-4 py-2 bg-purple-500/20 border border-purple-500 text-purple-300 rounded-lg font-medium text-center">
+                      ✅ Listo para Aprobación
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

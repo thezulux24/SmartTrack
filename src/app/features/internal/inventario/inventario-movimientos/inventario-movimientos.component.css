@@ -1,0 +1,61 @@
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Transiciones suaves para elementos interactivos */
+button, select, input {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover effects mejorados */
+.hover\:text-blue-600:hover {
+  color: rgb(37 99 235);
+  transition: color 0.15s ease-in-out;
+}
+
+/* Animaciones de entrada para las cards */
+.bg-white {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mejoras para el modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .dark\:bg-gray-800 {
+    background-color: rgb(31 41 55);
+  }
+  
+  .dark\:border-gray-700 {
+    border-color: rgb(55 65 81);
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .grid-cols-1.md\:grid-cols-2 {
+    gap: 0.75rem;
+  }
+  
+  .grid-cols-1.md\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

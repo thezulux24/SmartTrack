@@ -1,0 +1,230 @@
+<!-- Contenedor principal con fondo navy -->
+<div class="min-h-screen bg-[#10284C] relative overflow-hidden">
+  <!-- Fondo con formas SVG geométricas -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0098A8;stop-opacity:0.1" />
+          <stop offset="100%" style="stop-color:#C8D900;stop-opacity:0.05" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Hexágonos -->
+      <polygon points="100,50 125,65 125,95 100,110 75,95 75,65" fill="#0098A8" opacity="0.08" />
+      <polygon points="300,120 330,140 330,180 300,200 270,180 270,140" fill="#C8D900" opacity="0.06" />
+      
+      <!-- Círculos de diferentes tamaños -->
+      <circle cx="80%" cy="15%" r="120" fill="#0098A8" opacity="0.07" />
+      <circle cx="15%" cy="80%" r="90" fill="#C8D900" opacity="0.08" />
+      <circle cx="90%" cy="75%" r="60" fill="#0098A8" opacity="0.09" />
+      <circle cx="50%" cy="50%" r="40" fill="url(#grad1)" opacity="0.1" />
+      
+      <!-- Triángulos -->
+      <polygon points="85%,10% 95%,30% 75%,30%" fill="#C8D900" opacity="0.07" transform="translate(0, 0)" />
+      <polygon points="10%,85% 20%,95% 5%,95%" fill="#0098A8" opacity="0.08" />
+      
+      <!-- Rombos (cuadrados rotados) -->
+      <rect x="60%" y="20%" width="80" height="80" fill="#0098A8" opacity="0.06" transform="rotate(45 65% 25%)" />
+      <rect x="25%" y="60%" width="60" height="60" fill="#C8D900" opacity="0.07" transform="rotate(45 28% 63%)" />
+      
+      <!-- Líneas decorativas cruzadas -->
+      <line x1="0%" y1="30%" x2="40%" y2="30%" stroke="#0098A8" stroke-width="2" opacity="0.1" />
+      <line x1="60%" y1="70%" x2="100%" y2="70%" stroke="#C8D900" stroke-width="2" opacity="0.1" />
+      <line x1="20%" y1="0%" x2="20%" y2="40%" stroke="#0098A8" stroke-width="2" opacity="0.08" />
+      
+      <!-- Estrellas de 8 puntas -->
+      <polygon points="400,300 410,320 430,325 410,330 400,350 390,330 370,325 390,320" fill="#C8D900" opacity="0.09" />
+      
+      <!-- Arcos curvos -->
+      <path d="M 0 200 Q 100 150 200 200" stroke="#0098A8" stroke-width="3" fill="none" opacity="0.08" />
+      <path d="M 300 400 Q 400 350 500 400" stroke="#C8D900" stroke-width="3" fill="none" opacity="0.07" />
+    </svg>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 bg-gradient-to-br from-[#10284C]/95 to-[#10284C]/60 backdrop-blur-md border-b border-white/10 shadow-2xl">
+    <div class="px-4 py-4">
+      <!-- Top bar con logo -->
+      <div class="flex justify-center items-center mb-3">
+        <div class="flex items-center space-x-3">
+          <img src="logo.webp" 
+               alt="Implameq" class="h-8 brightness-0 invert">
+          <span class="text-lg font-semibold text-white">Detalles del Kit</span>
+        </div>
+      </div>
+      
+      <!-- Título principal -->
+      <div class="text-center">
+        <h1 class="text-2xl font-bold mb-1 text-white">Kit Quirúrgico</h1>
+        <p class="text-[#C8D900] text-sm" *ngIf="kit()">
+          {{ kit()?.numero_kit }} - {{ kit()?.cirugia?.numero_cirugia }}
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="relative z-10 px-4 py-6">
+      <div class="max-w-lg mx-auto">
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 text-center">
+          <div class="flex justify-center mb-4">
+            <div class="w-12 h-12 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p class="text-sm text-white/90 mt-4">Cargando información del kit...</p>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (error()) {
+    <div class="relative z-10 px-4 py-4">
+      <div class="max-w-lg mx-auto">
+        <div class="bg-red-500/20 backdrop-blur-md border border-red-400/30 rounded-2xl shadow-xl px-4 py-3">
+          <div class="flex items-center space-x-3">
+            <svg class="w-5 h-5 text-red-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+            </svg>
+            <p class="text-sm text-red-200">{{ error() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Contenido principal -->
+  @if (!loading() && !error()) {
+    <main class="relative z-10 px-4 py-6">
+      <div class="max-w-lg mx-auto space-y-6">
+        
+        <!-- Información del Kit -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+          <div class="mb-6">
+            <div>
+              <h2 class="text-2xl font-bold text-white mb-2">
+                Kit {{ kit()?.numero_kit || 'N/A' }}
+              </h2>
+              <div class="flex items-center space-x-3">
+                <span class="kit-status-badge" [ngClass]="getEstadoColor(kit()?.estado || 'pendiente')">
+                  {{ kit()?.estado | titlecase }}
+                </span>
+                <span class="text-sm text-white/70">
+                  Creado: {{ formatearFecha(kit()?.created_at || '') }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de la cirugía -->
+          @if (kit()?.cirugia) {
+            <div class="bg-[#10284C]/50 backdrop-blur-sm rounded-lg border border-white/10 p-4 mb-6">
+              <h3 class="font-semibold text-white mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-[#C8D900]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                Información de la Cirugía
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span class="font-medium text-white/70">Cliente:</span>
+                  <span class="ml-2 text-white">{{ getClienteNombre() }}</span>
+                </div>
+                <div>
+                  <span class="font-medium text-white/70">Médico:</span>
+                  <span class="ml-2 text-white">{{ kit()?.cirugia?.medico_cirujano }}</span>
+                </div>
+                <div>
+                  <span class="font-medium text-white/70">Fecha:</span>
+                  <span class="ml-2 text-white">{{ formatearFecha(kit()?.cirugia?.fecha_programada || '') }}</span>
+                </div>
+                <div>
+                  <span class="font-medium text-white/70">Hospital:</span>
+                  <span class="ml-2 text-white">{{ kit()?.cirugia?.hospital?.nombre }}</span>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Observaciones -->
+          @if (kit()?.observaciones) {
+            <div class="mt-4 p-4 bg-[#0098A8]/30 backdrop-blur-sm rounded-lg border border-white/10">
+              <h4 class="font-medium text-[#C8D900] mb-2">Observaciones:</h4>
+              <p class="text-sm text-white/90">{{ kit()?.observaciones }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Productos del Kit -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+            <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+            </div>
+            <span>Productos del Kit ({{ productos().length }})</span>
+          </h3>
+          
+          @if (productos().length === 0) {
+            <div class="text-center py-8">
+              <svg class="w-12 h-12 text-[#C8D900]/50 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+              <p class="text-white/70">No hay productos en este kit</p>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              @for (producto of productos(); track producto.id) {
+                <div class="border border-white/20 rounded-lg p-4 bg-[#10284C]/40 backdrop-blur-sm">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="flex-1">
+                      <h4 class="font-medium text-white">{{ producto.producto?.nombre }}</h4>
+                      <p class="text-sm text-white/70">{{ producto.producto?.codigo }}</p>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-sm font-bold text-[#C8D900]">
+                        {{ producto.cantidad_solicitada }} unidades
+                      </div>
+                      @if (producto.cantidad_enviada !== producto.cantidad_solicitada) {
+                        <div class="text-xs text-orange-300">
+                          Entregado: {{ producto.cantidad_enviada || 0 }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+                  
+                  @if (producto.observaciones) {
+                    <div class="text-xs text-white/80 bg-[#0098A8]/20 p-2 rounded mt-2 border border-white/10">
+                      {{ producto.observaciones }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Botones de acción al final -->
+        <div class="flex gap-2">
+          <button (click)="volver()" 
+                  class="flex-1 bg-white/10 hover:bg-white/20 text-white border border-white/20 px-4 py-3 rounded-lg font-medium transition-all backdrop-blur-sm active:scale-95">
+            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Volver
+          </button>
+          <button (click)="onEditarKit()" 
+                  class="flex-1 bg-[#C8D900] hover:bg-[#d4e820] text-[#10284C] px-4 py-3 rounded-lg font-bold transition-all shadow-xl active:scale-95">
+            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Editar Kit
+          </button>
+        </div>
+
+      </div>
+    </main>
+  }
+</div>

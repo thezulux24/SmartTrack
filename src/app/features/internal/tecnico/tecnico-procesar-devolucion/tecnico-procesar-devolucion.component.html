@@ -1,0 +1,276 @@
+<div class="min-h-screen bg-gradient-to-br from-[#10284C] via-[#0d1f3a] to-[#0a1829] p-6">
+  <!-- Header -->
+  <div class="max-w-7xl mx-auto mb-8">
+    <button 
+      (click)="regresar()"
+      class="mb-6 flex items-center gap-2 text-white hover:text-[#C8D900] transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      <span class="font-medium">Volver al Dashboard</span>
+    </button>
+
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-bold text-white mb-2">Procesar Devolución</h1>
+        <p class="text-gray-300">Clasifica productos y envía a limpieza</p>
+      </div>
+      @if (kit()) {
+        <div class="bg-[#FF8C00]/10 border border-[#FF8C00] rounded-lg px-4 py-2">
+          <div class="text-[#FF8C00] font-bold text-lg">{{ kit()?.numero_kit }}</div>
+          <div class="text-gray-300 text-sm">Kit ID</div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (cargando()) {
+    <div class="flex items-center justify-center py-20">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#C8D900] mx-auto mb-4"></div>
+        <p class="text-white text-lg">Cargando datos del kit...</p>
+      </div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !cargando()) {
+    <div class="max-w-7xl mx-auto">
+      <div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center">
+        <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <h3 class="text-xl font-bold text-red-500 mb-2">Error</h3>
+        <p class="text-white">{{ error() }}</p>
+      </div>
+    </div>
+  }
+
+  <!-- Main Content -->
+  @if (!cargando() && !error() && kit()) {
+    <div class="max-w-7xl mx-auto space-y-6">
+      
+      <!-- Kit Info Card -->
+      <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6">
+        <h2 class="text-xl font-bold text-white mb-4">Información de la Cirugía</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <div class="text-gray-400 text-sm mb-1">Hospital</div>
+            <div class="text-white font-medium">{{ kit()?.hospital?.nombre || 'N/A' }}</div>
+          </div>
+          <div>
+            <div class="text-gray-400 text-sm mb-1">Médico</div>
+            <div class="text-white font-medium">{{ kit()?.medico_cirujano || 'N/A' }}</div>
+          </div>
+          <div>
+            <div class="text-gray-400 text-sm mb-1">Cliente</div>
+            <div class="text-white font-medium">
+              {{ kit()?.cliente?.nombre }} {{ kit()?.cliente?.apellido || '' }}
+            </div>
+          </div>
+          <div>
+            <div class="text-gray-400 text-sm mb-1">Fecha Devolución</div>
+            <div class="text-white font-medium">
+              {{ kit()?.fecha_devolucion | date: 'dd/MM/yyyy HH:mm' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-white/80 text-sm font-medium">Total Productos</h3>
+            <svg class="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+          </div>
+          <div class="text-white text-4xl font-bold">{{ totalProductos() }}</div>
+        </div>
+
+        <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-white/80 text-sm font-medium">Desechables</h3>
+            <svg class="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </div>
+          <div class="text-white text-4xl font-bold">{{ totalDesechables() }}</div>
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-white/80 text-sm font-medium">A Limpieza</h3>
+            <svg class="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+          </div>
+          <div class="text-white text-4xl font-bold">{{ totalALimpieza() }}</div>
+          <div class="text-white/70 text-xs mt-1">Reutilizables</div>
+        </div>
+
+        <div class="bg-gradient-to-br from-[#C8D900] to-[#a0b300] rounded-lg p-6 shadow-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-white/80 text-sm font-medium">A Recuperar</h3>
+            <svg class="w-8 h-8 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="text-white text-4xl font-bold">{{ totalARecuperar() }}</div>
+        </div>
+      </div>
+
+      <!-- Instructions Card -->
+      <div class="bg-yellow-500/10 border border-yellow-500 rounded-lg p-6">
+        <h3 class="text-yellow-500 font-bold text-lg mb-3 flex items-center gap-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Instrucciones
+        </h3>
+        <div class="text-white space-y-2">
+          <p><strong>1.</strong> Revisa cada producto y marca si es desechable o reutilizable</p>
+          <p><strong>2.</strong> Para productos reutilizables, indica la cantidad a recuperar</p>
+          <p><strong>3.</strong> Agrega notas si es necesario (daños, observaciones)</p>
+          <p><strong>4.</strong> Todos los productos <strong class="text-purple-400">reutilizables</strong> pasarán por proceso de limpieza y esterilización</p>
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
+        <div class="p-6 border-b border-white/10">
+          <h2 class="text-2xl font-bold text-white">Productos del Kit</h2>
+          <p class="text-gray-300 mt-1">Clasifica cada producto según su disposición</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-white/5">
+              <tr>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Producto</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-white">Enviado</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-white">Utilizado</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-white">Disponible</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-white">Estado</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-white">Tipo</th>
+                <th class="px-6 py-4 text-center text-sm font-semibold text-white">A Recuperar</th>
+                <th class="px-6 py-4 text-left text-sm font-semibold text-white">Notas</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+              @for (producto of productos(); track producto.id) {
+                <tr class="hover:bg-white/5 transition-colors">
+                  <!-- Producto Info -->
+                  <td class="px-6 py-4">
+                    <div class="text-white font-medium">{{ producto.nombre }}</div>
+                    <div class="text-gray-400 text-sm">{{ producto.codigo }}</div>
+                  </td>
+
+                  <!-- Cantidad Enviada -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-white font-medium">{{ producto.cantidad_enviada }}</span>
+                  </td>
+
+                  <!-- Cantidad Utilizada -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-yellow-500 font-medium">{{ producto.cantidad_utilizada }}</span>
+                  </td>
+
+                  <!-- Cantidad Disponible -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-green-500 font-bold text-lg">{{ producto.cantidad_disponible }}</span>
+                  </td>
+
+                  <!-- Estado -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
+                      A Limpieza
+                    </span>
+                  </td>
+
+                  <!-- Toggle Desechable -->
+                  <td class="px-6 py-4 text-center">
+                    <button
+                      (click)="toggleDesechable(producto)"
+                      [class]="producto.es_desechable 
+                        ? 'bg-red-500 border-red-600 text-white' 
+                        : 'bg-green-500 border-green-600 text-white'"
+                      class="px-4 py-2 rounded-lg font-medium border-2 hover:opacity-80 transition-opacity min-w-[130px]">
+                      {{ producto.es_desechable ? '🗑️ Desechable' : '♻️ Reutilizable' }}
+                    </button>
+                  </td>
+
+                  <!-- Cantidad a Recuperar -->
+                  <td class="px-6 py-4">
+                    @if (!producto.es_desechable && producto.cantidad_disponible > 0) {
+                      <div class="flex items-center justify-center gap-2">
+                        <button
+                          (click)="ajustarCantidadRecuperar(producto, -1)"
+                          [disabled]="producto.cantidad_a_recuperar <= 0"
+                          class="w-8 h-8 bg-red-500 hover:bg-red-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-bold transition-colors">
+                          -
+                        </button>
+                        <span class="text-white font-bold text-lg min-w-[40px] text-center">
+                          {{ producto.cantidad_a_recuperar }}
+                        </span>
+                        <button
+                          (click)="ajustarCantidadRecuperar(producto, 1)"
+                          [disabled]="producto.cantidad_a_recuperar >= producto.cantidad_disponible"
+                          class="w-8 h-8 bg-green-500 hover:bg-green-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-bold transition-colors">
+                          +
+                        </button>
+                      </div>
+                    } @else {
+                      <div class="text-center">
+                        <span class="text-gray-500 font-medium">-</span>
+                      </div>
+                    }
+                  </td>
+
+                  <!-- Notas -->
+                  <td class="px-6 py-4">
+                    <input
+                      type="text"
+                      [(ngModel)]="producto.notas"
+                      placeholder="Observaciones..."
+                      class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#C8D900]">
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-between gap-4">
+        <button
+          (click)="regresar()"
+          class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors">
+          Cancelar
+        </button>
+
+        <button
+          (click)="confirmarProcesamiento()"
+          [disabled]="procesando() || productos().length === 0"
+          class="px-8 py-3 bg-gradient-to-r from-[#C8D900] to-[#0098A8] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-[#10284C] rounded-lg font-bold text-lg transition-opacity flex items-center gap-2">
+          @if (procesando()) {
+            <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-[#10284C]"></div>
+            <span>Procesando...</span>
+          } @else {
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Confirmar y Enviar a Limpieza</span>
+          }
+        </button>
+      </div>
+
+    </div>
+  }
+</div>

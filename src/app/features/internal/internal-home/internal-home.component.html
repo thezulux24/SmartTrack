@@ -1,0 +1,121 @@
+<div class="min-h-screen relative bg-white">
+  <!-- Componente de Toast para notificaciones -->
+  <app-notification-toast />
+
+  <!-- HEADER con gradiente + imagen + WAVE dentro -->
+  <div class="relative overflow-hidden bg-gradient-to-b from-[#10284C] via-[#0098A8] to-[#0098A8]">
+    <!-- Imagen de fondo -->
+    <img src="05.jpg" alt="Medical background"
+         class="absolute inset-0 w-full h-full object-cover object-top opacity-40 z-0">
+
+    <!-- Contenido del header -->
+    <div class="relative z-10">
+      <header class="px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <!-- Top bar with logo, notifications and profile -->
+          <div class="flex justify-between items-center mb-8">
+            <img src="logo.webp"
+                 alt="Implameq" class="h-10 brightness-0 invert">
+            
+            <div class="flex items-center gap-3">
+              <!-- Panel de notificaciones -->
+              <app-notification-panel />
+              
+              <!-- Menú de perfil (reemplaza botón Salir) -->
+              <app-profile-menu />
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#C8D900] mb-2">Dashboard Operativo</h1>
+            <p class="text-white/90 text-sm">Panel de control para gestión interna</p>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-2 gap-5 pb-16">
+            <!-- Cirugías Hoy -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">{{ cirugiasHoy() }}</div>
+              <div class="text-white/90 text-sm">Cirugías Hoy</div>
+            </div>
+
+            <!-- Stock Crítico -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">{{ stockCritico() }}</div>
+              <div class="text-white/90 text-sm">Stock Crítico</div>
+            </div>
+
+            <!-- Kits en Proceso -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">{{ kitsEnProceso() }}</div>
+              <div class="text-white/90 text-sm">Kits en Proceso</div>
+            </div>
+
+            <!-- Cotizaciones Pendientes -->
+            <div class="bg-[#0098A8]/20 backdrop-blur-sm rounded-2xl border-2 border-[#C8D900] p-5">
+              <div class="text-4xl font-bold text-white mb-1">{{ cotizacionesPendientes() }}</div>
+              <div class="text-white/90 text-sm">Cotizaciones Pendientes</div>
+            </div>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <!-- WAVE pegada al fondo del header -->
+    <svg class="pointer-events-none absolute bottom-0 left-0 w-full h-20 sm:h-24 md:h-28 lg:h-32 z-0"
+         viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,96 C240,136 480,144 720,112 C960,80 1200,64 1440,104 L1440,160 L0,160 Z" fill="#ffffff"/>
+    </svg>
+  </div>
+
+  <!-- Main content with navigation cards -->
+  <div class="bg-white px-4 pt-6 pb-8">
+    <div class="max-w-lg mx-auto space-y-5">
+
+      <!-- Tarjetas dinámicas según rol -->
+      @for (item of menuItems(); track item.route) {
+        <a [routerLink]="item.route"
+          class="block bg-[#10284C] rounded-2xl p-5 hover:bg-[#10284C]/90 transition-all duration-200 relative">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="w-14 h-14 bg-[#C8D900] rounded-xl flex items-center justify-center flex-shrink-0 relative">
+                <svg class="w-6 h-6 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    [attr.d]="getIconPath(item.icon)"/>
+                </svg>
+                <!-- Badge de mensajes no leídos solo para Chat -->
+                @if (item.route === '/internal/chat' && totalUnreadMessages() > 0) {
+                  <span class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {{ totalUnreadMessages() > 99 ? '99+' : totalUnreadMessages() }}
+                  </span>
+                }
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-white">{{ item.title }}</h2>
+                <p class="text-sm text-white/70">{{ item.description }}</p>
+              </div>
+            </div>
+            <svg class="w-6 h-6 text-[#0098A8] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </a>
+      }
+
+      <!-- Si no hay items que mostrar -->
+      @if (menuItems().length === 0) {
+        <div class="text-center py-12">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-[#C8D900] rounded-full mb-4">
+            <svg class="w-8 h-8 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-[#10284C] mb-2">Sin módulos disponibles</h3>
+          <p class="text-gray-600">No tienes permisos asignados. Contacta al administrador.</p>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,86 @@
+<div class="font-neo relative min-h-screen overflow-hidden bg-gradient-to-b from-[#0098A8] from-0% via-[#006B7A] via-60% to-[#10284C] to-100%">
+  <!-- Contenido principal -->
+  <div class="relative flex items-center justify-center min-h-screen px-6 py-12">
+    <div class="w-full max-w-md">
+      <!-- Logo y header -->
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="mb-4">
+          <img src="logo.webp"
+               alt="Implameq" 
+               class="w-48 h-auto brightness-0 invert">
+        </div>
+        <p class="text-sm text-white/90 mb-6">Implantes médico - Quirúrgicos</p>
+        <h1 class="text-3xl font-semibold text-white">Crea tu cuenta</h1>
+      </div>
+
+      <!-- Tarjeta del formulario -->
+      <div class="bg-transparent border-2 border-white rounded-3xl p-8 mb-6">
+        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+          <!-- Nombre completo -->
+          <div class="space-y-2">
+            <label for="full_name" class="block text-sm font-medium text-white">
+              Nombre completo
+            </label>
+            <input 
+              id="full_name" 
+              type="text" 
+              formControlName="full_name"
+              placeholder="Escribe tu nombre aquí"
+              class="w-full bg-accent border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all">
+          </div>
+
+          <!-- Email field -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-white">
+              Correo electrónico
+            </label>
+            <input 
+              id="email" 
+              type="email" 
+              required 
+              formControlName="email"
+              placeholder="Escribe tu correo electrónico aquí"
+              class="w-full bg-accent border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all">
+          </div>
+
+          <!-- Password field -->
+          <div class="space-y-2">
+            <label for="password" class="block text-sm font-medium text-white">
+              Contraseña
+            </label>
+            <input 
+              id="password" 
+              type="password" 
+              required 
+              formControlName="password"
+              placeholder="Escribe tu contraseña aquí"
+              class="w-full bg-accent border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all">
+          </div>
+        </form>
+      </div>
+
+      <!-- Submit button -->
+      <button 
+        type="submit"
+        (click)="submit()"
+        class="w-full bg-white hover:bg-white/90 text-[#0098A8] font-bold text-base h-12 
+               rounded-lg shadow-lg transition-all duration-200">
+        Crear cuenta
+      </button>
+
+      <!-- Login link -->
+      <p class="text-center text-sm text-white mt-6">
+        ¿Ya tienes una cuenta?
+        <a routerLink="/auth/login" class="font-medium text-[#C8D900] hover:underline ml-1">
+          Inicia sesión aquí
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,268 @@
+[
+  {
+    "Nombre de la Función": "actualizar_estado_mensajero",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "calculate_cotizacion_totals",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "cleanup_old_notifications",
+    "Argumentos": "",
+    "Tipo de Retorno": "integer",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "generate_numero_cotizacion",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "generate_numero_hoja",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "get_unread_messages_count",
+    "Argumentos": "p_user_id uuid, p_cirugia_id uuid",
+    "Tipo de Retorno": "integer",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "get_unread_notifications_count",
+    "Argumentos": "p_user_id uuid",
+    "Tipo de Retorno": "integer",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "log_cotizacion_estado_change",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "mark_all_notifications_read",
+    "Argumentos": "p_user_id uuid",
+    "Tipo de Retorno": "void",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "mark_messages_as_read",
+    "Argumentos": "p_cirugia_id uuid, p_user_id uuid",
+    "Tipo de Retorno": "void",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "notify_cirugia_status_change",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "notify_kit_status_change",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "update_cotizacion_updated_at",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "update_hoja_gasto_totals",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "update_kit_productos_limpieza_updated_at",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "update_mensajes_cirugia_updated_at",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  },
+  {
+    "Nombre de la Función": "update_updated_at_column",
+    "Argumentos": "",
+    "Tipo de Retorno": "TRIGGER",
+    "Lenguaje": "plpgsql",
+    "Volatilidad": "VOLATILE"
+  }
+]
+
+
+  {
+    "Nombre del Trigger": "trigger_cirugia_status_change",
+    "Tabla": "cirugias",
+    "Timing": "AFTER",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "notify_cirugia_status_change",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "update_clientes_updated_at",
+    "Tabla": "clientes",
+    "Timing": "BEFORE",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "update_updated_at_column",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_calculate_cotizacion_totals",
+    "Tabla": "cotizacion_items",
+    "Timing": "AFTER",
+    "Evento": "INSERT",
+    "Nivel": "ROW",
+    "Función Asociada": "calculate_cotizacion_totals",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_generate_numero_cotizacion",
+    "Tabla": "cotizaciones",
+    "Timing": "BEFORE",
+    "Evento": "INSERT",
+    "Nivel": "ROW",
+    "Función Asociada": "generate_numero_cotizacion",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_log_cotizacion_estado_change",
+    "Tabla": "cotizaciones",
+    "Timing": "AFTER",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "log_cotizacion_estado_change",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_update_cotizacion_updated_at",
+    "Tabla": "cotizaciones",
+    "Timing": "BEFORE",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "update_cotizacion_updated_at",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trg_actualizar_estado_mensajero",
+    "Tabla": "envios",
+    "Timing": "AFTER",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "actualizar_estado_mensajero",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_update_hoja_gasto_totals",
+    "Tabla": "hoja_gasto_items",
+    "Timing": "AFTER",
+    "Evento": "INSERT",
+    "Nivel": "ROW",
+    "Función Asociada": "update_hoja_gasto_totals",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_update_hoja_gasto_totals_delete",
+    "Tabla": "hoja_gasto_items",
+    "Timing": "AFTER",
+    "Evento": "DELETE",
+    "Nivel": "ROW",
+    "Función Asociada": "update_hoja_gasto_totals",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_update_hoja_gasto_totals_insert",
+    "Tabla": "hoja_gasto_items",
+    "Timing": "AFTER",
+    "Evento": "INSERT",
+    "Nivel": "ROW",
+    "Función Asociada": "update_hoja_gasto_totals",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_update_hoja_gasto_totals_update",
+    "Tabla": "hoja_gasto_items",
+    "Timing": "AFTER",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "update_hoja_gasto_totals",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_generate_numero_hoja",
+    "Tabla": "hojas_gasto",
+    "Timing": "BEFORE",
+    "Evento": "INSERT",
+    "Nivel": "ROW",
+    "Función Asociada": "generate_numero_hoja",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_update_kit_productos_limpieza_updated_at",
+    "Tabla": "kit_productos_limpieza",
+    "Timing": "BEFORE",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "update_kit_productos_limpieza_updated_at",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_kit_status_change",
+    "Tabla": "kits_cirugia",
+    "Timing": "AFTER",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "notify_kit_status_change",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "trigger_update_mensajes_cirugia_updated_at",
+    "Tabla": "mensajes_cirugia",
+    "Timing": "BEFORE",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "update_mensajes_cirugia_updated_at",
+    "Habilitado": "O"
+  },
+  {
+    "Nombre del Trigger": "update_profiles_updated_at",
+    "Tabla": "profiles",
+    "Timing": "BEFORE",
+    "Evento": "UPDATE",
+    "Nivel": "ROW",
+    "Función Asociada": "update_updated_at_column",
+    "Habilitado": "O"
+  }
+]

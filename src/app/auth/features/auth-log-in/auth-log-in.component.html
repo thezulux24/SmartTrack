@@ -1,0 +1,113 @@
+<div class="font-neo relative min-h-screen bg-white overflow-hidden">
+  <!-- Ola superior con gradiente -->
+  <div class="absolute top-0 left-0 right-0 h-24 md:h-32">
+    <svg viewBox="0 0 1440 120" class="w-full h-full" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(85)">
+          <stop offset="0%" stop-color="#0098A8" />
+          <stop offset="100%" stop-color="#10284C" />
+        </linearGradient>
+      </defs>
+      <path d="M0,0 L1440,0 L1440,80 Q1080,120 720,80 Q360,40 0,80 Z" fill="url(#waveGradient)" />
+    </svg>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="relative flex items-center justify-center min-h-screen px-6 py-10">
+    <div class="w-full max-w-md">
+      <!-- Logo y header -->
+      <div class="flex flex-col items-center text-center mb-8">
+        <div class="mb-4">
+    <img src="logo.webp"
+      alt="Implameq" 
+      class="w-48 h-auto">
+        </div>
+        <p class="text-sm text-gray-500 mb-6">Implantes médico - Quirúrgicos</p>
+        <h1 class="text-2xl font-semibold text-heading">Inicio de sesión</h1>
+      </div>
+
+      <!-- Tarjeta del formulario -->
+      <div class="bg-white border-2 border-heading/20 rounded-3xl shadow-lg p-8">
+        <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+          <!-- Email field -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-semibold text-heading">
+              Correo electrónico
+            </label>
+            <input 
+              id="email" 
+              type="email" 
+              required 
+              formControlName="email"
+              placeholder="Ingresa tu correo electrónico"
+              class="w-full bg-gray-100 border border-gray-300 rounded-lg h-11 px-3 text-sm 
+                     placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand 
+                     transition-all">
+          </div>
+
+          <!-- Password field -->
+          <div class="space-y-2">
+            <label for="password" class="block text-sm font-semibold text-heading">
+              Contraseña
+            </label>
+            <input 
+              id="password" 
+              type="password" 
+              required 
+              formControlName="password"
+              placeholder="Ingresa tu contraseña"
+              class="w-full bg-gray-100 border border-gray-300 rounded-lg h-11 px-3 text-sm 
+                     placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand focus:border-brand 
+                     transition-all">
+          </div>
+
+          <!-- Remember me y forgot password -->
+          <div class="flex items-center justify-between pt-1">
+            <div class="flex items-center space-x-2">
+              <input 
+                id="remember" 
+                type="checkbox"
+                class="h-4 w-4 rounded border-gray-400 text-brand focus:ring-brand cursor-pointer">
+              <label for="remember" class="text-sm text-gray-600 cursor-pointer select-none">
+                Recuérdame
+              </label>
+            </div>
+            <a href="#" class="text-sm font-medium text-brand hover:underline">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <!-- Submit button -->
+          <button 
+            type="submit"
+            class="w-full bg-accent hover:bg-[#B5C600] text-heading font-bold text-sm h-11 
+                   rounded-lg shadow-md transition-all duration-200 hover:shadow-lg 
+                   focus:outline-none focus:ring-4 focus:ring-accent/40">
+            Iniciar de sesión
+          </button>
+
+          <!-- Sign up link -->
+          <p class="text-center text-sm text-gray-600 pt-2">
+            ¿No tienes cuenta aún?
+            <a routerLink="/auth/sign-up" class="font-medium text-brand hover:underline ml-1">
+              Regístrate aquí
+            </a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ola inferior con gradiente -->
+  <div class="absolute bottom-0 left-0 right-0 h-32 md:h-40">
+    <svg viewBox="0 0 1440 120" class="w-full h-full" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="waveGradientBottom" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(85)">
+          <stop offset="0%" stop-color="#0098A8" />
+          <stop offset="100%" stop-color="#10284C" />
+        </linearGradient>
+      </defs>
+      <path d="M0,120 L0,40 Q360,0 720,40 Q1080,80 1440,40 L1440,120 Z" fill="url(#waveGradientBottom)" />
+    </svg>
+  </div>
+</div>

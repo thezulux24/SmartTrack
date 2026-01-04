@@ -1,0 +1,365 @@
+<div class="min-h-screen bg-white">
+  <!-- Loading state -->
+  <div *ngIf="loading()" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="animate-pulse space-y-4">
+        <div class="h-4 bg-gray-200 rounded w-64 mx-auto"></div>
+        <div class="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
+      </div>
+      <p class="text-sm text-gray-500 mt-4">Cargando cirugías...</p>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!loading() && error()" class="flex items-center justify-center min-h-screen px-4">
+    <div class="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+      <div class="text-red-600">
+        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+          </path>
+        </svg>
+        <p class="text-lg">{{ error() }}</p>
+      </div>
+      <button type="button" (click)="loadData()"
+              class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium">
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div *ngIf="!loading() && !error()">
+    <div class="relative">
+      <!-- Diagonal navy background -->
+      <div class="absolute top-0 left-0 w-full bg-[#10284C]" 
+           style="height: 720px; clip-path: polygon(0 0, 100% 0, 100% 60%, 0 90%);"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <!-- Top bar -->
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <img src="logo.webp" 
+                   alt="Implameq" 
+                   class="h-8 brightness-0 invert">
+            </div>
+            <div class="flex items-center space-x-3">
+              <button [routerLink]="['/internal']"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button [routerLink]="['/internal/agenda/calendario']"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#C8D900] mb-2">Agenda</h1>
+            <p class="text-white/90 text-sm">Cirugías y programa cirugías</p>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ cirugiasProgramadas().toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Cirugías programadas</div>
+            </div>
+
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ cirugiasCurso().toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Cirugías en curso</div>
+            </div>
+
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ cirugiasFcompletadas().toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Cirugías completadas</div>
+            </div>
+
+            <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+              <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                {{ cirugiaUrgencia().toString().padStart(2, '0') }}
+              </div>
+              <div class="text-white text-sm">Urgencias</div>
+            </div>
+          </div>
+
+          <!-- Nueva Cirugía Button -->
+          <button [routerLink]="['/internal/agenda/nueva']"
+                  class="w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold py-4 rounded-2xl shadow-lg transition-colors">
+            + Nueva Cirugía
+          </button>
+
+          <!-- Filtros Section -->
+          <div class="bg-[#0098A8] rounded-2xl p-5 mt-6 shadow-lg">
+            <h3 class="text-[#10284C] font-bold text-lg mb-4">Filtros</h3>
+            <div class="space-y-4">
+              <!-- Search -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Buscar</label>
+                <div class="relative">
+                  <input type="text"
+                         [value]="searchTerm()"
+                         (input)="onSearchChange($event)"
+                         placeholder="Cliente, hospital, médico..."
+                         class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Estado -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Estado</label>
+                <select [value]="selectedEstado()"
+                        (change)="onEstadoChange($event)"
+                        class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <option value="">Todos los estados</option>
+                  <option value="programada">Programada</option>
+                  <option value="en_curso">En Curso</option>
+                  <option value="completada">Completada</option>
+                  <option value="cancelada">Cancelada</option>
+                  <option value="urgencia">Urgencia</option>
+                </select>
+              </div>
+
+              <!-- Fecha -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Fecha</label>
+                <div class="relative">
+                  <input type="date"
+                         [value]="selectedFecha()"
+                         (change)="onFechaChange($event)"
+                         class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60 pointer-events-none"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de Vista (Lista/Calendario) -->
+          <div class="bg-[#0098A8]/30 backdrop-blur-sm rounded-xl p-1 border border-white/20 mt-6 flex">
+            <button (click)="setViewMode('list')" 
+                    [class]="viewMode() === 'list' ? 'bg-[#C8D900] text-[#10284C] shadow-lg' : 'text-white/70 hover:text-white'"
+                    class="flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all">
+              Lista
+            </button>
+            <button (click)="setViewMode('calendar')" 
+                    [class]="viewMode() === 'calendar' ? 'bg-[#C8D900] text-[#10284C] shadow-lg' : 'text-white/70 hover:text-white'"
+                    class="flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all">
+              Calendario
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista de Calendario Mensual -->
+    <div *ngIf="viewMode() === 'calendar'" class="px-4 pb-8">
+      <div class="max-w-4xl mx-auto">
+        <!-- Navegación del Mes -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl mb-6">
+          <div class="flex items-center justify-between">
+            <button (click)="previousMonth()" 
+                    class="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-[#C8D900] text-center">
+              {{ currentMonthLabel() }}
+            </h2>
+            <button (click)="nextMonth()" 
+                    class="p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Calendario -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl overflow-hidden">
+          <!-- Encabezados de días -->
+          <div class="grid grid-cols-7 bg-[#0098A8]/40">
+            <div *ngFor="let day of weekDays" class="p-2 text-center">
+              <span class="text-xs font-semibold text-white">{{ day }}</span>
+            </div>
+          </div>
+          
+          <!-- Días del calendario -->
+          <div class="grid grid-cols-7">
+            <div *ngFor="let calendarDay of calendarDays()" 
+                 [class]="calendarDay.isCurrentMonth ? 'bg-[#0098A8]/10' : 'bg-[#10284C]/50'"
+                 class="min-h-[80px] p-1 border-b border-r border-white/10">
+              <div [class]="calendarDay.isToday ? 'bg-[#C8D900] text-[#10284C] font-bold' : 
+                           calendarDay.isCurrentMonth ? 'text-white' : 'text-white/40'"
+                   class="text-xs mb-1 w-6 h-6 flex items-center justify-center rounded">
+                {{ calendarDay.date.getDate() }}
+              </div>
+              
+              <!-- Cirugías del día -->
+              <div class="space-y-1">
+                <button *ngFor="let cirugia of calendarDay.events" 
+                        (click)="navigateToCirugia(cirugia)"
+                        [class]="getUrgenciaClass(cirugia)"
+                        class="w-full text-left px-2 py-1 rounded text-xs border truncate transition-colors">
+                  <div class="font-medium truncate">{{ getClienteNombre(cirugia) }}</div>
+                  <div class="truncate">{{ cirugia.hora_inicio || 'Sin hora' }}</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- White background section (Lista) -->
+    <div *ngIf="viewMode() === 'list'" class="px-4 pb-8">
+      <div class="max-w-lg mx-auto">
+        <!-- Surgery Cards -->
+        <div class="space-y-4">
+          <div *ngFor="let cirugia of filteredCirugias()" 
+               class="bg-white rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]">
+            <!-- Card Header -->
+            <div class="p-4 border-b-2 border-[#0098A8]/30">
+              <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center space-x-2 flex-wrap gap-2">
+                  <h3 class="text-lg font-bold text-[#10284C]">{{ cirugia.numero_cirugia }}</h3>
+                  <span [class]="getEstadoBadgeClass(cirugia.estado)"
+                        class="px-3 py-1 rounded-full text-xs font-medium">
+                    {{ getEstadoLabel(cirugia.estado) }}
+                  </span>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm text-gray-600">{{ formatFecha(cirugia.fecha_programada) }}</p>
+                  <p *ngIf="cirugia.hora_inicio" class="text-sm font-medium text-[#10284C]">
+                    {{ cirugia.hora_inicio }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Content -->
+            <div class="p-4 space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <p class="text-xs text-gray-500 mb-1">Hospital</p>
+                  <p class="text-sm font-medium text-[#10284C]">{{ getHospitalNombre(cirugia) }}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500 mb-1">Médico</p>
+                  <p class="text-sm font-medium text-[#10284C]">{{ cirugia.medico_cirujano }}</p>
+                </div>
+              </div>
+
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Tipo de Cirugía</p>
+                <p class="text-sm font-medium text-[#10284C]">{{ getTipoCirugiaNombre(cirugia) }}</p>
+              </div>
+
+              <div>
+                <p class="text-xs text-gray-500 mb-1">Cliente</p>
+                <p class="text-sm font-medium text-[#10284C]">{{ getClienteNombre(cirugia) }}</p>
+              </div>
+
+              <div *ngIf="cirugia.tecnico_asignado">
+                <p class="text-xs text-gray-500 mb-1">Técnico Asignado</p>
+                <p class="text-sm font-medium text-[#10284C]">{{ cirugia.tecnico_asignado.full_name }}</p>
+              </div>
+
+              <div *ngIf="cirugia.notas" class="border-t-2 border-[#0098A8]/30 pt-3">
+                <p class="text-xs text-gray-500 mb-1">Notas</p>
+                <p class="text-sm text-gray-700">{{ cirugia.notas }}</p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="space-y-2 pt-3">
+                <button [routerLink]="['/internal/agenda/detalle', cirugia.id]"
+                        class="w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold py-3 rounded-xl transition-colors">
+                  Ver Detalle Completo
+                </button>
+                <div class="grid grid-cols-3 gap-2">
+                  <button [routerLink]="['/internal/agenda/editar', cirugia.id]"
+                          class="bg-[#10284C] hover:bg-[#10284C]/90 text-white font-medium py-2.5 rounded-xl transition-colors">
+                    Editar
+                  </button>
+                  <button (click)="cambiarEstado(cirugia)"
+                          [disabled]="cirugia.estado === 'completada' || cirugia.estado === 'cancelada'"
+                          class="bg-[#10284C] hover:bg-[#10284C]/90 disabled:bg-gray-400 disabled:cursor-not-allowed text-[#C8D900] font-medium py-2.5 rounded-xl transition-colors">
+                    Estado
+                  </button>
+                  <button [routerLink]="['/internal/chat', cirugia.id]"
+                          class="bg-[#0098A8] hover:bg-[#0098A8]/90 text-white font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    Chat
+                  </button>
+                </div>
+                <!-- Kit Button -->
+                <button (click)="onManejarKit(cirugia.id)"
+                        [class]="tieneKit(cirugia.id) 
+                          ? 'w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center'
+                          : 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center'">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path *ngIf="!tieneKit(cirugia.id)" 
+                          stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    <path *ngIf="tieneKit(cirugia.id)" 
+                          stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  {{ tieneKit(cirugia.id) ? 'Ver Kit' : 'Crear Kit' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No results -->
+        <div *ngIf="filteredCirugias().length === 0" 
+             class="bg-white rounded-2xl border-2 border-[#0098A8] p-8 text-center shadow-lg">
+          <div class="text-4xl mb-4">📅</div>
+          <h3 class="text-lg font-bold text-[#10284C] mb-2">No se encontraron cirugías</h3>
+          <p class="text-gray-600 mb-4">Intenta ajustar los filtros de búsqueda</p>
+          <button [routerLink]="['/internal/agenda/nueva']"
+                  class="bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold px-6 py-3 rounded-xl transition-colors">
+            Programar Primera Cirugía
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Diálogo de cambio de estado -->
+<app-estado-dialog
+  [isOpen]="showEstadoDialog()"
+  [currentStatus]="cirugiaSeleccionada()?.estado || ''"
+  (close)="closeEstadoDialog()"
+  (statusChange)="onCambioEstadoCirugia($event)">
+</app-estado-dialog>

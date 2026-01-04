@@ -1,0 +1,405 @@
+<div class="min-h-screen bg-white">
+  <!-- Main content -->
+  <div>
+    <div class="relative">
+      <!-- Diagonal navy background -->
+      <div class="absolute top-0 left-0 w-full bg-[#10284C] z-0" 
+           style="height: 540px; clip-path: polygon(0 0, 100% 0, 100% 90%, 0 60%);"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <!-- Top bar -->
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <img src="logo.webp" 
+                   alt="Implameq" 
+                   class="h-8 brightness-0 invert">
+            </div>
+            <div class="flex items-center space-x-3">
+              <button (click)="volverAtras()"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </button>
+              <button (click)="recargarDatos()"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#C8D900] mb-2">Movimientos de Inventario</h1>
+            <p class="text-white/90 text-sm">Historial de entradas, salidas y transferencias</p>
+          </div>
+
+          <!-- Exportar Button -->
+          <button (click)="exportarMovimientos()"
+                  class="w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-extrabold py-4.5 rounded-2xl shadow-lg transition-colors mb-6">
+            Exportar Movimientos
+          </button>
+
+          <!-- Loading state -->
+          @if (loading()) {
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+              <div class="animate-pulse space-y-4">
+                <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              </div>
+              <p class="text-sm text-gray-500 mt-4">Cargando movimientos...</p>
+            </div>
+          } @else {
+
+            <!-- Mensaje de error -->
+            @if (error()) {
+              <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+                <div class="text-red-600">
+                  <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                    </path>
+                  </svg>
+                  <p class="text-lg font-bold text-[#10284C] mb-2">Error al cargar datos</p>
+                  <p class="text-sm text-gray-600">{{ error() }}</p>
+                </div>
+                <button (click)="recargarDatos()" 
+                        class="mt-6 w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold px-6 py-3 rounded-xl transition-colors">
+                  Reintentar
+                </button>
+              </div>
+            }
+
+            <!-- Estadísticas rápidas -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+                <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                  {{ stats().totalMovimientos.toString().padStart(2, '0') }}
+                </div>
+                <div class="text-white text-sm">Total movimientos</div>
+              </div>
+
+              <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+                <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                  {{ stats().entradasHoy.toString().padStart(2, '0') }}
+                </div>
+                <div class="text-white text-sm">Entradas hoy</div>
+              </div>
+
+              <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+                <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                  {{ stats().salidasHoy.toString().padStart(2, '0') }}
+                </div>
+                <div class="text-white text-sm">Salidas hoy</div>
+              </div>
+
+              <div class="bg-[#0098A8] rounded-2xl p-4 shadow-lg">
+                <div class="text-3xl font-bold text-[#C8D900] mb-1">
+                  {{ stats().productosAfectados.toString().padStart(2, '0') }}
+                </div>
+                <div class="text-white text-sm">Productos afectados</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+      <div class="px-4 pb-6">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-[#0098A8] rounded-2xl p-5 shadow-lg">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-[#10284C] font-bold text-lg">Filtros de Búsqueda</h3>
+              <button (click)="limpiarFiltros()" 
+                      class="text-sm text-white font-medium hover:text-white/80">
+                Limpiar
+              </button>
+            </div>
+
+            <form [formGroup]="filtrosForm" class="space-y-4">
+              <!-- Rango de fechas -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[#10284C] text-sm mb-2 font-medium">Fecha desde</label>
+                  <input type="date" 
+                         formControlName="fecha_desde"
+                         class="w-full px-3 py-2 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50 text-sm">
+                </div>
+                
+                <div>
+                  <label class="block text-[#10284C] text-sm mb-2 font-medium">Fecha hasta</label>
+                  <input type="date" 
+                         formControlName="fecha_hasta"
+                         class="w-full px-3 py-2 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50 text-sm">
+                </div>
+              </div>
+
+              <!-- Búsqueda -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Buscar</label>
+                <div class="relative">
+                  <input type="text" 
+                         formControlName="search"
+                         placeholder="Producto, usuario, motivo..."
+                         class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Tipo de movimiento -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Tipo de movimiento</label>
+                <select formControlName="tipo"
+                        class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <option value="">Todos los tipos</option>
+                  @for (tipo of tiposMovimiento; track tipo.value) {
+                    <option [value]="tipo.value">{{ tipo.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Producto específico -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Producto específico</label>
+                <select formControlName="producto_id"
+                        class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <option value="">Todos los productos</option>
+                  @for (producto of productos(); track producto.id) {
+                    <option [value]="producto.id">{{ producto.codigo }} - {{ producto.nombre }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Ubicación -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Ubicación</label>
+                <select formControlName="ubicacion"
+                        class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <option value="">Todas las ubicaciones</option>
+                  
+                  @for (ubicacion of ubicacionesOrganizadas.ubicaciones; track ubicacion.value) {
+                    <option [value]="ubicacion.value" class="bg-[#10284C]">{{ ubicacion.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Resultado del filtro -->
+              <div class="text-center pt-2 border-t border-white/20">
+                <div class="bg-[#C8D900] text-[#10284C] font-extrabold text-sm py-2 rounded-xl">
+                  {{ filteredMovimientos().length }} Movimientos Encontrados
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen por tipo -->
+      @if (filteredMovimientos().length > 0) {
+        <div class="px-4 pb-6">
+          <div class="max-w-lg mx-auto">
+            <div class="bg-[#10284C] rounded-2xl shadow-lg p-5">
+              <h3 class="text-lg font-bold text-[#C8D900] mb-1">Resumen por Tipo</h3>
+              <div class="h-0.5 w-full bg-[#CBDD00] rounded mb-4"></div>
+              <div class="grid grid-cols-2 gap-4">
+                @for (tipoData of getMovimientosPorTipo(); track tipoData.tipo) {
+                  <div class="text-center p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div class="text-2xl font-extrabold" [class]="tipoData.info.color">{{ tipoData.cantidad }}</div>
+                    <div class="text-xs text-white/80 mt-1 font-medium">{{ tipoData.info.label }}</div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Lista de movimientos -->
+      @if (filteredMovimientos().length > 0) {
+        <div class="px-4 pb-6">
+          <div class="max-w-lg mx-auto space-y-6">
+          @for (movimiento of filteredMovimientos(); track movimiento.id) {
+            <article class="bg-white rounded-2xl shadow-[0_10px_20px_rgba(16,40,76,0.08)] border-2 border-[#0098A8] overflow-hidden">
+              
+              <!-- Header del movimiento -->
+              <header class="p-5 border-b border-[#E5EEF1]">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h3 class="font-extrabold text-[#10284C] text-xl leading-tight">
+                      {{ getTipoInfo(movimiento.tipo).label }}
+                    </h3>
+                    <p class="text-xs text-gray-500 mt-1 tracking-wide">
+                      {{ formatFecha(movimiento.created_at) }}
+                    </p>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-extrabold" [class]="getTipoInfo(movimiento.tipo).color">
+                      {{ movimiento.tipo === 'salida' ? '-' : '+' }}{{ movimiento.cantidad }}
+                    </div>
+                    <div class="text-xs text-gray-500 font-medium">
+                      unidades
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-3 h-0.5 w-full bg-[#CBDD00] rounded"></div>
+              </header>
+
+              <!-- Contenido del movimiento -->
+              <section class="p-5">
+                <!-- Información del producto -->
+                <div class="flex justify-between items-start gap-3 mb-4">
+                  <div class="flex-1">
+                    <div class="font-extrabold text-[#10284C] text-lg leading-tight">
+                      {{ movimiento.producto?.nombre || 'Producto no encontrado' }}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1 tracking-wide">
+                      {{ movimiento.producto?.codigo }}
+                    </p>
+                  </div>
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#0098A8]/10 text-[#0098A8]">
+                    {{ movimiento.producto?.categoria | titlecase }}
+                  </span>
+                </div>
+                
+                <div class="h-0.5 w-full bg-[#CBDD00]/70 rounded mb-4"></div>
+
+                <!-- Ubicaciones -->
+                @if (movimiento.ubicacion_origen || movimiento.ubicacion_destino) {
+                  <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-3">
+                      @if (movimiento.ubicacion_origen) {
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                          <div class="text-xs font-bold text-gray-500 mb-1">Origen</div>
+                          <div class="text-sm text-[#10284C] font-semibold">
+                            {{ formatUbicacion(movimiento.ubicacion_origen) }}
+                          </div>
+                        </div>
+                      }
+                      @if (movimiento.ubicacion_destino) {
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                          <div class="text-xs font-bold text-gray-500 mb-1">Destino</div>
+                          <div class="text-sm text-[#10284C] font-semibold">
+                            {{ formatUbicacion(movimiento.ubicacion_destino) }}
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Motivo y observaciones -->
+                @if (movimiento.motivo || movimiento.observaciones) {
+                  <div class="mb-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    @if (movimiento.motivo) {
+                      <div class="mb-2">
+                        <div class="text-xs font-bold text-gray-500 mb-1">Motivo</div>
+                        <div class="text-sm text-[#10284C]">{{ movimiento.motivo }}</div>
+                      </div>
+                    }
+                    @if (movimiento.observaciones) {
+                      <div>
+                        <div class="text-xs font-bold text-gray-500 mb-1">Observaciones</div>
+                        <div class="text-sm text-[#10284C]">{{ movimiento.observaciones }}</div>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Información adicional -->
+                <div class="mb-4 pt-3 border-t border-[#CBDD00]/30 flex justify-between items-center text-xs">
+                  <div class="text-gray-600">
+                    <span class="font-bold">Realizado por:</span> {{ movimiento.usuario?.full_name || 'Usuario no encontrado' }}
+                  </div>
+                  @if (movimiento.referencia) {
+                    <div class="font-mono text-[#0098A8] font-bold text-sm">
+                      {{ movimiento.referencia }}
+                    </div>
+                  }
+                </div>
+
+                <!-- Información de lote y vencimiento -->
+                @if (movimiento.lote || movimiento.fecha_vencimiento) {
+                  <div class="pt-3 border-t border-[#CBDD00]/30">
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                      @if (movimiento.lote) {
+                        <div class="bg-gray-50 p-2 rounded border border-gray-200">
+                          <span class="font-bold text-gray-500">Lote:</span>
+                          <span class="text-[#10284C] ml-1 font-semibold">{{ movimiento.lote }}</span>
+                        </div>
+                      }
+                      @if (movimiento.fecha_vencimiento) {
+                        <div class="bg-gray-50 p-2 rounded border border-gray-200">
+                          <span class="font-bold text-gray-500">Vencimiento:</span>
+                          <span class="text-[#10284C] ml-1 font-semibold">{{ formatFechaCorta(movimiento.fecha_vencimiento) }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </section>
+            </article>
+          }
+          </div>
+        </div>
+      } @else {
+        <!-- Sin resultados -->
+        <div class="px-4 pb-6">
+          <div class="max-w-lg mx-auto">
+            <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
+              <div class="text-gray-400 mb-6">
+                <svg class="w-20 h-20 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="text-lg font-bold text-[#10284C] mb-2">No se encontraron movimientos</h3>
+                <p class="text-gray-500">Intenta ajustar los filtros de búsqueda</p>
+              </div>
+              <button (click)="recargarDatos()"
+                      class="w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold px-6 py-3 rounded-xl transition-colors">
+                Recargar movimientos
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Productos más movidos -->
+      @if (getProductosMasMovidos().length > 0) {
+        <div class="px-4 pb-6">
+          <div class="max-w-lg mx-auto">
+            <div class="bg-[#10284C] rounded-2xl shadow-lg p-5">
+              <h3 class="text-lg font-bold text-[#C8D900] mb-1">Productos con Más Movimientos</h3>
+              <div class="h-0.5 w-full bg-[#CBDD00] rounded mb-4"></div>
+              <div class="space-y-3">
+                @for (producto of getProductosMasMovidos(); track producto.codigo) {
+                  <div class="flex justify-between items-center p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div class="flex-1">
+                      <div class="font-extrabold text-white">{{ producto.producto }}</div>
+                      <div class="text-sm text-white/70">{{ producto.codigo }}</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="font-extrabold text-[#C8D900] text-2xl">{{ producto.cantidad }}</div>
+                      <div class="text-xs text-white/70">movimientos</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Bottom spacing para móvil -->
+      <div class="px-4 pb-6">
+        <div class="h-6"></div>
+      </div>
+  </div>
+</div>

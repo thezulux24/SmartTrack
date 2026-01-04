@@ -1,0 +1,173 @@
+/* Animaciones suaves sin movimiento */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Aplicar animación de entrada a las tarjetas */
+.grid > div {
+  animation: fadeIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+/* Efecto hover mejorado para tarjetas - SIN MOVIMIENTO */
+.grid > div[class*="cursor-pointer"] {
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.grid > div[class*="cursor-pointer"]:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Efecto de brillo en los números principales - SIN CAMBIO EN HOVER */
+.text-3xl,
+.text-2xl {
+  text-shadow: 0 0 10px rgba(200, 217, 0, 0.2);
+}
+
+/* Efecto de shimmer para el loading */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilo para la frase motivacional - SIN ANIMACIÓN */
+.bg-gradient-to-r {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mejorar los botones de acceso rápido - SIN MOVIMIENTO */
+button[class*="group"] {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button[class*="group"]:hover {
+  box-shadow: 0 10px 15px -3px rgba(200, 217, 0, 0.2);
+}
+
+button[class*="group"]:active {
+  opacity: 0.8;
+}
+
+/* Efecto de glass morphism mejorado */
+[class*="backdrop-blur"] {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Animación para las barras de progreso (si se agregan) */
+@keyframes growWidth {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Header sin animación */
+header {
+  position: relative;
+  background: linear-gradient(135deg, #10284C 0%, #0098A8 100%);
+}
+
+/* Mejorar la legibilidad en móvil */
+@media (max-width: 768px) {
+  .text-3xl {
+    font-size: 2rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  .grid {
+    gap: 1rem;
+  }
+}
+
+/* Efecto hover para las secciones de estado - SIN MOVIMIENTO */
+.space-y-3 > div {
+  transition: background-color 0.3s ease;
+}
+
+/* Logo sin animación */
+header img {
+  transition: opacity 0.3s;
+}
+
+header img:hover {
+  opacity: 0.9;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(16, 40, 76, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 152, 168, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 152, 168, 0.7);
+}
+
+/* Efecto de enfoque mejorado */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #C8D900;
+  outline-offset: 2px;
+}
+
+/* Error state sin animación */
+
+/* Transiciones suaves para cambios de estado */
+* {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Efecto de resplandor en tarjetas importantes */
+.bg-\[\#C8D900\]\/20 {
+  box-shadow: 0 0 20px rgba(200, 217, 0, 0.15);
+}
+
+.bg-\[\#0098A8\]\/20 {
+  box-shadow: 0 0 20px rgba(0, 152, 168, 0.15);
+}
+
+/* Animación de carga mejorada */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Fondo decorativo sin efectos */
+.absolute.inset-0 svg {
+  opacity: 0.8;
+}

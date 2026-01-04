@@ -1,0 +1,119 @@
+<section class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+  <!-- Header mejorado para móvil -->
+  <header class="bg-gradient-to-r from-lime-500 to-green-600 text-white shadow-lg">
+    <div class="px-4 py-4">
+      <!-- Top bar con logo y logout -->
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center space-x-3">
+          <img src="logo.webp" 
+               alt="Implameq" class="h-8 brightness-0 invert">
+          <span class="text-lg font-semibold">Portal Cliente</span>
+        </div>
+                <button (click)="logout()" 
+                class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md backdrop-blur-sm">
+          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          Salir
+        </button>
+      </div>
+      
+      <!-- Título principal -->
+      <div class="text-center">
+        <h1 class="text-2xl font-bold mb-1">¡Bienvenido!</h1>
+        <p class="text-lime-100 text-sm">Gestiona tus cirugías e implantes desde aquí</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="px-4 py-6">
+    <!-- Grid de opciones optimizado para móvil -->
+    <div class="max-w-lg mx-auto space-y-4">
+      
+      <!-- Próximas cirugías -->
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100">
+        <div class="flex items-start space-x-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-lime-400 to-lime-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Próximas Cirugías</h3>
+            <p class="text-sm text-lime-600 dark:text-lime-400 font-medium mb-2">3 programadas esta semana</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Ver y gestionar cirugías programadas, solicitar implantes</p>
+          </div>
+          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Inventario disponible -->
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100">
+        <div class="flex items-start space-x-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Inventario</h3>
+            <p class="text-sm text-green-600 dark:text-green-400 font-medium mb-2">Stock disponible</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Consultar disponibilidad de implantes y dispositivos</p>
+          </div>
+          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Soporte técnico -->
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100">
+        <div class="flex items-start space-x-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364"></path>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Soporte Técnico</h3>
+            <p class="text-sm text-yellow-600 dark:text-yellow-400 font-medium mb-2">Asistencia especializada</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Contactar equipo de soporte para asistencia técnica</p>
+          </div>
+          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Historial -->
+      <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 dark:border dark:border-gray-700 p-5 hover:shadow-lg transition-all duration-200 cursor-pointer border border-gray-100">
+        <div class="flex items-start space-x-4">
+          <div class="w-14 h-14 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Historial</h3>
+            <p class="text-sm text-purple-600 dark:text-purple-400 font-medium mb-2">Cirugías anteriores</p>
+            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">Revisar historial de cirugías y trazabilidad</p>
+          </div>
+          <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom spacing para móvil -->
+    <div class="h-6"></div>
+  </main>
+</section>

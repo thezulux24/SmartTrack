@@ -1,0 +1,316 @@
+<!-- Contenedor principal con fondo navy -->
+<div class="min-h-screen bg-[#10284C] relative overflow-hidden">
+  <!-- Fondo con formas SVG modernas -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+      <!-- Círculos decorativos -->
+      <circle cx="10%" cy="15%" r="120" fill="#0098A8" opacity="0.08" />
+      <circle cx="85%" cy="25%" r="150" fill="#C8D900" opacity="0.06" />
+      <circle cx="90%" cy="85%" r="100" fill="#0098A8" opacity="0.07" />
+      
+      <!-- Líneas diagonales -->
+      <line x1="0" y1="200" x2="400" y2="0" stroke="#0098A8" stroke-width="2" opacity="0.1" />
+      <line x1="100%" y1="300" x2="60%" y2="100" stroke="#C8D900" stroke-width="2" opacity="0.08" />
+      
+      <!-- Triángulos -->
+      <polygon points="200,600 250,700 150,700" fill="#0098A8" opacity="0.06" />
+      <polygon points="900,400 950,500 850,500" fill="#C8D900" opacity="0.05" />
+      
+      <!-- Rectángulos rotados -->
+      <rect x="50" y="400" width="80" height="80" fill="#0098A8" opacity="0.07" transform="rotate(45 90 440)" />
+      <rect x="80%" y="600" width="60" height="60" fill="#C8D900" opacity="0.06" transform="rotate(30 85% 630)" />
+    </svg>
+  </div>
+  
+  <!-- VISTA DE SELECCIÓN -->
+  @if (vistaActual() === 'seleccion') {
+    <!-- Header -->
+    <header class="relative z-10 bg-gradient-to-br from-[#10284C]/95 to-[#10284C]/60 backdrop-blur-md border-b border-white/10 shadow-2xl">
+      <div class="px-4 py-4">
+        <div class="flex justify-center items-center mb-3">
+          <div class="flex items-center space-x-3">
+            <img src="logo.webp" 
+                 alt="Implameq" class="h-8 brightness-0 invert">
+            <span class="text-lg font-semibold text-white">Trazabilidad</span>
+          </div>
+        </div>
+        
+        <div class="text-center">
+          <h1 class="text-2xl font-bold mb-1 text-white">Historial de Actividades</h1>
+          <p class="text-[#C8D900] text-sm">Selecciona una cirugía para ver su trazabilidad completa</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Buscador y Filtros Mejorados -->
+    <div class="relative z-10 px-4 py-6">
+      <div class="max-w-lg mx-auto">
+        <!-- Botón Volver arriba -->
+        <div class="mb-4">
+          <button (click)="volverAlMenu()" type="button"
+                  class="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg backdrop-blur-sm border border-white/20 active:scale-95 flex items-center justify-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Volver</span>
+          </button>
+        </div>
+
+        <!-- Buscador -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-4 mb-4">
+          <div class="relative">
+            <input 
+              type="text" 
+              [(ngModel)]="busqueda"
+              placeholder="Buscar por número, cliente, médico u hospital..."
+              class="w-full px-4 py-3 pl-10 bg-[#10284C]/50 border border-white/20 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-[#C8D900] focus:border-transparent transition duration-200">
+            <svg class="absolute left-3 top-3.5 w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    @if (loading()) {
+      <div class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 text-center">
+            <div class="w-12 h-12 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-sm text-white/90">Cargando cirugías...</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Lista de Cirugías -->
+    @if (!loading()) {
+      <main class="relative z-10 px-4 pb-6">
+        <div class="max-w-lg mx-auto">
+          
+          <h2 class="text-lg font-semibold text-white mb-4 flex items-center">
+            <span class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center mr-2">
+              <svg class="w-4 h-4 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </span>
+            Cirugías ({{ cirugiasFiltradas.length }})
+          </h2>
+            
+            @if (cirugiasFiltradas.length === 0) {
+              <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6 text-center">
+                <p class="text-white/70">No se encontraron cirugías</p>
+              </div>
+            } @else {
+              <div class="space-y-3">
+                @for (cirugia of cirugiasFiltradas; track cirugia.id) {
+                  <button 
+                    (click)="seleccionarCirugia(cirugia)"
+                    class="w-full bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-4 hover:bg-[#0098A8]/30 transition-all duration-200 text-left active:scale-98">
+                    <div class="flex justify-between items-start mb-2">
+                      <div class="flex-1">
+                        <h3 class="font-semibold text-white text-lg">
+                          {{ cirugia.numero_cirugia }}
+                        </h3>
+                        <p class="text-sm text-white/70">
+                          {{ obtenerNombreCliente(cirugia) }}
+                        </p>
+                        <p class="text-xs text-white/50 mt-1">
+                          {{ cirugia.medico_cirujano }}
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <span [class]="'px-2 py-1 rounded-full text-xs font-semibold ' + obtenerColorEstado(cirugia.estado)">
+                          {{ cirugia.estado | titlecase }}
+                        </span>
+                        <p class="text-xs text-white/50 mt-2">
+                          {{ formatearFecha(cirugia.fecha_programada) }}
+                        </p>
+                      </div>
+                    </div>
+                    @if (cirugia.hospital?.nombre) {
+                      <div class="flex items-center gap-1 text-xs text-white/60 mt-2">
+                        <span>📍</span>
+                        <span>{{ cirugia.hospital?.nombre }}</span>
+                      </div>
+                    }
+                  </button>
+                }
+              </div>
+            }
+
+        </div>
+      </main>
+    }
+  }
+
+  <!-- VISTA DE DETALLE -->
+  @if (vistaActual() === 'detalle') {
+    <!-- Header -->
+    <header class="relative z-10 bg-gradient-to-br from-[#10284C]/95 to-[#10284C]/60 backdrop-blur-md border-b border-white/10 shadow-2xl">
+      <div class="px-4 py-4">
+        <div class="flex justify-center items-center mb-3">
+          <div class="flex items-center space-x-3">
+            <img src="logo.webp" 
+                 alt="Implameq" class="h-8 brightness-0 invert">
+            <span class="text-lg font-semibold text-white">Historial de Actividad</span>
+          </div>
+        </div>
+        
+        <div class="text-center">
+          <h1 class="text-2xl font-bold mb-1 text-white">
+            Cirugía {{ cirugiaSeleccionada()?.numero_cirugia }}
+          </h1>
+          <p class="text-[#C8D900] text-sm">
+            {{ obtenerNombreCliente(cirugiaSeleccionada()!) }} • {{ cirugiaSeleccionada()?.medico_cirujano }}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Botón Volver arriba -->
+    <div class="relative z-10 px-4 pt-6">
+      <div class="max-w-lg mx-auto">
+        <button (click)="volver()" type="button"
+                class="w-full bg-white/10 hover:bg-white/20 text-white px-4 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg backdrop-blur-sm border border-white/20 active:scale-95 flex items-center justify-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          <span>Volver</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl p-6 text-center">
+            <div class="w-12 h-12 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-sm text-white/90">Cargando historial...</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="relative z-10 px-4 py-4">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-red-500/20 backdrop-blur-md border border-red-400/30 rounded-2xl shadow-xl px-4 py-3">
+            <p class="text-sm text-red-200">{{ error() }}</p>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Timeline de Trazabilidad -->
+    @if (!loading() && !error()) {
+      <main class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 p-6">
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center space-x-2">
+              <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <span>Historial de Actividad ({{ eventos().length }})</span>
+            </h3>
+            
+            @if (eventos().length === 0) {
+              <div class="text-center py-8">
+                <svg class="w-12 h-12 text-white/40 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-white/60">No hay actividad registrada</p>
+              </div>
+            } @else {
+              <div class="space-y-4">
+                @for (evento of eventos(); track evento.id) {
+                  <div class="border-l-4 border-[#C8D900] pl-4 py-2 bg-white/5 backdrop-blur-sm rounded-r-xl hover:bg-white/10 transition duration-200">
+                    <div class="flex items-start">
+                      <div class="text-2xl mr-3">{{ obtenerIconoAccion(evento.accion) }}</div>
+                      <div class="flex-1">
+                        <div class="flex justify-between items-start mb-1">
+                          <h4 class="font-medium text-white">
+                            {{ obtenerTextoAccion(evento.accion) }}
+                          </h4>
+                          <span class="text-xs text-white/50">
+                            {{ formatearFecha(evento.timestamp) }}
+                          </span>
+                        </div>
+                        
+                        @if (evento.estado_anterior || evento.estado_nuevo) {
+                          <div class="flex items-center gap-2 text-sm my-2">
+                            @if (evento.estado_anterior) {
+                              <span class="px-2 py-1 bg-white/10 rounded text-xs text-white/70">
+                                {{ evento.estado_anterior }}
+                              </span>
+                              <span class="text-white/50">→</span>
+                            }
+                            @if (evento.estado_nuevo) {
+                              <span class="px-2 py-1 bg-[#C8D900] text-[#10284C] rounded text-xs font-medium">
+                                {{ evento.estado_nuevo }}
+                              </span>
+                            }
+                          </div>
+                        }
+                        
+                        @if (evento.observaciones) {
+                          <p class="text-sm text-white/70 mt-2 bg-[#10284C]/30 p-2 rounded">
+                            💬 {{ evento.observaciones }}
+                          </p>
+                        }
+                        
+                        @if (evento.usuario_nombre) {
+                          <div class="flex items-center gap-2 mt-2 text-xs text-white/50">
+                            <span>👤</span>
+                            <span>{{ evento.usuario_nombre }}</span>
+                            @if (evento.usuario_rol) {
+                              <span class="px-2 py-0.5 bg-white/10 rounded">
+                                {{ evento.usuario_rol }}
+                              </span>
+                            }
+                          </div>
+                        }
+                        
+                        @if (evento.ubicacion) {
+                          <div class="flex items-center gap-1 text-xs text-white/50 mt-1">
+                            <span>📍</span>
+                            <span>{{ evento.ubicacion }}</span>
+                            @if (evento.coordenadas_lat && evento.coordenadas_lng) {
+                              <a 
+                                [href]="'https://www.google.com/maps?q=' + evento.coordenadas_lat + ',' + evento.coordenadas_lng"
+                                target="_blank"
+                                class="text-[#C8D900] hover:text-[#C8D900]/80 hover:underline ml-2">
+                                Ver en mapa
+                              </a>
+                            }
+                          </div>
+                        }
+                        
+                        @if (evento.metadata && Object.keys(evento.metadata).length > 0) {
+                          <details class="mt-2">
+                            <summary class="cursor-pointer text-xs text-white/60 hover:text-white/80">
+                              Ver detalles adicionales
+                            </summary>
+                            <div class="mt-2 p-2 bg-[#10284C]/30 rounded text-xs">
+                              <pre class="whitespace-pre-wrap text-white/70">{{ evento.metadata | json }}</pre>
+                            </div>
+                          </details>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </main>
+    }
+  }
+
+</div>

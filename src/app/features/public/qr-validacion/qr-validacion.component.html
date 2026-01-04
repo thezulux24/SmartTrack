@@ -1,0 +1,234 @@
+<div class="min-h-screen relative overflow-hidden">
+  <!-- Background Implameq -->
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-[#10284C]">
+      <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10%" cy="15%" r="120" fill="#0098A8" opacity="0.1"/>
+        <circle cx="85%" cy="25%" r="180" fill="#C8D900" opacity="0.08"/>
+        <circle cx="50%" cy="80%" r="150" fill="#0098A8" opacity="0.12"/>
+        <rect x="60%" y="5%" width="200" height="200" fill="#0098A8" opacity="0.06" transform="rotate(45 70 15)"/>
+        <rect x="15%" y="65%" width="160" height="160" fill="#C8D900" opacity="0.08" transform="rotate(30 20 70)"/>
+      </svg>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-[#10284C]/50 via-[#10284C]/80 to-[#10284C]/95"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="relative z-10 px-4 py-6">
+    <div class="max-w-4xl mx-auto space-y-6">
+      
+      <!-- Header con Logo -->
+      <div class="text-center">
+  <img src="logo.webp" 
+             alt="Implameq" 
+             class="h-12 w-auto mx-auto brightness-0 invert mb-4">
+        <h1 class="text-2xl sm:text-3xl font-bold text-[#C8D900]">Validación de Entrega</h1>
+        <p class="text-white/70 text-sm mt-2">Confirme la recepción de su kit quirúrgico</p>
+      </div>
+
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="flex justify-center items-center py-20">
+          <div class="w-16 h-16 border-4 border-[#C8D900] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (error() && !loading()) {
+        <div class="bg-red-500/20 backdrop-blur-md rounded-2xl border border-red-400/30 p-6 shadow-xl text-center">
+          <svg class="w-16 h-16 mx-auto text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-xl font-bold text-red-300 mb-2">Error</h3>
+          <p class="text-red-200">{{ error() }}</p>
+        </div>
+      }
+
+      <!-- Estado Exitoso -->
+      @if (exitoso() && !loading()) {
+        <div class="bg-green-500/20 backdrop-blur-md rounded-2xl border border-green-400/30 p-8 shadow-xl text-center">
+          <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-green-300 mb-3">¡Recepción Confirmada!</h2>
+          <p class="text-green-200 mb-6">Su kit ha sido entregado exitosamente. Recibirá una confirmación por correo electrónico.</p>
+          <p class="text-white/60 text-sm">Gracias por utilizar Implameq SmartTrack</p>
+        </div>
+      }
+
+      <!-- Formulario de Validación -->
+      @if (!loading() && !error() && !exitoso() && kit()) {
+        
+        <!-- Información del Kit -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+          <h2 class="text-xl font-bold text-[#C8D900] mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+            Información del Kit
+          </h2>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <p class="text-white/50 text-xs mb-1">Número de Kit</p>
+              <p class="text-white font-bold text-lg">{{ kit()?.numero_kit }}</p>
+            </div>
+            <div>
+              <p class="text-white/50 text-xs mb-1">Cliente</p>
+              <p class="text-white font-medium">{{ obtenerNombreCliente() }}</p>
+            </div>
+            <div>
+              <p class="text-white/50 text-xs mb-1">Hospital</p>
+              <p class="text-white font-medium">{{ obtenerNombreHospital() }}</p>
+            </div>
+            <div>
+              <p class="text-white/50 text-xs mb-1">Fecha de Cirugía</p>
+              <p class="text-white font-medium">{{ obtenerFechaCirugia() }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Productos -->
+        <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+          <h2 class="text-xl font-bold text-[#C8D900] mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+            </svg>
+            Productos Incluidos ({{ productos().length }})
+          </h2>
+
+          <div class="space-y-3 max-h-64 overflow-y-auto">
+            @for (producto of productos(); track producto.id) {
+              <div class="bg-[#10284C]/40 rounded-lg p-4 border border-white/10">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <p class="text-white font-medium">{{ producto.producto?.nombre }}</p>
+                    <p class="text-white/50 text-xs mt-1">Código: {{ producto.producto?.codigo }}</p>
+                    @if (producto.lote) {
+                      <p class="text-white/50 text-xs">Lote: {{ producto.lote }}</p>
+                    }
+                  </div>
+                  <div class="text-right ml-4">
+                    <p class="text-[#C8D900] font-bold text-lg">{{ producto.cantidad_preparada }}</p>
+                    <p class="text-white/40 text-xs">unidades</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Formulario de Validación -->
+        <form class="space-y-6">
+          
+          <!-- Datos del Receptor -->
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+            <h2 class="text-xl font-bold text-[#C8D900] mb-4 flex items-center gap-2">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              Datos del Receptor
+            </h2>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-white/80 text-sm mb-2">Nombre Completo *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="nombreReceptor"
+                  name="nombre"
+                  placeholder="Ingrese su nombre completo"
+                  required
+                  class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#C8D900] transition-colors">
+              </div>
+
+              <div>
+                <label class="block text-white/80 text-sm mb-2">Número de Cédula *</label>
+                <input 
+                  type="text" 
+                  [(ngModel)]="cedulaReceptor"
+                  name="cedula"
+                  placeholder="Ej: 1234567890"
+                  maxlength="13"
+                  required
+                  class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#C8D900] transition-colors">
+              </div>
+
+              <div>
+                <label class="block text-white/80 text-sm mb-2">Observaciones (Opcional)</label>
+                <textarea 
+                  [(ngModel)]="observaciones"
+                  name="observaciones"
+                  rows="3"
+                  placeholder="Comentarios adicionales sobre la recepción..."
+                  class="w-full px-4 py-3 bg-[#10284C]/50 border border-white/20 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-[#C8D900] resize-none transition-colors"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Firma Digital -->
+          <div class="bg-[#0098A8]/20 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-bold text-[#C8D900] flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                </svg>
+                Firma Digital *
+              </h2>
+              <button 
+                type="button"
+                (click)="limpiarFirma()"
+                class="px-3 py-1 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors text-sm">
+                Limpiar
+              </button>
+            </div>
+
+            <p class="text-white/60 text-sm mb-3">Firme en el recuadro blanco usando su dedo o mouse</p>
+            
+            <div class="bg-[#ffffff] rounded-lg p-2 border-2 border-[#C8D900]/50">
+              <canvas 
+                #firmaCanvas
+                width="600"
+                height="200"
+                (mousedown)="iniciarDibujo($event)"
+                (mousemove)="dibujar($event)"
+                (mouseup)="detenerDibujo()"
+                (mouseleave)="detenerDibujo()"
+                style="touch-action: none;"
+                class="w-full h-48 cursor-crosshair"></canvas>
+            </div>
+          </div>
+
+          <!-- Botón de Confirmación -->
+          <div class="flex justify-center pt-4">
+            <button 
+              type="button"
+              (click)="confirmarRecepcion()"
+              [disabled]="procesando()"
+              class="px-12 py-4 bg-[#C8D900] text-[#10284C] rounded-xl hover:bg-[#d4e820] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-2xl font-bold text-lg flex items-center gap-3 active:scale-95">
+              @if (procesando()) {
+                <div class="w-6 h-6 border-3 border-[#10284C] border-t-transparent rounded-full animate-spin"></div>
+                <span>Procesando...</span>
+              } @else {
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Confirmar Recepción</span>
+              }
+            </button>
+          </div>
+
+        </form>
+
+      }
+
+      <!-- Footer -->
+      <div class="text-center text-white/40 text-xs py-4">
+        <p>© {{ 2025 }} Implameq - Sistema de Trazabilidad SmartTrack</p>
+      </div>
+
+    </div>
+  </main>
+</div>

@@ -1,0 +1,584 @@
+<div class="min-h-screen bg-white relative">
+  <!-- Background Image -->
+  <div class="fixed inset-0 z-0">
+    <img src="02.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover">
+    <div class="absolute inset-0 bg-white/90"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10">
+    <!-- Header -->
+    <div class="bg-white shadow-md">
+      <div class="max-w-lg mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-3">
+            <div class="bg-white rounded-lg px-3 py-2">
+              <img src="logo.webp" 
+                   alt="Implameq" class="h-6">
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 sm:space-x-3">
+            <button [routerLink]="['/internal/agenda']"
+                    class="w-10 h-10 bg-[#10284C] rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+              </svg>
+            </button>
+            <button [routerLink]="['/internal/agenda/calendario']"
+                    class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+              <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="max-w-lg mx-auto px-4 py-6 text-center">
+      <h1 class="text-2xl sm:text-3xl font-bold text-[#10284C] mb-2">
+        {{ isEditing ? 'Editar Cirugía' : 'Programa Nueva Cirugía' }}
+      </h1>
+      <p class="text-[#10284C]/70 text-sm">
+        {{ isEditing ? 'Actualiza la información de la cirugía' : 'Completa los datos para programar la cirugía' }}
+      </p>
+    </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="px-4 py-6">
+      <div class="max-w-lg mx-auto">
+        <div class="bg-white rounded-xl shadow-md dark:bg-gray-800 p-6 text-center">
+          <div class="animate-pulse space-y-4">
+            <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+            <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+            <div class="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
+          </div>
+          <p class="text-sm text-gray-500 mt-4">Cargando datos...</p>
+        </div>
+      </div>
+    </div>
+  } @else {
+    
+    <!-- Alerts -->
+    @if (error()) {
+      <div class="px-4 py-4">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-md">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                </path>
+              </svg>
+              <div class="flex-1">
+                <p class="text-sm">{{ error() }}</p>
+              </div>
+            </div>
+            <button (click)="loadInitialData()" class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Mensaje de éxito simple (sin cirugía creada) -->
+    @if (success() && !cirugiaCreada()) {
+      <div class="px-4 py-4">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl shadow-md">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <p class="text-sm">{{ success() }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Estado de cirugía creada exitosamente con opciones -->
+    @if (cirugiaCreada()) {
+      <div class="px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-green-50 border border-green-200 rounded-xl shadow-md p-6 text-center">
+            <div class="mb-4">
+              <svg class="w-12 h-12 text-green-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-green-800 mb-2">¡Cirugía creada exitosamente!</h3>
+              <p class="text-green-700 text-sm mb-1">
+                <span class="font-medium">{{ cirugiaCreada()?.numero_cirugia }}</span>
+              </p>
+              <p class="text-green-600 text-sm">
+                {{ getClienteNombreCreada() }} - {{ cirugiaCreada()?.medico_cirujano }}
+              </p>
+            </div>
+            
+            <div class="space-y-3">
+              <p class="text-sm text-gray-700 mb-4">
+                ¿Qué te gustaría hacer ahora?
+              </p>
+              
+              <div class="space-y-2">
+                <button type="button" 
+                        (click)="onCrearKit()"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition duration-200 shadow-md">
+                  <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  Crear Kit Quirúrgico
+                </button>
+                
+                <button type="button" 
+                        (click)="onVolverAgenda()"
+                        class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 px-4 py-3 rounded-lg font-medium transition duration-200">
+                  <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                  </svg>
+                  Volver a la Agenda
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Estado de cirugía editada - Opción de crear kit -->
+    @if (isEditing && cirugiaEditada() && !tieneKit()) {
+      <div class="px-4 py-4">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl shadow-md p-4">
+            <div class="flex items-start space-x-3">
+              <svg class="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-blue-800 mb-1">Esta cirugía no tiene kit asignado</h3>
+                <p class="text-sm text-blue-700 mb-3">
+                  Para completar la preparación, puedes crear un kit quirúrgico con los productos necesarios.
+                </p>
+                <button type="button" 
+                        (click)="onCrearKit()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 shadow-md">
+                  <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                  Crear Kit Quirúrgico
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Indicador de kit existente -->
+    @if (isEditing && cirugiaEditada() && tieneKit()) {
+      <div class="px-4 py-4">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-green-50 border border-green-200 rounded-xl shadow-md p-4">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-medium text-green-800">Kit quirúrgico creado</p>
+                <p class="text-xs text-green-600">Esta cirugía ya tiene su kit asignado</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Contenido principal -->
+    @if (!cirugiaCreada()) {
+      <div class="max-w-lg mx-auto px-4 pb-8">
+        <!-- Form -->
+        <form [formGroup]="cirugiaForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        
+        <!-- Información del Cliente -->
+        <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+          <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold text-[#10284C]">Información del Cliente</h2>
+            </div>
+          </div>
+          
+          <!-- Indicador de cliente encontrado -->
+          @if (clienteEncontrado()) {
+            <div class="mb-3 p-2.5 bg-green-100 border border-green-200 rounded-lg">
+              <div class="flex items-center text-green-800">
+                <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="text-xs sm:text-sm font-medium">Cliente encontrado en el sistema</span>
+              </div>
+            </div>
+          }
+          
+          <div class="space-y-3">
+            <!-- Documento -->
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Tipo Doc *
+                </label>
+                <select
+                  formControlName="documento_tipo"
+                  class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+                  @for (tipo of documentoTipoOptions; track tipo.value) {
+                    <option [value]="tipo.value">{{ tipo.label }}</option>
+                  }
+                </select>
+              </div>
+              
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Número de Documento *
+                  @if (buscandoCliente()) {
+                    <span class="text-blue-600 text-xs ml-1">🔍</span>
+                  }
+                </label>
+                <input
+                  type="text"
+                  formControlName="documento_numero"
+                  (input)="onDocumentoChange()"
+                  [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                          (isFieldInvalid('documento_numero') ? 'border-red-300' : 'border-gray-300')"
+                  placeholder="12345678">
+                @if (isFieldInvalid('documento_numero')) {
+                  <p class="mt-1 text-xs text-red-600">{{ getFieldError('documento_numero') }}</p>
+                }
+              </div>
+            </div>
+
+            <!-- Nombres -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Nombres *
+                </label>
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                          (isFieldInvalid('nombre') ? 'border-red-300' : 'border-gray-300')"
+                  placeholder="Juan Carlos">
+                @if (isFieldInvalid('nombre')) {
+                  <p class="mt-1 text-xs text-red-600">{{ getFieldError('nombre') }}</p>
+                }
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Apellidos *
+                </label>
+                <input
+                  type="text"
+                  formControlName="apellido"
+                  [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                          (isFieldInvalid('apellido') ? 'border-red-300' : 'border-gray-300')"
+                  placeholder="Pérez García">
+                @if (isFieldInvalid('apellido')) {
+                  <p class="mt-1 text-xs text-red-600">{{ getFieldError('apellido') }}</p>
+                }
+              </div>
+            </div>
+
+            <!-- Contacto -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Teléfono
+                </label>
+                <input
+                  type="tel"
+                  formControlName="telefono"
+                  class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent"
+                  placeholder="3001234567">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  formControlName="email"
+                  [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                          (isFieldInvalid('email') ? 'border-red-300' : 'border-gray-300')"
+                  placeholder="cliente@email.com">
+                @if (isFieldInvalid('email')) {
+                  <p class="mt-1 text-xs text-red-600">{{ getFieldError('email') }}</p>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de la Cirugía -->
+        <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+          <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold text-[#10284C]">Información de la Cirugía</h2>
+            </div>
+          </div>
+          
+          <div class="p-4 space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Hospital/Clínica * 
+                <span class="text-xs text-gray-500">({{ hospitales().length }} disponibles)</span>
+              </label>
+              <select
+                formControlName="hospital_id"
+                [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                        (isFieldInvalid('hospital_id') ? 'border-red-300' : 'border-gray-300')">
+                <option value="">Seleccionar hospital...</option>
+                @for (hospital of hospitales(); track hospital.id) {
+                  <option [value]="hospital.id">{{ hospital.nombre }}@if (hospital.ciudad) { - {{ hospital.ciudad }} }</option>
+                }
+              </select>
+              @if (isFieldInvalid('hospital_id')) {
+                <p class="mt-1 text-xs text-red-600">{{ getFieldError('hospital_id') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Tipo de Cirugía * 
+                <span class="text-xs text-gray-500">({{ tiposCirugia().length }} disponibles)</span>
+              </label>
+              <select
+                formControlName="tipo_cirugia_id"
+                (change)="onTipoCirugiaChange($event)"
+                [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                        (isFieldInvalid('tipo_cirugia_id') ? 'border-red-300' : 'border-gray-300')">
+                <option value="">Seleccionar tipo...</option>
+                @for (tipo of tiposCirugia(); track tipo.id) {
+                  <option [value]="tipo.id">{{ tipo.nombre }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('tipo_cirugia_id')) {
+                <p class="mt-1 text-xs text-red-600">{{ getFieldError('tipo_cirugia_id') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Médico Cirujano *
+              </label>
+              <input
+                type="text"
+                formControlName="medico_cirujano"
+                [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                        (isFieldInvalid('medico_cirujano') ? 'border-red-300' : 'border-gray-300')"
+                placeholder="Dr. Roberto Silva">
+              @if (isFieldInvalid('medico_cirujano')) {
+                <p class="mt-1 text-xs text-red-600">{{ getFieldError('medico_cirujano') }}</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Programación -->
+        <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+          <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold text-[#10284C]">Programación</h2>
+            </div>
+          </div>
+          
+          <div class="p-4 space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Fecha Programada *
+              </label>
+              <input
+                type="date"
+                formControlName="fecha_programada"
+                [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                        (isFieldInvalid('fecha_programada') ? 'border-red-300' : 'border-gray-300')">
+              @if (isFieldInvalid('fecha_programada')) {
+                <p class="mt-1 text-xs text-red-600">{{ getFieldError('fecha_programada') }}</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Hora de Inicio *
+              </label>
+              <input
+                type="time"
+                formControlName="hora_inicio"
+                class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Duración <span class="text-xs text-gray-500">(min)</span>
+              </label>
+              <input
+                type="number"
+                formControlName="duracion_estimada"
+                [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                        (isFieldInvalid('duracion_estimada') ? 'border-red-300' : 'border-gray-300')"
+                placeholder="120"
+                min="15">
+              @if (isFieldInvalid('duracion_estimada')) {
+                <p class="mt-1 text-xs text-red-600">{{ getFieldError('duracion_estimada') }}</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado y Asignación -->
+        <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+          <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold text-[#10284C]">Estado y Asignación</h2>
+            </div>
+          </div>
+          
+          <div class="p-4 space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Estado *
+              </label>
+              <select
+                formControlName="estado"
+                class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+                @for (estado of estadosOptions; track estado.value) {
+                  <option [value]="estado.value">{{ estado.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Prioridad *
+              </label>
+              <select
+                formControlName="prioridad"
+                class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+                @for (prioridad of prioridadOptions; track prioridad.value) {
+                  <option [value]="prioridad.value">{{ prioridad.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Técnico Asignado 
+                <span class="text-xs text-gray-500">({{ tecnicos().length }} disponibles)</span>
+              </label>
+              <select
+                formControlName="tecnico_asignado_id"
+                class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+                <option value="">Sin asignar</option>
+                @for (tecnico of tecnicos(); track tecnico.id) {
+                  <option [value]="tecnico.id">{{ tecnico.full_name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notas -->
+        <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+          <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold text-[#10284C]">Observaciones</h2>
+            </div>
+          </div>
+          
+          <div class="p-4">
+            <label class="block text-sm font-medium text-[#10284C] mb-1">
+              Notas Adicionales
+            </label>
+            <textarea
+              formControlName="notas"
+              rows="4"
+              class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent resize-none"
+              placeholder="Información adicional sobre la cirugía..."></textarea>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="space-y-3 pt-2">
+          <button
+            type="submit"
+            [disabled]="loading() || cirugiaForm.invalid"
+            class="w-full bg-[#C8D900] hover:bg-[#B8C900] active:bg-[#B8C900] 
+                   disabled:bg-gray-400 disabled:cursor-not-allowed
+                   text-[#10284C] font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95 
+                   flex items-center justify-center space-x-3">
+            @if (loading()) {
+              <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[#10284C]"></div>
+            } @else {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            }
+            <span class="text-lg">{{ isEditing ? 'Actualizar' : 'Crear' }} Cirugía</span>
+          </button>
+          
+          <button
+            type="button"
+            (click)="onCancel()"
+            class="w-full bg-[#10284C] hover:bg-[#10284C]/90 active:bg-[#10284C]/90 text-[#C8D900] font-bold py-3 rounded-2xl transition-all active:scale-95">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <!-- Bottom spacing -->
+      <div class="h-6"></div>
+      </div>
+    }
+  }
+</div>
+
+<!-- Diálogo de éxito -->
+<app-success-dialog
+  [isOpen]="showSuccessDialog()"
+  [title]="successDialogTitle()"
+  [showDetailsButton]="true"
+  [showAgendarButton]="successDialogAction() === 'create'"
+  (close)="onSuccessDialogClose()"
+  (verDetalles)="onVerDetalles()"
+  (agendarOtra)="onAgendarOtraCirugia()">
+</app-success-dialog>

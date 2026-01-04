@@ -1,0 +1,308 @@
+<div class="min-h-screen bg-white">
+  <!-- Loading state -->
+  <div *ngIf="loading()" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="animate-pulse space-y-4">
+        <div class="h-4 bg-gray-200 rounded w-64 mx-auto"></div>
+        <div class="h-4 bg-gray-200 rounded w-48 mx-auto"></div>
+      </div>
+      <p class="text-sm text-gray-500 mt-4">Cargando inventario...</p>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="!loading() && error()" class="flex items-center justify-center min-h-screen px-4">
+    <div class="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+      <div class="text-red-600">
+        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+          </path>
+        </svg>
+        <p class="text-lg">{{ error() }}</p>
+      </div>
+      <button type="button" (click)="loadData()"
+              class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium">
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div *ngIf="!loading() && !error()">
+    <div class="relative">
+      <!-- Diagonal navy background -->
+      <div class="absolute top-0 left-0 w-full bg-[#10284C]" 
+           style="height: 640px; clip-path: polygon(0 0, 100% 0, 100% 60%, 0 90%);"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <!-- Top bar -->
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <img src="logo.webp" 
+                   alt="Implameq" 
+                   class="h-8 brightness-0 invert">
+            </div>
+            <div class="flex items-center space-x-3">
+              <button [routerLink]="['/internal']"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+              <button [routerLink]="['movimientos']"
+                      class="w-10 h-10 bg-[#C8D900] rounded-lg flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#C8D900] mb-2">Inventario</h1>
+            <p class="text-white/90 text-sm">Gestión de productos y stock</p>
+          </div>
+
+          <!-- Nuevo Producto Button -->
+          <button [routerLink]="['nuevo-producto']"
+                  class="w-full bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-extrabold py-4.5 rounded-2xl shadow-lg transition-colors mb-6">
+            + Nuevo Producto
+          </button>
+
+          <!-- Filtros Section -->
+          <div class="bg-[#0098A8] rounded-2xl p-5 shadow-lg">
+            <h3 class="text-[#10284C] font-bold text-lg mb-4">Filtros</h3>
+            <div class="space-y-4">
+              <!-- Search -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Buscar</label>
+                <div class="relative">
+                  <input type="text"
+                         [value]="searchTerm()"
+                         (input)="onSearchChange($event)"
+                         placeholder="Nombre, código..."
+                         class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60"
+                       fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Categoría -->
+              <div>
+                <label class="block text-[#10284C] text-sm mb-2 font-medium">Categoría</label>
+                <select [value]="selectedCategory()"
+                        (change)="onCategoryChange($event)"
+                        class="w-full px-4 py-2.5 bg-[#0098A8]/50 border border-white/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/50">
+                  <option value="">Todas las categorías</option>
+                  <option *ngFor="let cat of categorias" [value]="cat">
+                    {{ cat | titlecase }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Resumen -->
+              <div class="text-center pt-2 border-t border-white/20">
+                <div class="bg-[#C8D900] text-[#10284C] font-extrabold text-sm py-2 rounded-xl">
+                  {{ filteredProductos().length }} Productos Encontrados
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- White background section -->
+    <div class="px-4 pb-8">
+      <div class="max-w-lg mx-auto">
+        <!-- Product Cards -->
+        <div class="space-y-6">
+          <article *ngFor="let producto of filteredProductos()"
+            class="rounded-2xl border-2 border-[#0098A8] bg-white shadow-[0_10px_20px_rgba(16,40,76,0.08)] overflow-hidden">
+
+            <!-- Header -->
+            <header class="p-5 border-b border-[#E5EEF1]">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-2xl leading-tight font-extrabold text-[#10284C]">{{ producto.nombre }}</h3>
+                  <p class="text-xs mt-1 tracking-wide text-gray-500">{{ producto.codigo }}</p>
+                </div>
+                  <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                      [ngClass]="categoriaPill(producto.categoria)">
+                  {{ producto.categoria | titlecase }}
+                </span>
+              </div>
+              <div class="mt-3 h-0.5 w-full bg-[#CBDD00] rounded"></div>
+            </header>            <!-- Body -->
+            <section class="p-5">
+              <!-- Totales -->
+              <div class="flex items-end justify-between">
+                <div class="leading-none">
+                  <div class="text-[#10284C] text-2xl font-extrabold">
+                    {{ producto.stock_total | number:'2.0-0' }} <span class="text-base font-bold">Unidades</span>
+                  </div>
+                  <div class="text-xs mt-1 text-gray-500">Mínimo: {{ producto.stock_minimo | number:'1.0-0' }}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-2xl font-extrabold text-[#0098A8]">
+                    ${{ producto.precio | number:'1.0-0' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4 h-0.5 w-full bg-[#CBDD00]/70 rounded"></div>
+
+              <!-- Stock por ubicación -->
+              <div *ngIf="producto.inventario?.length" class="mt-4">
+                <div class="text-[#10284C] font-bold">Stock por Ubicación</div>
+                <div class="mt-2 rounded-lg border border-[#E5EEF1] overflow-hidden">
+                  <div *ngFor="let inv of producto.inventario"
+                       class="flex items-center justify-between text-sm px-3 py-2 border-b last:border-0 border-[#E5EEF1]">
+                    <span class="text-gray-700">{{ formatUbicacion(inv.ubicacion) }}</span>
+                    <span class="font-mono" [ngClass]="inv.cantidad > 0 ? 'text-[#10284C] font-semibold' : 'text-red-600 font-semibold'">
+                      {{ inv.cantidad }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acciones -->
+              <div class="mt-5">
+                <button (click)="openModal('entrada', producto)"
+                        class="w-full py-3 rounded-lg font-extrabold tracking-wide bg-[#CBDD00] text-[#10284C] hover:bg-[#B8C900] transition-colors">
+                  Entrada
+                </button>
+                <button (click)="openModal('salida', producto)"
+                        [disabled]="producto.stock_total === 0"
+                        class="mt-2 w-full py-3 rounded-lg font-extrabold tracking-wide bg-[#10284C] text-[#CBDD00] hover:bg-[#0e2341] disabled:bg-gray-400 disabled:text-white disabled:cursor-not-allowed transition-colors">
+                  Salida
+                </button>
+              </div>
+            </section>
+          </article>
+        </div>
+
+        <!-- No results -->
+        <div *ngIf="filteredProductos().length === 0" 
+             class="bg-white rounded-2xl border-2 border-gray-200 p-8 text-center shadow-md">
+          <div class="text-4xl mb-4">📦</div>
+          <h3 class="text-lg font-bold text-[#10284C] mb-2">No se encontraron productos</h3>
+          <p class="text-gray-600 mb-4">Intenta ajustar los filtros de búsqueda</p>
+          <button [routerLink]="['nuevo-producto']"
+                  class="bg-[#C8D900] hover:bg-[#B8C900] text-[#10284C] font-bold px-6 py-3 rounded-xl transition-colors">
+            Crear Primer Producto
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal con estilo Implameq -->
+<div *ngIf="showModal()" 
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+     (click)="closeModal()">
+  <div class="w-full max-w-md" (click)="$event.stopPropagation()">
+    <!-- Background with gradient and surgical image -->
+    <div class="relative min-h-[600px] bg-gradient-to-b from-[#10284C] via-[#10284C] to-[#0098A8] rounded-lg overflow-hidden">
+      <!-- Surgical background image with overlay -->
+      <div class="absolute inset-0 bg-cover bg-center opacity-10"
+           style="background-image: url('/02.jpg')"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 p-6">
+          <!-- Header -->
+          <div class="flex items-center mb-8">
+            <div class="flex items-center gap-2">
+              <img 
+                src="logo.webp" 
+                alt="Implameq" 
+                class="h-8 brightness-0 invert" />
+            </div>
+          </div>
+
+          <!-- Title and product info -->
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-[#CBDD00] mb-2">
+              {{ modalType() === 'entrada' ? 'Entrada de Inventario' : 'Salida de Inventario' }}
+            </h2>
+            <p class="text-white text-sm mb-1">{{ selectedProducto()?.nombre }}</p>
+            <p class="text-white/70 text-xs">{{ selectedProducto()?.codigo }}</p>
+          </div>
+
+          <!-- Form card -->
+          <div class="bg-[#10284C]/80 backdrop-blur-sm rounded-lg p-6 space-y-4">
+            <form (ngSubmit)="submitMovimiento()" #form="ngForm" class="space-y-4">
+              <!-- Cantidad -->
+              <div>
+                <label class="block text-white text-sm font-medium mb-2">Cantidad*</label>
+                <input type="number" 
+                       [(ngModel)]="cantidad"
+                       name="cantidad"
+                       min="1"
+                       [max]="modalType() === 'salida' ? (selectedInventario()?.cantidad ?? 999) : 999"
+                       required
+                       class="w-full px-4 py-3 bg-[#0098A8]/40 border-0 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#CBDD00]">
+                <div *ngIf="modalType() === 'salida' && selectedInventario()" 
+                     class="text-white/60 text-xs mt-1">
+                  Disponible: {{ selectedInventario()?.cantidad }}
+                </div>
+              </div>
+
+              <!-- Ubicación (para entradas y salidas) -->
+              <div>
+                <label class="block text-white text-sm font-medium mb-2">
+                  {{ modalType() === 'entrada' ? 'Ubicación de destino*' : 'Ubicación de origen*' }}
+                </label>
+                <select [(ngModel)]="ubicacion" 
+                        name="ubicacion"
+                        required
+                        class="w-full px-4 py-3 bg-[#0098A8]/40 border-0 rounded text-white focus:outline-none focus:ring-2 focus:ring-[#CBDD00]">
+                  <option value="" class="bg-[#10284C]">Selecciona una ubicación</option>
+                  
+                  <option value="sede_principal" class="bg-[#10284C]">Sede Principal</option>
+                  <option value="bodega" class="bg-[#10284C]">Bodega</option>
+                  <option value="sede_secundaria" class="bg-[#10284C]">Sede Secundaria</option>
+                </select>
+              </div>
+
+              <!-- Motivo -->
+              <div>
+                <label class="block text-white text-sm font-medium mb-2">Motivo (opcional)</label>
+                <textarea 
+                   [(ngModel)]="motivo"
+                   name="motivo"
+                   rows="3"
+                   placeholder="Descripción del movimiento..."
+                   class="w-full px-4 py-3 bg-[#0098A8]/40 border-0 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#CBDD00] resize-none"></textarea>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="space-y-3 pt-2">
+                <button type="submit" 
+                        [disabled]="!form.valid || loading()"
+                        class="w-full bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C] font-bold py-3 text-base rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  {{ modalType() === 'entrada' ? 'Registrar Entrada' : 'Registrar Salida' }}
+                </button>
+                
+                <button type="button" 
+                        (click)="closeModal()"
+                        class="w-full bg-[#CBDD00] hover:bg-[#b5c700] text-[#10284C] font-bold py-3 text-base rounded-lg transition-colors">
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

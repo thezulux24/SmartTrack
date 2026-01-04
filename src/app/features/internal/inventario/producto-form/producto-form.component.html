@@ -1,0 +1,357 @@
+<div class="min-h-screen bg-white relative">
+  <!-- Background Image -->
+  <div class="fixed inset-0 z-0">
+    <img src="02.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover">
+    <div class="absolute inset-0 bg-white/90"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="relative z-10">
+    <!-- Header -->
+    <div class="bg-white shadow-md">
+      <div class="max-w-lg mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center space-x-3">
+            <div class="bg-white rounded-lg px-3 py-2">
+              <img src="logo.webp" 
+                   alt="Implameq" class="h-6">
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 sm:space-x-3">
+            <button (click)="onCancel()"
+                    class="w-10 h-10 bg-[#10284C] rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="max-w-lg mx-auto px-4 py-6 text-center">
+      <h1 class="text-2xl sm:text-3xl font-bold text-[#10284C] mb-2">
+        {{ isEditing() ? 'Editar Producto' : 'Nuevo Producto' }}
+      </h1>
+      <p class="text-[#10284C]/70 text-sm">
+        {{ isEditing() ? 'Modifica la información del producto' : 'Ingresa los datos del nuevo producto' }}
+      </p>
+    </div>
+
+    <!-- Loading state -->
+    @if (loading()) {
+      <div class="px-4 py-6">
+        <div class="max-w-lg mx-auto">
+          <div class="bg-white rounded-xl shadow-md p-6 text-center">
+            <div class="animate-pulse space-y-4">
+              <div class="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+              <div class="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              <div class="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
+            </div>
+            <p class="text-sm text-gray-500 mt-4">
+              {{ isEditing() ? 'Cargando producto...' : 'Guardando producto...' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    } @else {
+
+      <!-- Mensaje de éxito -->
+      @if (success() && !productoCreado()) {
+        <div class="px-4 py-4">
+          <div class="max-w-lg mx-auto">
+            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl shadow-md">
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <p class="text-sm">{{ success() }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Mensaje de error -->
+      @if (error()) {
+        <div class="px-4 py-4">
+          <div class="max-w-lg mx-auto">
+            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-md">
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
+                  </path>
+                </svg>
+                <p class="text-sm">{{ error() }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Formulario -->
+      @if (!productoCreado()) {
+        <div class="max-w-lg mx-auto px-4 pb-8">
+          <form [formGroup]="productoForm" (ngSubmit)="onSubmit()" class="space-y-4">
+          
+          <!-- Información básica -->
+          <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+            <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h2 class="text-lg font-bold text-[#10284C]">Información Básica</h2>
+              </div>
+            </div>
+            
+            <div class="p-4 space-y-3">
+              <!-- Nombre del producto -->
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Nombre del Producto *
+                </label>
+                <input type="text" 
+                       formControlName="nombre"
+                       placeholder="Ej: Implante de titanio grado 4"
+                       [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                               (isFieldInvalid('nombre') ? 'border-red-300' : 'border-gray-300')">
+                @if (isFieldInvalid('nombre')) {
+                  <p class="text-red-600 text-xs mt-1">{{ getFieldError('nombre') }}</p>
+                }
+              </div>
+
+              <!-- Código del producto -->
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Código del Producto
+                </label>
+                <input type="text" 
+                       formControlName="codigo"
+                       placeholder="Se generará automáticamente si se deja vacío"
+                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+                <p class="text-xs text-[#10284C]/60 mt-1">
+                  Opcional. Si no se especifica, se generará automáticamente.
+                </p>
+              </div>
+
+              <!-- Descripción -->
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Descripción
+                </label>
+                <textarea formControlName="descripcion"
+                          rows="3"
+                          placeholder="Descripción detallada del producto..."
+                          class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent resize-none"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Categorización -->
+          <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+            <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                  </svg>
+                </div>
+                <h2 class="text-lg font-bold text-[#10284C]">Categorización</h2>
+              </div>
+            </div>
+            
+            <div class="p-4 space-y-3">
+              <!-- Categoría -->
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Categoría *
+                </label>
+                <select formControlName="categoria"
+                        [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                                (isFieldInvalid('categoria') ? 'border-red-300' : 'border-gray-300')">
+                  <option value="">Selecciona una categoría</option>
+                  @for (cat of categoriasOptions; track cat.value) {
+                    <option [value]="cat.value">{{ cat.label }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('categoria')) {
+                  <p class="text-red-600 text-xs mt-1">{{ getFieldError('categoria') }}</p>
+                }
+              </div>
+
+              <!-- Proveedor -->
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Proveedor
+                </label>
+                <input type="text" 
+                       formControlName="proveedor"
+                       placeholder="Nombre del proveedor"
+                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- Información de inventario -->
+          <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+            <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                  </svg>
+                </div>
+                <h2 class="text-lg font-bold text-[#10284C]">Inventario y Precios</h2>
+              </div>
+            </div>
+            
+            <div class="p-4 space-y-3">
+              <!-- Precio -->
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Precio *
+                </label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500 text-sm">$</span>
+                  </div>
+                  <input type="number" 
+                         formControlName="precio"
+                         min="0"
+                         step="0.01"
+                         placeholder="0.00"
+                         [class]="'w-full pl-8 px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                                 (isFieldInvalid('precio') ? 'border-red-300' : 'border-gray-300')">
+                </div>
+                @if (isFieldInvalid('precio')) {
+                  <p class="text-red-600 text-xs mt-1">{{ getFieldError('precio') }}</p>
+                }
+              </div>
+
+              <!-- Stock mínimo y unidad de medida -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-[#10284C] mb-1">
+                    Stock Mínimo *
+                  </label>
+                  <input type="number" 
+                         formControlName="stock_minimo"
+                         min="0"
+                         placeholder="5"
+                         [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                                 (isFieldInvalid('stock_minimo') ? 'border-red-300' : 'border-gray-300')">
+                  @if (isFieldInvalid('stock_minimo')) {
+                    <p class="text-red-600 text-xs mt-1">{{ getFieldError('stock_minimo') }}</p>
+                  }
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-[#10284C] mb-1">
+                    Unidad *
+                  </label>
+                  <select formControlName="unidad_medida"
+                          [class]="'w-full px-3 py-2 bg-gray-100 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent ' + 
+                                  (isFieldInvalid('unidad_medida') ? 'border-red-300' : 'border-gray-300')">
+                    @for (unidad of unidadesMedidaOptions; track unidad.value) {
+                      <option [value]="unidad.value">{{ unidad.label }}</option>
+                    }
+                  </select>
+                  @if (isFieldInvalid('unidad_medida')) {
+                    <p class="text-red-600 text-xs mt-1">{{ getFieldError('unidad_medida') }}</p>
+                  }
+                </div>
+              </div>
+
+              <!-- Ubicación principal -->
+              <div>
+                <label class="block text-sm font-medium text-[#10284C] mb-1">
+                  Ubicación Principal
+                </label>
+                <select formControlName="ubicacion_principal"
+                        class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent">
+                  
+                  @for (ubicacion of ubicacionesOrganizadas.ubicaciones; track ubicacion.value) {
+                    <option [value]="ubicacion.value">{{ ubicacion.label }}</option>
+                  }
+                </select>
+                <p class="text-xs text-[#10284C]/60 mt-1">
+                  Ubicación donde se almacenará principalmente este producto.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notas adicionales -->
+          <div class="bg-white/50 rounded-2xl border-2 border-[#0098A8] overflow-hidden shadow-sm">
+            <div class="bg-white/50 px-4 py-3 border-b-2 border-[#0098A8]">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-[#C8D900] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-[#10284C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </div>
+                <h2 class="text-lg font-bold text-[#10284C]">Información Adicional</h2>
+              </div>
+            </div>
+            
+            <div class="p-4">
+              <label class="block text-sm font-medium text-[#10284C] mb-1">
+                Notas y Observaciones
+              </label>
+              <textarea formControlName="notas"
+                        rows="4"
+                        placeholder="Información adicional, instrucciones especiales, etc..."
+                        class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0098A8] focus:border-transparent resize-none"></textarea>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="space-y-3 pt-2">
+            <button
+              type="submit"
+              [disabled]="loading() || productoForm.invalid"
+              class="w-full bg-[#C8D900] hover:bg-[#B8C900] active:bg-[#B8C900] 
+                     disabled:bg-gray-400 disabled:cursor-not-allowed
+                     text-[#10284C] font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95 
+                     flex items-center justify-center space-x-3">
+              @if (loading()) {
+                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-[#10284C]"></div>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              }
+              <span class="text-lg">{{ isEditing() ? 'Actualizar' : 'Crear' }} Producto</span>
+            </button>
+            
+            <button
+              type="button"
+              (click)="onCancel()"
+              class="w-full bg-[#10284C] hover:bg-[#10284C]/90 active:bg-[#10284C]/90 text-[#C8D900] font-bold py-3 rounded-2xl transition-all active:scale-95">
+              Cancelar
+            </button>
+          </div>
+        </form>
+
+        <!-- Bottom spacing -->
+        <div class="h-6"></div>
+      </div>
+      }
+    }
+  </div>
+</div>
+
+<!-- Dialog de éxito -->
+<app-producto-success-dialog
+  [isOpen]="showSuccessDialog()"
+  [title]="successDialogTitle()"
+  [productName]="productoCreado()?.nombre || ''"
+  (close)="onSuccessDialogClose()"
+  (crearOtro)="onCrearOtro()">
+</app-producto-success-dialog>

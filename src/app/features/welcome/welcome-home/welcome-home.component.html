@@ -1,0 +1,217 @@
+<div class="font-neo relative min-h-screen overflow-hidden">
+  <!-- Background image con overlay -->
+  <div class="absolute inset-0 z-0">
+    <img src="06.jpg" alt="Medical background" class="w-full h-full object-cover">
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(16, 40, 76, 0.75) 0%, rgba(0, 152, 168, 0.65) 100%)"></div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="relative z-10 flex items-center justify-center min-h-screen px-6 py-10">
+    <div class="w-full max-w-md">
+      <!-- Header -->
+      <div class="flex flex-col items-center text-center mb-8">
+        <h1 class="text-2xl font-semibold text-white mb-6">
+          {{ showProfileForm ? 'Completar Perfil' : 'Bienvenido a' }}
+        </h1>
+
+        <!-- Logo -->
+        <div class="mb-4">
+          <img src="logo.webp"
+               alt="Implameq" 
+               class="w-48 h-auto brightness-0 invert">
+        </div>
+        <p class="text-sm text-white/80 mb-8">Implantes médico - Quirúrgicos</p>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="loading" class="bg-[#10284C]/40 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-3 border-[#C8D900]">
+        <div class="text-center">
+          <div class="animate-pulse">
+            <div class="h-4 bg-white/20 rounded w-3/4 mx-auto mb-2"></div>
+            <div class="h-4 bg-white/20 rounded w-1/2 mx-auto"></div>
+          </div>
+          <p class="text-sm text-white/70 mt-4">Cargando información del usuario...</p>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div *ngIf="!loading && error" class="bg-[#10284C]/40 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-3 border-[#C8D900]">
+        <div class="text-center">
+          <div class="text-red-400">
+        <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+            <p class="text-sm text-white">{{ error }}</p>
+          </div>
+          <button type="button" (click)="logout()"
+                  class="mt-6 w-full bg-white hover:bg-white/90 text-[#0098A8] font-bold text-sm h-12 rounded-lg shadow-lg">
+            Volver al login
+          </button>
+        </div>
+      </div>
+
+      <!-- Formulario de completar perfil -->
+      <div *ngIf="!loading && !error && showProfileForm" class="bg-[#10284C]/40 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-3 border-[#C8D900]">
+        <h2 class="text-xl font-semibold text-white text-center mb-6">
+          Completa tu perfil para continuar
+        </h2>
+      
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="space-y-5">
+          
+          <!-- Nombre completo -->
+          <div class="space-y-2">
+            <label for="full_name" class="block text-sm font-medium text-white">
+              Nombre completo *
+            </label>
+            <input 
+              type="text" 
+              id="full_name" 
+              formControlName="full_name"
+              placeholder="Escribe tu nombre aquí"
+              class="w-full bg-accent border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all"
+              [class.ring-2]="profileForm.get('full_name')?.invalid && profileForm.get('full_name')?.touched"
+              [class.ring-red-400]="profileForm.get('full_name')?.invalid && profileForm.get('full_name')?.touched">
+            <div *ngIf="profileForm.get('full_name')?.invalid && profileForm.get('full_name')?.touched" 
+                 class="text-red-300 text-xs mt-1">
+              El nombre es requerido (mínimo 2 caracteres)
+            </div>
+          </div>
+
+          <!-- Rol -->
+          <div class="space-y-2">
+            <label for="role" class="block text-sm font-medium text-white">
+              Área de trabajo *
+            </label>
+            <select 
+              id="role" 
+              formControlName="role"
+              class="w-full bg-[#C8D900] border-none rounded-lg h-12 px-3 text-sm 
+                     text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all"
+              [class.ring-2]="profileForm.get('role')?.invalid && profileForm.get('role')?.touched"
+              [class.ring-red-400]="profileForm.get('role')?.invalid && profileForm.get('role')?.touched">
+              <option value="">Selecciona tu área</option>
+              <option *ngFor="let option of roleOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <div *ngIf="profileForm.get('role')?.invalid && profileForm.get('role')?.touched" 
+                 class="text-red-300 text-xs mt-1">
+              Debes seleccionar un área de trabajo
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="space-y-2">
+            <label for="phone" class="block text-sm font-medium text-white">
+              Teléfono (opcional)
+            </label>
+            <input 
+              type="tel" 
+              id="phone" 
+              formControlName="phone"
+              placeholder="+57 300 123 4567"
+              class="w-full bg-[#C8D900] border-none rounded-lg h-12 px-3 text-sm 
+                     placeholder:text-heading/60 text-heading font-medium 
+                     focus:outline-none focus:ring-2 focus:ring-white transition-all"
+              [class.ring-2]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched"
+              [class.ring-red-400]="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched">
+            <div *ngIf="profileForm.get('phone')?.invalid && profileForm.get('phone')?.touched" 
+                 class="text-red-300 text-xs mt-1">
+              Formato de teléfono inválido
+            </div>
+          </div>
+
+          <!-- Botones -->
+          <div class="space-y-3 pt-2">
+            <button type="submit" 
+                    [disabled]="savingProfile"
+                    class="w-full bg-white hover:bg-white/90 text-[#0098A8] font-bold text-base h-12 
+                           rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+              <span *ngIf="!savingProfile">Crear Perfil</span>
+              <span *ngIf="savingProfile" class="flex items-center justify-center">
+                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-[#0098A8]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creando perfil...
+              </span>
+            </button>
+
+            <button type="button" (click)="logout()"
+                    class="w-full bg-[#10284C] hover:bg-[#10284C]/80 text-white border-2 border-white/30 
+                           font-semibold text-sm h-12 rounded-lg transition-all">
+              Cerrar sesión
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Usuario con perfil completo -->
+      <div *ngIf="!loading && !error && !showProfileForm && userProfile" class="bg-[#10284C]/40 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border-3 border-[#C8D900]">
+        <!-- Avatar con icono de cámara -->
+        <div class="flex flex-col items-center mb-6">
+          <div class="relative mb-4">
+            <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white/20 bg-gradient-to-r from-[#C8D900] to-[#0098A8] flex items-center justify-center">
+              <span class="text-white text-3xl font-bold">{{ displayName.charAt(0).toUpperCase() }}</span>
+            </div>
+            <!-- Camera icon -->
+            <div class="absolute bottom-0 right-0 bg-[#0098A8] rounded-full p-2">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Nombre usuario -->
+          <h2 class="text-xl font-semibold text-white mb-1">{{ displayName }}</h2>
+
+          <!-- Email -->
+          <p class="text-sm text-white/70 mb-3">{{ userProfile.email }}</p>
+          
+          <!-- Role badge -->
+          <div class="bg-[#C8D900] px-4 py-1 rounded-full mb-4">
+            <span class="text-sm font-semibold text-[#10284C]">{{ roleDisplayName }}</span>
+          </div>
+
+          <!-- Organización -->
+          <p class="text-xs text-white/60 mb-6">Implameq S.A.S.</p>
+        </div>
+
+        <!-- Info section -->
+        <div class="border-t border-white/20 pt-4 mb-6 space-y-2">
+          <div *ngIf="userProfile.phone" class="flex justify-between text-sm">
+            <span class="text-white/70">Teléfono:</span>
+            <span class="text-white font-medium">{{ userProfile.phone }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-white/70">Estado:</span>
+            <span class="text-[#C8D900] font-medium">{{ userProfile.is_active ? 'Activo' : 'Inactivo' }}</span>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="space-y-3">
+          <button type="button" (click)="acceder()"
+                  class="w-full bg-[#C8D900] hover:bg-[#B5C600] text-[#10284C] font-bold text-sm h-12 
+                         rounded-lg shadow-lg transition-all duration-200">
+            Acceder al Sistema
+          </button>
+
+          <button type="button" (click)="logout()"
+                  class="w-full bg-[#10284C] hover:bg-[#10284C]/80 text-white border-2 border-white/30 
+                         font-semibold text-sm h-12 rounded-lg transition-all">
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
